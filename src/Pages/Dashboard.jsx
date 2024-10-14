@@ -32,7 +32,8 @@ const Dashboard = () => {
           </div>
 
           {/* Two equally sized grids */}
-          <div className="grid grid-cols-2 gap-6">
+          <div className="flex flex-col sm:grid sm:grid-cols-2 gap-6">
+
             <div className="px-6">
               <Revenue />
             </div>

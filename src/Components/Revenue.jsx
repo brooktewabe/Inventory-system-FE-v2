@@ -41,13 +41,7 @@ const IncomeSection = () => {
       }
 
       const response = await axios.get(endpoint);
-      // console.log(`Response for ${period}:`, response.data); // Log entire response
-
-      // Accessing total directly from the response
       const data = response.data.total; // Assuming total is a string
-      // console.log(`Data for ${period}:`, data); // Log extracted data
-
-      // Convert the string to a float for calculations
       const totalAmount = parseFloat(data) || 0;
 
       if (period === "daily") {
@@ -68,14 +62,14 @@ const IncomeSection = () => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-bold">Revenue</h3>
-        <div className="flex">
+      <div className="flex justify-between items-center mb-4 flex-wrap">
+        <h3 className="text-lg font-bold flex-1">Revenue</h3>
+        <div className="flex flex-col md:flex-row md:flex-1 justify-end">
           {["yearly", "monthly", "daily"]?.map((period) => (
             <button
               key={period}
               onClick={() => handleToggle(period)}
-              className={`py-1 px-4 rounded-lg ${
+              className={`py-1 px-4 rounded-lg mb-2 md:mb-0 md:mr-2 ${
                 activePeriod === period ? "bg-black text-white" : "bg-[#e0e9ec] text-black"
               }`}
             >

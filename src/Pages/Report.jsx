@@ -103,38 +103,39 @@ const Report = () => {
               </div>
             </div>
             <div className="py-10 px-6">
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-bold">Total Sales</h3>
-                  <div className="flex">
-                    {["yearly", "monthly", "daily"]?.map((period) => (
-                      <button
-                        key={period}
-                        onClick={() => handleToggle(period)}
-                        className={`py-1 px-4 rounded-lg ${
-                          activePeriod === period
-                            ? "bg-black text-white"
-                            : "bg-[#e0e9ec] text-black"
-                        }`}
-                      >
-                        {period.charAt(0).toUpperCase() + period.slice(1)}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <p className="text-2xl font-extrabold">
-                    {activePeriod === "daily"
-                      ? currentDateIncome.toFixed(2)
-                      : activePeriod === "monthly"
-                      ? currentMonthIncome.toFixed(2)
-                      : currentYearIncome.toFixed(2)}
-                  </p>
-                </div>
-                <p className="mb-6 text-sm font-bold">Total Sales</p>
-                <p className="mb-6 text-sm">{formattedDate}</p>
-              </div>
-            </div>
+  <div className="bg-white p-6 rounded-lg shadow-md">
+    <div className="flex justify-between items-center mb-4 flex-wrap">
+      <h3 className="text-lg font-bold flex-shrink-0">Total Sales</h3>
+      <div className="flex flex-col sm:flex-row justify-end items-start sm:items-center">
+        {["yearly", "monthly", "daily"]?.map((period) => (
+          <button
+            key={period}
+            onClick={() => handleToggle(period)}
+            className={`py-1 px-4 rounded-lg mb-2 sm:mb-0 sm:mr-2 ${
+              activePeriod === period
+                ? "bg-black text-white"
+                : "bg-[#e0e9ec] text-black"
+            }`}
+          >
+            {period.charAt(0).toUpperCase() + period.slice(1)}
+          </button>
+        ))}
+      </div>
+    </div>
+    <div className="mt-4">
+      <p className="text-2xl font-extrabold">
+        {activePeriod === "daily"
+          ? currentDateIncome.toFixed(2)
+          : activePeriod === "monthly"
+          ? currentMonthIncome.toFixed(2)
+          : currentYearIncome.toFixed(2)}
+      </p>
+    </div>
+    <p className="mb-6 text-sm font-bold">Total Sales</p>
+    <p className="mb-6 text-sm">{formattedDate}</p>
+  </div>
+</div>
+
           </div>
         </div>
       </div>

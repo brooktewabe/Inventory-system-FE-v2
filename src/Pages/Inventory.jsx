@@ -7,7 +7,6 @@ import withAuth from "../withAuth";
 import { FaEdit, FaTrash, FaSearch, FaFilter, FaPlus } from "react-icons/fa";
 import { AiOutlineHourglass } from "react-icons/ai";
 
-
 const Inventory = () => {
   const navigate = useNavigate();
 
@@ -18,11 +17,12 @@ const Inventory = () => {
   const [filterStatus, setFilterStatus] = useState("");
   const [filteredStocks, setFilteredStocks] = useState([]);
 
-
   useEffect(() => {
     const fetchStocks = async () => {
       try {
-        const response = await axios.get("https://api.akbsproduction.com/stock/all");
+        const response = await axios.get(
+          "https://api.akbsproduction.com/stock/all"
+        );
         setStocks(response.data.data);
         setFilteredStocks(response.data.data);
       } catch (error) {
@@ -69,20 +69,26 @@ const Inventory = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.get(`https://api.akbsproduction.com/stock/${id}`);
+          const response = await axios.get(
+            `https://api.akbsproduction.com/stock/${id}`
+          );
           const stockToDelete = response.data;
           await axios.delete(`https://api.akbsproduction.com/stock/all/${id}`);
           setStocks(stocks.filter((stock) => stock.id !== id));
           const notifData = new FormData();
           notifData.append("message", `${stockToDelete.Name} is deleted.`);
           notifData.append("priority", "High");
-  
+
           // Post notification data
-          await axios.post("https://api.akbsproduction.com/notification/create", notifData, {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
+          await axios.post(
+            "https://api.akbsproduction.com/notification/create",
+            notifData,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
           toast.success("Deleted Successfully");
         } catch (error) {
           toast.error("Error deleting stock. Try again later.");
@@ -90,7 +96,6 @@ const Inventory = () => {
       }
     });
   };
-  
 
   const onEditStock = (id) => {
     navigate(`/edit-product/${id}`);
@@ -104,16 +109,16 @@ const Inventory = () => {
 
   return (
     <section className="bg-[#edf0f0b9] min-h-screen">
-      <div className="container m-auto ">
+      <div className="container mx-auto">
         <div className="grid grid-cols-1 gap-6">
           {/* First small full-width grid */}
           <div className="bg-white p-4  ">
             <h3 className="text-xl font-bold">Stock System</h3>
           </div>
 
-          {/* Two equally sized grids */}
-          <div className="grid grid-cols-2 gap-6">
-            <div className="px-10">
+          {/* Action Buttons */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+            <div>
               <div
                 className="bg-[#eceaeaec] p-6 max-w-sm rounded-lg ml-20 shadow-md cursor-pointer"
                 onClick={handleAddNavigation}
@@ -124,12 +129,12 @@ const Inventory = () => {
                 </div>
               </div>
             </div>
-            <div className="px-10">
-              <div 
-                className="bg-[#eceaeaec] p-6 max-w-sm rounded-lg mr-20 shadow-md cursor-pointer"
+            <div>
+              <div
+                className="bg-[#eceaeaec] p-6 max-w-sm rounded-lg ml-20 shadow-md cursor-pointer"
                 onClick={handleMovementNavigation}
-                >
-                <div className=" items-center mb-4  flex flex-col">
+              >
+                <div className="items-center mb-4 flex flex-col">
                   <AiOutlineHourglass size={40} />
                   <p>Stock Movement</p>
                 </div>
@@ -206,10 +211,9 @@ const Inventory = () => {
                   <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
                     Location
                   </td>
-                    <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
-                      Action
-                    </td>
-
+                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
+                    Action
+                  </td>
                 </tr>
               </thead>
               <tbody>
@@ -217,42 +221,32 @@ const Inventory = () => {
                   <tr key={stock.id}>
                     <td className="py-2 px-4 border-b">{index + 1}</td>
                     <td className="py-2 px-4 border-b">
-                    {formatProductId( stock.id )}
+                      {formatProductId(stock.id)}
                     </td>
+                    <td className="py-2 px-4 border-b">{stock.Category}</td>
+                    <td className="py-2 px-4 border-b">{stock.Name}</td>
+                    <td className="py-2 px-4 border-b">{stock.Price}</td>
+                    <td className="py-2 px-4 border-b">{stock.Curent_stock}</td>
                     <td className="py-2 px-4 border-b">
-                    {stock.Category}
-                    </td>
-                    <td className="py-2 px-4 border-b">
-                    {stock.Name}
-                    </td>
-                    <td className="py-2 px-4 border-b">
-                    {stock.Price}
-                    </td>
-                    <td className="py-2 px-4 border-b">
-                    {stock.Curent_stock}
-                    </td>
-                    <td className="py-2 px-4 border-b">
-                    {stock.Reorder_level}
-                    </td>
-                    
-                    <td className="py-2 px-4 border-b">
-                      {stock.Location}
+                      {stock.Reorder_level}
                     </td>
 
-                      <td className="py-3 px-4 border-b space-x-2">
-                        <button
-                          onClick={() => onEditStock(stock.id)}
-                          className="text-blue-500 hover:text-blue-700"
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          onClick={() => onDelete(stock.id)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <FaTrash />
-                        </button>
-                      </td>
+                    <td className="py-2 px-4 border-b">{stock.Location}</td>
+
+                    <td className="py-3 px-4 border-b space-x-2">
+                      <button
+                        onClick={() => onEditStock(stock.id)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        onClick={() => onDelete(stock.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <FaTrash />
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
