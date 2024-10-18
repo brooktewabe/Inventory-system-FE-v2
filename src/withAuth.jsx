@@ -18,7 +18,7 @@ const withAuth = (WrappedComponent) => {
             const jwtToken = cookies.get('jwt');
             if (!jwtToken) {
                 setRedirecting(true);
-                navigate('/login');
+                navigate('/userlogin');
             } else {
                 setLoading(false);
                 setUser(true);

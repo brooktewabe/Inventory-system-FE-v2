@@ -9,10 +9,11 @@ const Layout = () => {
     const role = localStorage.getItem("role");
     return role;
   });
+
   return (
     <>
       <Navbar />
-      <div className={` ${role ? "ml-56" : ""}`}>
+      <div className={` ${role ? "ml-32 md:ml-56" : ""}`}>
         <Outlet />
       </div>
       <ToastContainer />

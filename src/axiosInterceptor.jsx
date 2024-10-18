@@ -43,8 +43,8 @@ const handleLogout = async () => {
     localStorage.removeItem("uid");
 
     // Redirect to login page only if not already redirected
-    if (window.location.pathname !== "/login") {
-      window.location.href = "/login";
+    if (window.location.pathname !== "/userlogin") {
+      window.location.href = "/userlogin";
     }
   } catch (error) {
     console.error("Logout error:", error);

@@ -60,7 +60,7 @@ const UserAdmin = () => {
     }
 
     try {
-      await axios.post("/https://api.akbsproduction.com/signup", {
+      await axios.post("https://api.akbsproduction.com/signup", {
         fname,
         lname,
         email,
@@ -148,7 +148,7 @@ const UserAdmin = () => {
             </div>
             <div className="gap-6">
               <div>
-                <div className="bg-white p-2 w-[60%] rounded-lg ml-40 shadow-md cursor-pointer">
+                <div className="bg-white p-2 w-[60%] rounded-lg ml-20 shadow-md cursor-pointer">
                   <div className="items-center mb-4 flex flex-col">
                     <p className="mt-4 text-2xl">Add User</p>
                     <form
@@ -278,7 +278,7 @@ const UserAdmin = () => {
             </div>
 
             {/* Users List */}
-            <div className="bg-white p-6 rounded-lg shadow-md ml-20 mr-40">
+            <div className="bg-white p-6 rounded-lg min-w-fit shadow-md ml-20 mr-40">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-bold">Users List</h3>
                 <div className="flex items-center space-x-4">

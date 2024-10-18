@@ -10,7 +10,7 @@ const HomePage = () => {
     const jwtToken = Cookies.get("jwt");
     if (!jwtToken) {
       const timeoutId = setTimeout(() => {
-        navigate("/login");
+        navigate("/userlogin");
       }, 100);
 
       return () => clearTimeout(timeoutId);

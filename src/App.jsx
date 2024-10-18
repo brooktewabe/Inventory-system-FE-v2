@@ -40,7 +40,7 @@ const App = () => {
         {/* <Route path='/record-sale' element={<RecordSale />} />use as props */}
         <Route path='/dashboard' element={<Dashboard />}/>
         <Route path='/user-admin' element={<UserAdmin />} />
-        <Route path='/login' element={<ValidatedLoginForm />} />
+        <Route path='/userlogin' element={<ValidatedLoginForm />} />
         {/* <Route path='/account/:id' element={<Account  />} loader={userLoader} />
         <Route path='/changepassword/:id' element={<ChangePassword />} /> */}
       </Route>

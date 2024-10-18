@@ -10,12 +10,14 @@ const Notification = () => {
   const [searchVisible, setSearchVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [dateRange, setDateRange] = useState({ start: null, end: null });
-  const currentRole = localStorage.getItem('role');
+  const currentRole = localStorage.getItem("role");
 
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await axios.get(`https://api.akbsproduction.com/notification/all`);
+        const response = await axios.get(
+          `https://api.akbsproduction.com/notification/all`
+        );
         setNotifications(response.data);
 
         // Get the date range
@@ -26,13 +28,16 @@ const Notification = () => {
         // Set the date range in state
         setDateRange({
           start: thirtyDaysAgo,
-          end: currentDate
+          end: currentDate,
         });
 
         // Filter notifications for the past 30 days
-        const recentNotifications = response.data.filter(notification =>
-          new Date(notification.createdAt) >= thirtyDaysAgo
-        ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).reverse(); // Sort by createdAt descending;
+        const recentNotifications = response.data
+          .filter(
+            (notification) => new Date(notification.createdAt) >= thirtyDaysAgo
+          )
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .reverse(); // Sort by createdAt descending;
 
         setFilteredNotifications(recentNotifications);
       } catch (error) {
@@ -56,10 +61,10 @@ const Notification = () => {
   }, [searchTerm, filteredNotifications]);
 
   const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -71,11 +76,12 @@ const Notification = () => {
             <div className="bg-white p-4">
               <h3 className="text-xl font-bold">Notification</h3>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md ml-6">
+            <div className="bg-white p-6 rounded-lg shadow-md ml-6 min-w-fit">
               {/* Display Date Range */}
               {dateRange.start && dateRange.end && (
                 <p className="text-sm text-gray-600">
-                  Showing notifications from {formatDate(dateRange.start)} to {formatDate(dateRange.end)}
+                  Showing notifications from {formatDate(dateRange.start)} to{" "}
+                  {formatDate(dateRange.end)}
                 </p>
               )}
               <div className="flex justify-between items-center mb-6">
@@ -101,19 +107,27 @@ const Notification = () => {
 
               <table className="min-w-full bg-white">
                 <tbody>
-                  {filteredNotifications?.toReversed().map((notification, index) => (
-                    <tr key={notification.id}>
-                      <td className="py-2 px-4 border-b">{index + 1}</td>
-                      <td className="py-2 px-4 border-b">{notification.message}</td>
-                      <td className="py-2 px-4 border-b">
-                        {new Date(notification.createdAt).toLocaleString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })}
-                      </td>
-                    </tr>
-                  ))}
+                  {filteredNotifications &&
+                    [...filteredNotifications]
+                      .reverse()
+                      .map((notification, index) => (
+                        <tr key={notification.id}>
+                          <td className="py-2 px-4 border-b">{index + 1}</td>
+                          <td className="py-2 px-4 border-b">
+                            {notification.message}
+                          </td>
+                          <td className="py-2 px-4 border-b">
+                            {new Date(notification.createdAt).toLocaleString(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              }
+                            )}
+                          </td>
+                        </tr>
+                      ))}
                 </tbody>
               </table>
             </div>

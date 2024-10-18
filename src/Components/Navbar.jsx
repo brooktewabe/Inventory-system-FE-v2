@@ -123,7 +123,7 @@ const Navbar = () => {
       Cookies.remove("jwt");
       localStorage.removeItem("role");
       localStorage.removeItem("uid");
-      navigate("/login", { replace: true });
+      navigate("/userlogin", { replace: true });
       window.location.reload();
     } catch (error) {
       console.error("Logout error:", error);
@@ -150,14 +150,14 @@ const Navbar = () => {
     <div className="flex">
       <div
         ref={sidebarRef}
-        className={`fixed top-0 left-0 h-screen bg-[#06030b] z-50 duration-300 
+        className={`fixed top-0 left-0 h-screen bg-[#06030b] min-h-full z-50 duration-300 
           ${nav ? "w-[90px]" : "w-[13%]"} flex flex-col justify-between`}
       >
         <div className="bg-[#06030b] rounded-t-xl p-4 flex flex-col">
           {!nav && (
             <>
               <div className="flex">
-                <p className="text-xl text-white ml-2">Control Panel</p>
+                <p className="text-xl  hidden md:block text-white ml-2">Control Panel</p>
                 <AiOutlineMenu
                   size={30}
                   className="cursor-pointer text-white ml-auto"
@@ -165,12 +165,12 @@ const Navbar = () => {
                 />
               </div>
               <div className="text-white bg-black rounded-3xl flex items-center p-2 mt-8">
-                <AiOutlineUser size={25} className="mr-4" />
+                <AiOutlineUser size={25} className="mr-4 hidden md:block " />
                 <div>
-                  <h3 className="text-white">
+                  <h3 className="text-white hidden md:block ">
                     {user.fname + " " + user.lname}
                   </h3>
-                  <h3 className="text-neutral-800">{role}</h3>
+                  <h3 className="text-neutral-800 hidden md:block ">{role}</h3>
                 </div>
               </div>
             </>
@@ -204,11 +204,11 @@ const Navbar = () => {
                 <li key={index} className="my-4">
                   <NavLink
                     to={link}
-                    className="flex items-center text-lg hover:bg-[#424243] rounded-lg p-2"
+                    className="flex items-center text-lg  hover:bg-[#424243] rounded-lg p-2"
                     onClick={() => setNav(false)}
                   >
                     {icon}
-                    {!nav && <span className="ml-1">{text}</span>}
+                    {!nav && <span className="ml-1 hidden md:block ">{text}</span>}
                   </NavLink>
                 </li>
               ))}
@@ -221,7 +221,7 @@ const Navbar = () => {
             onClick={() => setModalIsOpen(true)}
           >
             <CiLogout size={30} />
-            {!nav && <span className="ml-4">Logout</span>}
+            {!nav && <span className="ml-4 hidden md:block ">Logout</span>}
           </button>
         </div>
       </div>
@@ -238,7 +238,7 @@ const Navbar = () => {
         isOpen={modalIsOpen}
         onRequestClose={() => setModalIsOpen(false)}
         contentLabel="Confirm Logout"
-        className="bg-white p-6 rounded-lg shadow-md w-1/4 mx-auto"
+        className="bg-white p-6 rounded-lg shadow-md w-1/3 mx-auto"
         overlayClassName="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center"
       >
         <div className="text-center mb-4">

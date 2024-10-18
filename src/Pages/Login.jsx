@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BiShow, BiHide } from "react-icons/bi";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { AiOutlineUser,AiFillSecurityScan } from "react-icons/ai";
+import { AiOutlineUser, AiFillSecurityScan } from "react-icons/ai";
 
 const ValidatedLoginForm = () => {
   const [email, setEmail] = useState("");
@@ -14,6 +14,18 @@ const ValidatedLoginForm = () => {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  // // Integrate Eruda
+  // useEffect(() => {
+  //   const script = document.createElement("script");
+  //   script.src = "https://cdn.jsdelivr.net/npm/eruda";
+  //   script.onload = () => {
+  //     if (window.eruda) {
+  //       window.eruda.init();
+  //     }
+  //   };
+  //   document.body.appendChild(script);
+  // }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,7 +41,6 @@ const ValidatedLoginForm = () => {
       });
 
       Cookies.set("jwt", response.data.jwt, { expires: 1 });
-      // Cookies.set("userId", response.data.profileId, { expires: 1 });
       localStorage.setItem("role", response.data.role);
       localStorage.setItem("uid", response.data.id);
 
@@ -38,15 +49,14 @@ const ValidatedLoginForm = () => {
       navigate("/");
       window.location.reload();
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Login error:", error.response ? error.response.data : error);
       toast.error("Invalid email or password");
     }
   };
+
   const validateForm = () => {
     const schema = Yup.object().shape({
-      email: Yup.string()
-        // .email("Invalid email address")
-        .required("Email is required"),
+      email: Yup.string().required("Email is required"),
       password: Yup.string()
         .required("Password is required")
         .min(8, "Password must be at least 8 characters"),
@@ -67,21 +77,21 @@ const ValidatedLoginForm = () => {
   };
 
   return (
-    <div className="flex items-center h-screen bg-black ">
-      <div className="w-1/2  px-8 mb-4 ml-6 text-white">
-        <div className="max-w-sm mx-auto mt-4">
-          <p className=" font-bold  text-2xl">Login</p>
+    <div className="flex items-center h-screen bg-black p-4 md:p-0">
+      <div className="w-full max-w-md p-8 rounded-lg text-white md:w-1/2 md:px-8 md:mb-4 md:ml-6">
+        <div className="mb-6">
+          <p className="font-bold text-2xl">Login</p>
           <p className="text-stone-500">Hello - Login to your panel</p>
         </div>
         {errors.login && (
           <div className="text-red-500 text-sm text-center">{errors.login}</div>
         )}
-        <form onSubmit={handleSubmit} className="max-w-sm mx-auto mt-4">
-          <div className="mb-4 ">
-            <label htmlFor="email" className="block text-white text-sm mb-2">
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-sm mb-2">
               Username
             </label>
-            <div className="flex items-center bg-[#a19f9f]">
+            <div className="flex items-center bg-[#a19f9f] rounded">
               <AiOutlineUser size={25} className="mr-4 ml-2" />
               <input
                 id="email"
@@ -90,23 +100,22 @@ const ValidatedLoginForm = () => {
                 placeholder="Enter username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className={`shadow appearance-none  rounded w-full py-2 px-3 bg-[#494747]  leading-tight focus:outline-none focus:shadow-outline ${
+                className={`w-full py-2 px-3 bg-[#494747] text-white outline-none ${
                   errors.email ? "border-red-500" : ""
                 }`}
               />
-              {errors.email && (
-                <div className="text-red-500 text-sm">{errors.email}</div>
-              )}
             </div>
+            {errors.email && (
+              <div className="text-red-500 text-sm">{errors.email}</div>
+            )}
+          </div>
 
-            <label
-              htmlFor="password"
-              className="block text-white  text-sm mt-6 mb-2"
-            >
+          <div className="mb-6">
+            <label htmlFor="password" className="block text-sm mb-2">
               Password
             </label>
             <div className="relative">
-              <div className="flex items-center bg-[#a19f9f]">
+              <div className="flex items-center bg-[#a19f9f] rounded">
                 <AiFillSecurityScan size={25} className="mr-4 ml-2" />
                 <input
                   id="password"
@@ -115,41 +124,33 @@ const ValidatedLoginForm = () => {
                   placeholder="Enter password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={` rounded py-2 px-3 w-full bg-[#494747]  ${
+                  className={`w-full py-2 px-3 bg-[#494747] text-white outline-none ${
                     errors.password ? "border-red-500" : ""
                   }`}
                 />
-                {errors.password && (
-                  <div className="text-red-500 text-sm">{errors.password}</div>
-                )}
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <BiHide /> : <BiShow />}
                 </button>
               </div>
-            </div>
-
-            <div className="text-center mt-6">
-              <button
-                type="submit"
-                className="bg-[#131756] hover:bg-blue-700 w-full text-white font-bold py-2 px-4 rounded"
-              >
-                Login
-              </button>
+              {errors.password && (
+                <div className="text-red-500 text-sm mt-2">{errors.password}</div>
+              )}
             </div>
           </div>
+
+          <div className="text-center">
+            <button
+              type="submit"
+              className="bg-[#131756] hover:bg-blue-700 w-full py-2 px-4 rounded font-bold"
+            >
+              Login
+            </button>
+          </div>
         </form>
-        {/* <div className="text-center justify-between">
-          <span className="text-sm">
-            Don&apos;t have an account?
-            <Link to="/signup" className="text-blue-400">
-              Sign Up
-            </Link>
-          </span>
-        </div> */}
       </div>
     </div>
   );
