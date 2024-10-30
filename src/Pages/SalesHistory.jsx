@@ -17,7 +17,7 @@ const SalesHistory = () => {
 
   const fetchSalesByPage = async (page) => {
     try {
-      const response = await axios.get(`https://api.akbsproduction.com/sales/all?page=${page}&limit=${itemsPerPage}`);
+      const response = await axios.get(`http://localhost:5000/sales/all?page=${page}&limit=${itemsPerPage}`);
       setSales(response.data.data);
       // Ensure the API returns totalCount for calculating total pages
       const totalCount = response.data.total;
@@ -31,7 +31,7 @@ const SalesHistory = () => {
   const fetchSalesByName = async (name) => {
     try {
       const response = await axios.get(
-        `https://api.akbsproduction.com/sales/name/${name}`
+        `http://localhost:5000/sales/name/${name}`
       );
       setSales(response.data);
       setTotalPages(1); // Assuming no pagination for filtered data
@@ -44,7 +44,7 @@ const SalesHistory = () => {
   const fetchSalesByDate = async (date) => {
     try {
       const response = await axios.get(
-        `https://api.akbsproduction.com/sales/date/${date}`
+        `http://localhost:5000/sales/date/${date}`
       );
       setSales(response.data);
       setTotalPages(1); // Assuming no pagination for filtered data
@@ -142,7 +142,8 @@ const SalesHistory = () => {
                     "No.",
                     "Product ID",
                     "Client",
-                    "Amount",
+                    "Amount Paid",
+                    "Total amount",
                     "Payment",
                     "Credit",
                     "Contact",
@@ -172,6 +173,7 @@ const SalesHistory = () => {
 
                     <td className="py-2 px-4 border-b">{sale.Full_name}</td>
                     <td className="py-2 px-4 border-b">{sale.Amount}</td>
+                    <td className="py-2 px-4 border-b">{sale.Total_amount}</td>
                     <td className="py-2 px-4 border-b">
                       {sale.Payment_method}
                     </td>

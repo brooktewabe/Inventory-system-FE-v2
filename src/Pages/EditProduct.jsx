@@ -13,22 +13,41 @@ const EditProduct = () => {
   const navigate = useNavigate();
   const [stock, setStock] = useState(null);
   const [user, setUser] = useState(null);
+  const [categories, setCategories] = useState([]);
   const uid = localStorage.getItem("uid");
 
   const validationSchema = Yup.object({
     Name: Yup.string().required("Required"),
     Location: Yup.string().required("Required"),
     Category: Yup.string().required("Required"),
-    Price: Yup.number().required("Required").positive("Must be greater than zero"),
-    Curent_stock: Yup.number().required("Required").positive("Must be greater than zero")
+    Type: Yup.string().required("Required"),
+    Price: Yup.number()
+      .required("Required")
+      .positive("Must be greater than zero"),
+    Curent_stock: Yup.number()
+      .required("Required")
+      .positive("Must be greater than zero"),
     // .moreThan(Yup.ref('Reorder_level'), "Stock must be greater than reorder level"),
   });
+  useEffect(() => {
+    // Fetch categories from the API endpoint
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/category/all");
+        setCategories(response.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
 
+    fetchCategories();
+  }, []);
   const formik = useFormik({
     initialValues: {
       Name: "",
       Location: "",
       Category: "",
+      Type: "",
       Price: "",
       Curent_stock: "",
       Reorder_level: "",
@@ -40,6 +59,7 @@ const EditProduct = () => {
       formData.append("Name", values.Name);
       formData.append("Location", values.Location);
       formData.append("Category", values.Category);
+      formData.append("Type", values.Type);
       formData.append("Price", values.Price);
       formData.append("Curent_stock", values.Curent_stock);
       formData.append("Reorder_level", values.Reorder_level);
@@ -47,7 +67,7 @@ const EditProduct = () => {
 
       try {
         const response = await axios.patch(
-          `https://api.akbsproduction.com/stock/${id}`,
+          `http://localhost:5000/stock/all/${id}`,
           formData,
           {
             headers: {
@@ -64,24 +84,28 @@ const EditProduct = () => {
         mvtData.append("Type", "Modification");
 
         // Post movement data
-        await axios.post("https://api.akbsproduction.com/movement/create", mvtData, {
+        await axios.post("http://localhost:5000/movement/create", mvtData, {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         });
         // Create notification data
         if (values.Curent_stock < values.Reorder_level) {
-        const notifData = new FormData();
-        notifData.append("message", `${stock.Name} is running low on stock.`);
-        notifData.append("priority", "High");
+          const notifData = new FormData();
+          notifData.append("message", `${stock.Name} is running low on stock.`);
+          notifData.append("priority", "High");
 
-        // Post notification data
-        await axios.post("https://api.akbsproduction.com/notification/create", notifData, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-      }
+          // Post notification data
+          await axios.post(
+            "http://localhost:5000/notification/create",
+            notifData,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+        }
         Swal.fire({
           title: "Success!",
           text: "Updated successfully.",
@@ -102,12 +126,15 @@ const EditProduct = () => {
   useEffect(() => {
     const fetchStock = async () => {
       try {
-        const response = await axios.get(`https://api.akbsproduction.com/stock/${id}`);
+        const response = await axios.get(
+          `http://localhost:5000/stock/all/${id}`
+        );
         setStock(response.data);
         formik.setValues({
           Name: response.data.Name,
           Location: response.data.Location,
           Category: response.data.Category,
+          Type: response.data.Type,
           Price: response.data.Price,
           Curent_stock: response.data.Curent_stock,
           Reorder_level: response.data.Reorder_level,
@@ -117,18 +144,17 @@ const EditProduct = () => {
         console.error("Error fetching stock:", error);
       }
     };
-  
+
     // Fetch stock data only if it hasn't been fetched yet
     if (!stock) {
       fetchStock();
     }
-  }, [id, stock]); // Add stock as a dependency
-  
+  }, [id, stock]); 
 
   useEffect(() => {
     const fetchInfo = async () => {
       try {
-        const response = await axios.get(`https://api.akbsproduction.com/user/${uid}`);
+        const response = await axios.get(`http://localhost:5000/user/${uid}`);
         setUser(response.data);
       } catch (error) {
         console.error("Error fetching details:", error);
@@ -142,7 +168,6 @@ const EditProduct = () => {
   };
 
   if (!stock) return <div>Loading...</div>;
-
   const handleCancel = () => {
     navigate("/");
   };
@@ -173,7 +198,9 @@ const EditProduct = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
                     />
                     {formik.touched.Name && formik.errors.Name && (
-                      <div className="text-red-600 text-sm">{formik.errors.Name}</div>
+                      <div className="text-red-600 text-sm">
+                        {formik.errors.Name}
+                      </div>
                     )}
                   </div>
                   <div>
@@ -189,7 +216,9 @@ const EditProduct = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
                     />
                     {formik.touched.Location && formik.errors.Location && (
-                      <div className="text-red-600 text-sm">{formik.errors.Location}</div>
+                      <div className="text-red-600 text-sm">
+                        {formik.errors.Location}
+                      </div>
                     )}
                   </div>
                   <div>
@@ -205,7 +234,9 @@ const EditProduct = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
                     />
                     {formik.touched.Price && formik.errors.Price && (
-                      <div className="text-red-600 text-sm">{formik.errors.Price}</div>
+                      <div className="text-red-600 text-sm">
+                        {formik.errors.Price}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -214,16 +245,23 @@ const EditProduct = () => {
                     <label className="block text-sm font-medium text-gray-700">
                       Category
                     </label>
-                    <input
-                      type="text"
+                    <select
                       name="Category"
                       value={formik.values.Category}
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
+                    >
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.category}>
+                          {category.category}
+                        </option>
+                      ))}
+                    </select>
                     {formik.touched.Category && formik.errors.Category && (
-                      <div className="text-red-600 text-sm">{formik.errors.Category}</div>
+                      <div className="text-red-600 text-sm">
+                        {formik.errors.Category}
+                      </div>
                     )}
                   </div>
                   <div>
@@ -238,10 +276,30 @@ const EditProduct = () => {
                       onBlur={formik.handleBlur}
                       className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
                     />
-                    {formik.touched.Curent_stock && formik.errors.Curent_stock && (
-                      <div className="text-red-600 text-sm">{formik.errors.Curent_stock}</div>
-                    )}
+                    {formik.touched.Curent_stock &&
+                      formik.errors.Curent_stock && (
+                        <div className="text-red-600 text-sm">
+                          {formik.errors.Curent_stock}
+                        </div>
+                      )}
                   </div>
+                  <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700">
+                    Type
+                  </label>
+                  <select
+                    name="Type"
+                    value={formik.values.Type}
+                    onChange={formik.handleChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                  >
+                    <option value="" disabled>Select Type</option>
+                    <option value="Finished Product">Finished Product</option>
+                    <option value="Raw Material">Raw Material</option>
+                  </select>
+                </div>
+              </div>
                 </div>
               </div>
 

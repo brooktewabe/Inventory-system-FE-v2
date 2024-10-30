@@ -11,6 +11,7 @@ import * as Yup from "yup";
 const AddProduct = () => {
   const [Product_image, setProduct_image] = useState(null);
   const [user, setUser] = useState(null);
+  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
   const uid = localStorage.getItem("uid");
 
@@ -21,7 +22,7 @@ const AddProduct = () => {
   useEffect(() => {
     const fetchInfo = async () => {
       try {
-        const response = await axios.get(`https://api.akbsproduction.com/user/${uid}`);
+        const response = await axios.get(`http://localhost:5000/user/${uid}`);
         setUser(response.data);
       } catch (error) {
         console.error("Error fetching details:", error);
@@ -29,18 +30,38 @@ const AddProduct = () => {
     };
     fetchInfo();
   }, [uid]);
+  useEffect(() => {
+    // Fetch categories from the API endpoint
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/category/all");
+        setCategories(response.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
 
+    fetchCategories();
+  }, []);
   // Validation schema
   const validationSchema = Yup.object({
     Name: Yup.string().required("Required"),
     Location: Yup.string().required("Required"),
     Category: Yup.string().required("Required"),
-    Price: Yup.number().required("Required").positive("Must be greater than zero"),
-    Curent_stock: Yup.number().required("Required").positive("Must be greater than zero"),
+    Type: Yup.string().required("Required"),
+    Price: Yup.number()
+      .required("Required")
+      .positive("Must be greater than zero"),
+    Curent_stock: Yup.number()
+      .required("Required")
+      .positive("Must be greater than zero"),
     Reorder_level: Yup.number()
       .required("Required")
       .positive("Must be greater than zero")
-      .lessThan(Yup.ref("Curent_stock"), "Stock must be greater than reorder level"),
+      .lessThan(
+        Yup.ref("Curent_stock"),
+        "Stock must be greater than reorder level"
+      ),
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
@@ -54,15 +75,20 @@ const AddProduct = () => {
     formData.append("Price", values.Price);
     formData.append("Curent_stock", values.Curent_stock);
     formData.append("Reorder_level", values.Reorder_level);
+    formData.append("Type", values.Type);
     formData.append("files", Product_image);
 
     try {
       // Create the product
-      const productResponse = await axios.post("https://api.akbsproduction.com/stock/create", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const productResponse = await axios.post(
+        "http://localhost:5000/stock/create",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       // Create movement data
       const mvtData = {
@@ -73,11 +99,15 @@ const AddProduct = () => {
       };
 
       // Post movement data
-      const movementResponse = await axios.post("https://api.akbsproduction.com/movement/create", mvtData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const movementResponse = await axios.post(
+        "http://localhost:5000/movement/create",
+        mvtData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       Swal.fire({
         title: "Success!",
@@ -91,7 +121,9 @@ const AddProduct = () => {
       });
     } catch (error) {
       console.error("Error creating stock or movement:", error);
-      toast.error("Error creating stock. Make sure all fields are filled appropriately.");
+      toast.error(
+        "Error creating stock. Make sure all fields are filled appropriately."
+      );
     }
 
     setSubmitting(false);
@@ -122,6 +154,7 @@ const AddProduct = () => {
                 Price: "",
                 Curent_stock: "",
                 Reorder_level: "",
+                Type:""
               }}
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
@@ -132,62 +165,124 @@ const AddProduct = () => {
                     {/* Right Side */}
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Product Title</label>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Product Title
+                        </label>
                         <Field
                           name="Name"
                           type="text"
                           className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
                         />
-                        <ErrorMessage name="Name" component="div" className="text-red-600 text-sm" />
+                        <ErrorMessage
+                          name="Name"
+                          component="div"
+                          className="text-red-600 text-sm"
+                        />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Location</label>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Location
+                        </label>
                         <Field
                           name="Location"
                           type="text"
                           className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
                         />
-                        <ErrorMessage name="Location" component="div" className="text-red-600 text-sm" />
+                        <ErrorMessage
+                          name="Location"
+                          component="div"
+                          className="text-red-600 text-sm"
+                        />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Reorder Level</label>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Reorder Level
+                        </label>
                         <Field
                           name="Reorder_level"
                           type="number"
                           className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
                         />
-                        <ErrorMessage name="Reorder_level" component="div" className="text-red-600 text-sm" />
+                        <ErrorMessage
+                          name="Reorder_level"
+                          component="div"
+                          className="text-red-600 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Type
+                        </label>
+                        <Field
+                          as="select"
+                          name="Type"
+                          className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                        >
+                          <option value="">Select type</option>
+                          <option value="Finished Product">Finished Product</option>
+                          <option value="Raw Material">Raw Material</option>
+                        </Field>
+                        <ErrorMessage
+                          name="Type"
+                          component="div"
+                          className="text-red-600 text-sm"
+                        />
                       </div>
                     </div>
 
                     {/* Left Side */}
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Category</label>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Category
+                        </label>
                         <Field
+                          as="select"
                           name="Category"
-                          type="text"
                           className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                        >
+                          <option value="">Select category</option>
+                          {categories.map((category) => (
+                            <option key={category.id} value={category.category}>
+                              {category.category}
+                            </option>
+                          ))}
+                        </Field>
+                        <ErrorMessage
+                          name="Category"
+                          component="div"
+                          className="text-red-600 text-sm"
                         />
-                        <ErrorMessage name="Category" component="div" className="text-red-600 text-sm" />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Stock Amount</label>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Stock Amount
+                        </label>
                         <Field
                           name="Curent_stock"
                           type="number"
                           className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
                         />
-                        <ErrorMessage name="Curent_stock" component="div" className="text-red-600 text-sm" />
+                        <ErrorMessage
+                          name="Curent_stock"
+                          component="div"
+                          className="text-red-600 text-sm"
+                        />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Price</label>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Price
+                        </label>
                         <Field
                           name="Price"
                           type="number"
                           className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
                         />
-                        <ErrorMessage name="Price" component="div" className="text-red-600 text-sm" />
+                        <ErrorMessage
+                          name="Price"
+                          component="div"
+                          className="text-red-600 text-sm"
+                        />
                       </div>
                     </div>
                   </div>

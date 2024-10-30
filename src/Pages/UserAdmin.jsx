@@ -20,7 +20,7 @@ const UserAdmin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState("user");
+  const [role, setRole] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const currentRole = localStorage.getItem("role");
   const [errors, setErrors] = useState({});
@@ -30,6 +30,7 @@ const UserAdmin = () => {
       fname: Yup.string().required("First name is required"),
       lname: Yup.string().required("Last name is required"),
       email: Yup.string().required("Email is required"),
+      role: Yup.string().required("Email is required"),
       password: Yup.string()
         .required("Password is required")
         .min(8, "Password must be at least 8 characters"),
@@ -37,7 +38,7 @@ const UserAdmin = () => {
 
     try {
       schema.validateSync(
-        { email, password, fname, lname, confirmPassword },
+        { email, password, fname, lname, confirmPassword, role },
         { abortEarly: false }
       );
       setErrors({});
@@ -60,7 +61,7 @@ const UserAdmin = () => {
     }
 
     try {
-      await axios.post("https://api.akbsproduction.com/signup", {
+      await axios.post("http://localhost:5000/signup", {
         fname,
         lname,
         email,
@@ -74,6 +75,7 @@ const UserAdmin = () => {
       setLname("");
       setEmail("");
       setPassword("");
+      setRole("");
     } catch (error) {
       if (error.response && error.response.status === 409) {
         toast.error("Email already in use");
@@ -87,7 +89,7 @@ const UserAdmin = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("https://api.akbsproduction.com/users");
+        const response = await axios.get("http://localhost:5000/users");
         if (Array.isArray(response.data)) {
           setUsers(response.data);
           setFilteredUsers(response.data);
@@ -128,7 +130,7 @@ const UserAdmin = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`https://api.akbsproduction.com/user/${id}`);
+          await axios.delete(`http://localhost:5000/user/${id}`);
           setUsers(users.filter((user) => user.id !== id));
           toast.success("Deleted Successfully");
         } catch (error) {
@@ -230,7 +232,25 @@ const UserAdmin = () => {
                           </div>
                         )}
                       </div>
+                      <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Role
+                    </label>
 
+                  <select
+                    name="role"
+                    value={role}
+                    onChange={(e)=> setRole(e.target.value)}
+                    className="mt-1 block w-full border border-gray-300 rounded-lg p-2" 
+                    >
+                    <option value="">Choose Role</option>
+                    <option value="admin">Admin</option>
+                    <option value="user">User</option>
+                  </select>
+                    {errors.role && (
+                      <div className="text-red-600 text-sm">{errors.role}</div>
+                    )}
+                  </div>
                       <div className="mb-4">
                         <label
                           htmlFor="password"
