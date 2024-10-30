@@ -7,6 +7,7 @@ import {
   AiOutlineSwap,
   AiTwotonePlusCircle,
   AiTwotoneReconciliation,
+  AiFillSetting
 } from "react-icons/ai";
 import { CiLogout, CiViewList } from "react-icons/ci";
 import { useNavigate, NavLink, Outlet, useLocation } from "react-router-dom";
@@ -37,7 +38,7 @@ const Navbar = () => {
     const fetchInfo = async () => {
       try {
         const response = await axios.get(
-          `https://api.akbsproduction.com/user/${uid}`
+          `http://localhost:5000/user/${uid}`
         );
         setUser(response.data);
       } catch (error) {
@@ -106,6 +107,12 @@ const Navbar = () => {
       className: { linkClass },
     },
     {
+      icon: <  AiFillSetting  size={25} className="mr-4" />,
+      text: "Categories",
+      link: "/settings",
+      className: { linkClass },
+    },
+    {
       icon: <AiOutlineSwap size={25} className="mr-4" />,
       text: "Notifications",
       link: "/notification",
@@ -115,7 +122,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post(`https://api.akbsproduction.com/logout`, {
+      await axios.post(`http://localhost:5000/logout`, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
