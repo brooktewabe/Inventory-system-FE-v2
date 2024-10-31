@@ -36,7 +36,7 @@ axios.interceptors.response.use(
 // Logout function
 const handleLogout = async () => {
   try {
-    await axios.post(`https://api.akbsproduction.com/logout`);
+    await axios.post(`http://localhost:5000/logout`);
     // Remove cookies and local storage data
     Cookies.remove("jwt");
     localStorage.removeItem("role");

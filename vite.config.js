@@ -9,7 +9,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target :'https://api.akbsproduction.com',
+        target :'http://localhost:5000',
         // target :'http://frontend', for docker compose
         changeOrigin: true,
         secure:false,
