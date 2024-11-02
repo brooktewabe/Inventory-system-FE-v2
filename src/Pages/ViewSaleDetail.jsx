@@ -31,7 +31,7 @@ const ViewSaleDetail = () => {
     const fetchStock = async () => {
       if (sale && sale.Product_id) { 
         try {
-          const response = await axios.get(`https://api.akbsproduction.com/stock/${sale.Product_id}`);
+          const response = await axios.get(`https://api.akbsproduction.com/stock/all/${sale.Product_id}`);
           setStock(response.data);
         } catch (error) {
           console.error("Error fetching stock details:", error);

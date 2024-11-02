@@ -33,7 +33,7 @@ const EditProduct = () => {
     // Fetch categories from the API endpoint
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/category/all");
+        const response = await axios.get("https://api.akbsproduction.com/category/all");
         setCategories(response.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -67,7 +67,7 @@ const EditProduct = () => {
 
       try {
         const response = await axios.patch(
-          `http://localhost:5000/stock/all/${id}`,
+          `https://api.akbsproduction.com/stock/all/${id}`,
           formData,
           {
             headers: {
@@ -84,7 +84,7 @@ const EditProduct = () => {
         mvtData.append("Type", "Modification");
 
         // Post movement data
-        await axios.post("http://localhost:5000/movement/create", mvtData, {
+        await axios.post("https://api.akbsproduction.com/movement/create", mvtData, {
           headers: {
             "Content-Type": "application/json",
           },
@@ -97,7 +97,7 @@ const EditProduct = () => {
 
           // Post notification data
           await axios.post(
-            "http://localhost:5000/notification/create",
+            "https://api.akbsproduction.com/notification/create",
             notifData,
             {
               headers: {
@@ -127,7 +127,7 @@ const EditProduct = () => {
     const fetchStock = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/stock/all/${id}`
+          `https://api.akbsproduction.com/stock/all/${id}`
         );
         setStock(response.data);
         formik.setValues({
@@ -154,7 +154,7 @@ const EditProduct = () => {
   useEffect(() => {
     const fetchInfo = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/user/${uid}`);
+        const response = await axios.get(`https://api.akbsproduction.com/user/${uid}`);
         setUser(response.data);
       } catch (error) {
         console.error("Error fetching details:", error);

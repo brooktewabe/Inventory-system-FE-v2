@@ -41,7 +41,7 @@ const IncomeSection = () => {
       }
 
       const response = await axios.get(endpoint);
-      const data = response.data.total; // Assuming total is a string
+      const data = response.data.total; 
       const totalAmount = parseFloat(data) || 0;
 
       if (period === "daily") {
@@ -57,7 +57,7 @@ const IncomeSection = () => {
   };
 
   useEffect(() => {
-    fetchIncome(activePeriod); // Fetch income when component mounts or activePeriod changes
+    fetchIncome(activePeriod); 
   }, [activePeriod]);
 
   return (

@@ -16,13 +16,13 @@ const Donut = () => {
     const fetchData = async () => {
       try {
         // Fetch total count of sales and count of sales with credit
-        const salesResponse = await axios.get("http://localhost:5000/sales/count-with-credit");
+        const salesResponse = await axios.get("https://api.akbsproduction.com/sales/count-with-credit");
         const { totalCount, creditCount } = salesResponse.data;
 
         // Set series data for the chart
         setSeries([totalCount, creditCount]);
 
-        const creditDueResponse = await axios.get("http://localhost:5000/sales/clients-with-future-credit-due");
+        const creditDueResponse = await axios.get("https://api.akbsproduction.com/sales/clients-with-future-credit-due");
         const creditDueCount = creditDueResponse.data.count;
 
         // Set future credit due count

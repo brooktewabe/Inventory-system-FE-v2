@@ -4,8 +4,9 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import { FaEdit, FaTrash, FaSearch, FaFilter, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrash, FaSearch, FaPlus } from "react-icons/fa";
 import { AiOutlineHourglass } from "react-icons/ai";
+import { PiKeyReturnBold } from "react-icons/pi";
 
 const Inventory = () => {
   const navigate = useNavigate();
@@ -70,7 +71,7 @@ const Inventory = () => {
       if (result.isConfirmed) {
         try {
           const response = await axios.get(
-            `https://api.akbsproduction.com/stock/${id}`
+            `https://api.akbsproduction.com/stock/all/${id}`
           );
           const stockToDelete = response.data;
           await axios.delete(`https://api.akbsproduction.com/stock/all/${id}`);
@@ -102,6 +103,9 @@ const Inventory = () => {
   };
   const handleAddNavigation = () => {
     navigate("/add-product");
+  };
+  const handleReturnNavigation = (id) => {
+    navigate(`/return-product/${id}`);
   };
   const handleMovementNavigation = () => {
     navigate("/stock-movement");
@@ -153,12 +157,7 @@ const Inventory = () => {
                 >
                   <FaSearch size={20} />
                 </button>
-                {/* <button
-                  onClick={() => setFilterVisible(!filterVisible)}
-                  className="text-gray-600 hover:text-gray-900"
-                >
-                  <FaFilter size={20} />
-                </button> */}
+
               </div>
             </div>
             {searchVisible && (
@@ -170,19 +169,7 @@ const Inventory = () => {
                 className="w-full mb-4 p-2 border border-gray-300 rounded"
               />
             )}
-            {/* {filterVisible && (
-              <div className="mb-4">
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded"
-                >
-                  <option value="">Select status</option>
-                  <option value="Active">Free</option>
-                  <option value="unavailable">Rented</option>
-                </select>
-              </div>
-            )} */}
+
             <table className="min-w-full bg-white">
               <thead>
                 <tr>
@@ -196,6 +183,7 @@ const Inventory = () => {
                   <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
                     Category
                   </td>
+                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">Type</td>
                   <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
                     Name
                   </td>
@@ -224,6 +212,7 @@ const Inventory = () => {
                       {formatProductId(stock.id)}
                     </td>
                     <td className="py-2 px-4 border-b">{stock.Category}</td>
+                    <td className="py-2 px-4 border-b"> {stock.Type}</td>
                     <td className="py-2 px-4 border-b">{stock.Name}</td>
                     <td className="py-2 px-4 border-b">{stock.Price}</td>
                     <td className="py-2 px-4 border-b">{stock.Curent_stock}</td>
@@ -234,6 +223,12 @@ const Inventory = () => {
                     <td className="py-2 px-4 border-b">{stock.Location}</td>
 
                     <td className="py-3 px-4 border-b space-x-2">
+                      <button
+                        onClick={() => handleReturnNavigation(stock.id)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        <PiKeyReturnBold  />
+                      </button>
                       <button
                         onClick={() => onEditStock(stock.id)}
                         className="text-blue-500 hover:text-blue-700"

@@ -76,6 +76,7 @@ const StockMovement = () => {
                     {movement.Type === "Addition" && <FaPlus className="text-green-500" />}
                     {movement.Type === "Reduction" && <FaMinus className="text-red-500" />}
                     {movement.Type === "Modification" && <FaEdit className="text-blue-500" />}
+                    {movement.Type === "Return" && <FaEdit className="text-blue-500" />}
                   </td>
                     <td className="py-2 px-4 border-b">{index + 1}</td>
                     <td className="py-2 px-4 border-b">
