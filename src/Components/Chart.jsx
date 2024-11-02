@@ -40,7 +40,7 @@ const Donut = () => {
       <div className="flex justify-between">
         <p>Sales Overview</p>
       </div>
-      <Chart options={options} series={series} type="donut" width="400" />
+      <Chart options={options} series={series} type="pie" width="400" />
       
       <div className="mt-4">
         <h4 className="text-lg font-bold">Customers with Future Credit Due: <span className="p-3 bg-[#e4e3e3]">{futureCreditDueCount}</span> </h4>
