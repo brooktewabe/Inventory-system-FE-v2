@@ -27,7 +27,7 @@ const EditProduct = () => {
     },
     validationSchema,
     onSubmit: async (values) => {
-      const returnAmount =values.returnAmt; // Capture return amount
+      const returnAmount =values.returnAmt; 
       const updatedStock = values.Curent_stock + returnAmount; // Add return amount to current stock
       const formData = new FormData();
       formData.append("Name", values.Name);
@@ -39,15 +39,17 @@ const EditProduct = () => {
       if (values.Product_image) formData.append("files", values.Product_image);
 
       try {
-        const response = await axios.patch(
-          `http://localhost:5000/stock/all/${id}`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        if(formik.values.Return_reason!='faulty'){
+          const response = await axios.patch(
+            `https://api.akbsproduction.com/stock/all/${id}`,
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+        }
         // Create sales data
         const salesData = new FormData();
         salesData.append("Product_id", id);
@@ -61,7 +63,7 @@ const EditProduct = () => {
         salesData.append("Return_reason",  formik.values.Return_reason);
 
 
-        await axios.post("http://localhost:5000/sales/create", salesData, {
+        await axios.post("https://api.akbsproduction.com/sales/create", salesData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
 
@@ -73,7 +75,7 @@ const EditProduct = () => {
         mvtData.append("Type", "Return");
 
         // Post movement data
-        await axios.post("http://localhost:5000/movement/create", mvtData, {
+        await axios.post("https://api.akbsproduction.com/movement/create", mvtData, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -85,7 +87,7 @@ const EditProduct = () => {
         notifData.append("priority", "High");
 
         // Post notification data
-        await axios.post("http://localhost:5000/notification/create", notifData, {
+        await axios.post("https://api.akbsproduction.com/notification/create", notifData, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -111,7 +113,7 @@ const EditProduct = () => {
   useEffect(() => {
     const fetchStock = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/stock/all/${id}`);
+        const response = await axios.get(`https://api.akbsproduction.com/stock/all/${id}`);
         setStock(response.data);
         formik.setValues({
           Name: response.data.Name,
@@ -137,7 +139,7 @@ const EditProduct = () => {
   useEffect(() => {
     const fetchInfo = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/user/${uid}`);
+        const response = await axios.get(`https://api.akbsproduction.com/user/${uid}`);
         setUser(response.data);
       } catch (error) {
         console.error("Error fetching details:", error);

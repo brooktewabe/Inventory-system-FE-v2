@@ -49,7 +49,7 @@ const Categories = () => {
     }
 
     try {
-      await axios.post("http://localhost:5000/category", {
+      await axios.post("https://api.akbsproduction.com/category/create", {
         category
       });
       toast.success("Registration successful");
@@ -69,7 +69,7 @@ const Categories = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/category/all");
+        const response = await axios.get("https://api.akbsproduction.com/category/all");
         if (Array.isArray(response.data)) {
           setUsers(response.data);
           setfilteredCategories(response.data);
@@ -110,7 +110,7 @@ const Categories = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://localhost:5000/category/all/${id}`);
+          await axios.delete(`https://api.akbsproduction.com/category/all/${id}`);
           setUsers(users.filter((user) => user.id !== id));
           toast.success("Deleted Successfully");
         } catch (error) {

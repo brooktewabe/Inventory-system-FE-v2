@@ -1,0 +1,482 @@
+import { useState, useEffect } from "react";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
+import axios from "../axiosInterceptor";
+import withAuth from "../withAuth";
+import { toast, ToastContainer } from "react-toastify";
+import { GoImage } from "react-icons/go";
+const RecordSale = () => {
+  const navigate = useNavigate();
+  const [sale, setSale] = useState(null);
+  const [items, setItems] = useState([
+    {
+      itemName: "",
+      quantity: "",
+      totalAmount: 0,
+      amount: 0,
+      credit: 0,
+      credit_due: "",
+    },
+  ]);
+  const [formData, setFormData] = useState({
+    Full_name: "",
+    Contact: "",
+    Payment_method: "",
+    // Credit_due: "",
+    Receipt: "",
+    Transaction_id: "",
+    Sale_type: "Batch",
+  });
+
+  useEffect(() => {
+    const fetchStock = async () => {
+      try {
+        const response = await axios.get("https://api.akbsproduction.com/stock/all");
+        setSale(response.data.data);
+      } catch (error) {
+        console.error("Error fetching stock:", error);
+      }
+    };
+    fetchStock();
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+  };
+
+  const handleItemChange = (index, e) => {
+    const { name, value } = e.target;
+    setItems((prevItems) => {
+      const updatedItems = [...prevItems];
+      updatedItems[index][name] = value;
+
+      // Calculate total amount for the specific item when itemName or quantity changes
+      if (name === "itemName" || name === "quantity") {
+        const selectedItem = sale.find(
+          (sl) => sl.id === updatedItems[index].itemName
+        );
+        if (selectedItem && updatedItems[index].quantity) {
+          const quantity = parseInt(updatedItems[index].quantity, 10) || 0;
+          updatedItems[index].totalAmount = quantity * selectedItem.Price;
+        } else {
+          updatedItems[index].totalAmount = 0; // Reset if no item selected or quantity is invalid
+        }
+      }
+      // Calculate credit based on total amount and amount paid
+      const amountPaid = parseFloat(updatedItems[index].amount) || 0;
+      updatedItems[index].credit = updatedItems[index].totalAmount - amountPaid;
+      return updatedItems;
+    });
+  };
+
+  const addMoreItem = async () => {
+    // Validate current item before adding
+    const currentItem = items[items.length - 1];
+    if (!currentItem.itemName || !currentItem.quantity) {
+      Swal.fire({
+        title: "Error!",
+        text: "Item Name and Quantity are required for the current item.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
+    // Check for required fields
+    const requiredFields = [
+      "Full_name",
+      "Contact",
+      "Payment_method",
+      "Transaction_id",
+      // "Quantity",
+      // "Amount",
+    ];
+
+    for (let field of requiredFields) {
+      if (!formData[field]) {
+        Swal.fire({
+          title: "Error!",
+          text: `${field.replace("_", " ")} is required.`,
+          icon: "error",
+          confirmButtonColor: "#d33",
+          confirmButtonText: "OK",
+        });
+        return; // Exit the function if validation fails
+      }
+    }
+
+    // Check if Amount Paid is provided and Credit Due is required
+    if (currentItem.credit > 1 && !currentItem.credit_due) {
+      Swal.fire({
+        title: "Error!",
+        text: "Credit Due is required when Credit is provided.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+        confirmButtonText: "OK",
+      });
+      return; // Exit the function if validation fails
+    }
+    // Check if Credit is +ve
+    if (currentItem.credit < 0 ) {
+      Swal.fire({
+        title: "Error!",
+        text: "Credit shouldn't be Negative.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+        confirmButtonText: "OK",
+      });
+      return; // Exit the function if validation fails
+    }
+
+    // Calculate new quantity based on current stock
+    const selectedItem = sale.find((sl) => sl.id === currentItem.itemName);
+
+    if (!selectedItem) {
+      Swal.fire({
+        title: "Error!",
+        text: "Selected item not found in stock.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
+    const newQuantity = selectedItem.Curent_stock - currentItem.quantity;
+
+    // Check if the new quantity would be negative
+    if (newQuantity < 0) {
+      Swal.fire({
+        title: "Error!",
+        text: "Insufficient stock available.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+        confirmButtonText: "OK",
+      });
+      return; // Exit the function to prevent further actions
+    }
+    // Check if Credit_due is in the future
+    if (currentItem.credit_due) {
+      const dueDate = new Date(currentItem.credit_due);
+      const today = new Date();
+
+      // Set time of today to 00:00:00 for accurate comparison
+      today.setHours(0, 0, 0, 0);
+
+      if (dueDate <= today) {
+        Swal.fire({
+          title: "Error!",
+          text: "Credit Due must be a future date.",
+          icon: "error",
+          confirmButtonColor: "#d33",
+          confirmButtonText: "OK",
+        });
+        return; // Exit the function if validation fails
+      }
+    }
+    // Prepare sale data for this specific item
+    const saleData = {
+      ...formData,
+      Product_id: selectedItem.id,
+      Quantity: currentItem.quantity,
+      Total_amount: currentItem.totalAmount,
+      Amount: currentItem.amount,
+      Credit: currentItem.credit,
+      Credit_due: currentItem.credit_due,
+    };
+
+    console.log("Sending sale data:", saleData); // Console log each sale data
+
+    try {
+      // Send the POST request for the current item
+      // Send the POST request for each sale
+      await axios.post("https://api.akbsproduction.com/sales/create", saleData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      // Update stock quantity
+      const newQuantity = selectedItem.Curent_stock - currentItem.quantity;
+      await axios.patch(`https://api.akbsproduction.com/stock/all/${selectedItem.id}`, {
+        Curent_stock: newQuantity,
+      });
+
+      // Check if stock is low and send notification if necessary
+      if (newQuantity < selectedItem.Reorder_level) {
+        await axios.post("https://api.akbsproduction.com/notification/create", {
+          message: `${selectedItem.Name} is running low on stock.`,
+          priority: "High",
+        });
+      }
+
+      // Clear only the order data for the last added item
+      setItems([
+        ...items.slice(0, -1),
+        {
+          itemName: "",
+          quantity: "",
+          totalAmount: 0,
+          credit: 0,
+          credit_due: "",
+          amount: 0,
+        },
+      ]); // Keep existing items and add a new empty one
+
+      Swal.fire({
+        title: "Success!",
+        text: "Sale recorded successfully.",
+        icon: "success",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "OK",
+      });
+    } catch (error) {
+      console.error("Error creating sale:", error);
+      toast.error("Error recording sale. Try again later.");
+    }
+  };
+
+  const handleCancel = () => {
+    navigate("/");
+  };
+
+  if (!sale) return <div>Loading...</div>;
+
+  return (
+    <section className="bg-[#edf0f0b9] h-full">
+      <div className="container m-auto">
+        <div className="grid grid-cols-1 gap-6">
+          <div className="bg-white p-4">
+            <h3 className="text-xl font-bold">Record Batch Sale</h3>
+          </div>
+          <form onSubmit={(e) => e.preventDefault()}>
+            <div className="bg-white p-6 rounded-lg shadow-md max-w-[70%] ml-20">
+              <h3 className="text-xl font-bold mb-4">Record Sales</h3>
+              <hr />
+              <h3 className="text-md font-bold mb-4">Buyer Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      name="Full_name"
+                      value={formData.Full_name}
+                      onChange={handleChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700">
+                      Phone Number
+                    </label>
+                    <input
+                      type="number"
+                      name="Contact"
+                      value={formData.Contact}
+                      onChange={handleChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                    />
+                  </div>
+                </div>
+              </div>
+              <br />
+              <hr />
+              <br />
+              <h3 className="text-md font-bold mb-4">Order Information</h3>
+              {items.map((item, index) => (
+                <div
+                  key={index}
+                  className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4"
+                >
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700">
+                      Item Name
+                    </label>
+                    <select
+                      name="itemName"
+                      value={item.itemName}
+                      onChange={(e) => handleItemChange(index, e)}
+                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                    >
+                      <option value="" disabled>
+                        Select Item
+                      </option>
+                      {Array.isArray(sale) && sale.length > 0 ? (
+                        sale.map((sl) => (
+                          <option key={sl.id} value={sl.id}>
+                            {sl.Name}
+                          </option>
+                        ))
+                      ) : (
+                        <option disabled>No items available</option>
+                      )}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700">
+                      Quantity
+                    </label>
+                    <input
+                      type="number"
+                      name="quantity"
+                      value={item.quantity}
+                      onChange={(e) => handleItemChange(index, e)}
+                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700">
+                      Total Amount
+                    </label>
+                    <input
+                      type="number"
+                      value={item.totalAmount}
+                      readOnly
+                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700">
+                     Amount Paid 
+                    </label>
+                    <input
+                      type="number"
+                      name="amount"
+                      value={item.amount}
+                      onChange={(e) => handleItemChange(index, e)}
+                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700">
+                      Credit Given
+                    </label>
+                    <input
+                      type="number"
+                      disabled
+                      name="credit"
+                      value={item.credit}
+                      onChange={(e) => handleItemChange(index, e)}
+                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700">
+                      Credit Due
+                    </label>
+                    <input
+                      type="date"
+                      name="credit_due"
+                      value={item.credit_due}
+                      onChange={(e) => handleItemChange(index, e)}
+                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                    />
+                  </div>
+                </div>
+              ))}
+              {/* Add button to add more items */}
+              <div className="flex justify-end">
+                {/* Change this button to trigger the addMoreItem function */}
+                <button
+                  type="button"
+                  onClick={addMoreItem}
+                  className="bg-[#16033a] text-white px-4 py-2 rounded-lg"
+                >
+                  Add More Item
+                </button>
+              </div>
+
+             
+              <h3 className="text-md font-bold mb-4 mt-6">
+                Payment Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700">
+                    Transaction ID
+                  </label>
+                  <input
+                    type="text"
+                    name="Transaction_id"
+                    value={formData.Transaction_id}
+                    onChange={handleChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700">
+                    Payment Method
+                  </label>
+                  <select
+                    name="Payment_method"
+                    value={formData.Payment_method}
+                    onChange={handleChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                  >
+                    <option value="" disabled>Select Method</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Bank Transfer">Bank Transfer</option>
+                    <option value="Tele Birr">Tele Birr</option>
+                    <option value="E Birr">E Birr</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                {/* Receipt Input */}
+                <div className="mb-4 w-1/2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    Receipt
+                  </label>
+
+                  <input
+                    type="file"
+                    id="Receipt"
+                    name="Receipt"
+                    // value={formData.Receipt}
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      setFormData({ ...formData, Receipt: file });
+                    }}
+                    className="hidden"
+                    accept=".png, .jpg, .jpeg"
+                  />
+
+                  <div className="flex items-center">
+                    <div className="bg-[#]">
+                      <GoImage size={30} />
+                    </div>
+                    <label
+                      htmlFor="Receipt"
+                      className="text-white bg-[#16033a] py-2 px-6  mx-2 cursor-pointer border rounded-2xl"
+                    >
+                      Upload Image <br />
+                      {/* <span className="text-[#98b4c7]">(Required)</span> */}
+                    </label>
+                  </div>
+                </div>
+                <div className="mt-6 flex justify-around space-x-2">
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="border border-gray-400 text-gray-700 px-16 py-2 rounded-lg"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+          <ToastContainer />
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default withAuth(RecordSale);

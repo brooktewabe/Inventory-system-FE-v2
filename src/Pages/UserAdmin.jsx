@@ -30,7 +30,7 @@ const UserAdmin = () => {
       fname: Yup.string().required("First name is required"),
       lname: Yup.string().required("Last name is required"),
       email: Yup.string().required("Email is required"),
-      role: Yup.string().required("Email is required"),
+      role: Yup.string().required("Role is required"),
       password: Yup.string()
         .required("Password is required")
         .min(8, "Password must be at least 8 characters"),
@@ -61,7 +61,7 @@ const UserAdmin = () => {
     }
 
     try {
-      await axios.post("http://localhost:5000/signup", {
+      await axios.post("https://api.akbsproduction.com/signup", {
         fname,
         lname,
         email,
@@ -89,7 +89,7 @@ const UserAdmin = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/users");
+        const response = await axios.get("https://api.akbsproduction.com/users");
         if (Array.isArray(response.data)) {
           setUsers(response.data);
           setFilteredUsers(response.data);
@@ -130,7 +130,7 @@ const UserAdmin = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://localhost:5000/user/${id}`);
+          await axios.delete(`https://api.akbsproduction.com/user/${id}`);
           setUsers(users.filter((user) => user.id !== id));
           toast.success("Deleted Successfully");
         } catch (error) {

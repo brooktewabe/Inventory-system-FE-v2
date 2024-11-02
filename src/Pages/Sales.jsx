@@ -2,15 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import {  FaSearch, FaFilter, } from "react-icons/fa";
-
+import {  FaSearch } from "react-icons/fa";
 import { AiOutlineHourglass } from "react-icons/ai";
-import Swal from "sweetalert2";
-import { toast } from "react-toastify";
-
+import { GrMultiple } from "react-icons/gr";
 const Sales = () => {
   const navigate = useNavigate();
-
 
   const [stocks, setStocks] = useState([]);
   const [searchVisible, setSearchVisible] = useState(false);
@@ -65,6 +61,9 @@ const Sales = () => {
   const handleAddNavigation = () => {
     navigate("/sales-history");
   };
+  const handleBatchNavigation = () => {
+    navigate("/batch-sale");
+  };
 
   return (
     <section className="bg-[#edf0f0b9] min-h-screen">
@@ -76,8 +75,19 @@ const Sales = () => {
           </div>
 
           {/* Two equally sized grids */}
-          <div className="gap-6">
-            <div className=" flex justify-around">
+          <div className="flex flex-col sm:grid sm:grid-cols-2 gap-6">
+            <div>
+              <div
+                className="bg-[#eceaeaec] p-6 w-52 rounded-lg ml-32 shadow-md cursor-pointer"
+                onClick={handleBatchNavigation}
+              >
+                <div className="items-center mb-4 flex flex-col">
+                  <GrMultiple size={40} />
+                  <p>Multiple Item sale</p>
+                </div>
+              </div>
+            </div>
+            <div>
               <div
                 className="bg-[#eceaeaec] p-6 w-52 rounded-lg ml-20 shadow-md cursor-pointer"
                 onClick={handleAddNavigation}
@@ -101,12 +111,6 @@ const Sales = () => {
                 >
                   <FaSearch size={20} />
                 </button>
-                {/* <button
-                  onClick={() => setFilterVisible(!filterVisible)}
-                  className="text-gray-600 hover:text-gray-900"
-                >
-                  <FaFilter size={20} />
-                </button> */}
               </div>
             </div>
             {searchVisible && (
@@ -118,19 +122,7 @@ const Sales = () => {
                 className="w-full mb-4 p-2 border border-gray-300 rounded"
               />
             )}
-            {/* {filterVisible && (
-              <div className="mb-4">
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded"
-                >
-                  <option value="">Select status</option>
-                  <option value="Active">Free</option>
-                  <option value="unavailable">Rented</option>
-                </select>
-              </div>
-            )} */}
+
             <table className="min-w-full bg-white">
               <thead>
                 <tr>
@@ -144,6 +136,8 @@ const Sales = () => {
                   <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
                     Category
                   </td>
+                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">Type</td>
+
                   <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
                     Name
                   </td>
@@ -175,6 +169,8 @@ const Sales = () => {
                     <td className="py-2 px-4 border-b">
                     {stock.Category}
                     </td>
+                    <td className="py-2 px-4 border-b"> {stock.Type}</td>
+
                     <td className="py-2 px-4 border-b">
                     {stock.Name}
                     </td>

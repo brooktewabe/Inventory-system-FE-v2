@@ -29,7 +29,7 @@ const RecordSale = () => {
   useEffect(() => {
     const fetchStock = async () => {
       try {
-        const response = await axios.get(`https://api.akbsproduction.com/stock/${id}`);
+        const response = await axios.get(`https://api.akbsproduction.com/stock/all/${id}`);
         setSale(response.data);
       } catch (error) {
         console.error("Error fetching:", error);
@@ -39,8 +39,25 @@ const RecordSale = () => {
   }, [id]);
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    let updatedFormData = { ...formData, [name]: value };
+  
+    // Update Total_amount based on Quantity and sale.Price
+    if (name === "Quantity" && sale?.Price) {
+      const quantity = value;
+      const price = sale.Price;
+      updatedFormData.Total_amount = quantity * price;
+    }
+  
+    // Update Credit as Total_amount - Amount
+    if (name === "Amount" || name === "Quantity") {
+      const totalAmount = updatedFormData.Total_amount
+      const amount = updatedFormData.Amount
+      updatedFormData.Credit = totalAmount - amount;
+    }
+  
+    setFormData(updatedFormData);
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -71,7 +88,7 @@ const RecordSale = () => {
     }
   
     // Check if Credit is provided and Credit_due is required
-    if (formData.Credit &&  formData.Credit != 0 && (formData.Credit_due === null || formData.Credit_due === "")) {
+    if (formData.Credit &&  formData.Credit >1 && (formData.Credit_due === null || formData.Credit_due === "")) {
       Swal.fire({
         title: "Error!",
         text: "Credit Due is required when Credit is provided.",
@@ -123,7 +140,7 @@ const RecordSale = () => {
       });
   
       // Then, update the stock
-      await axios.patch(`https://api.akbsproduction.com/stock/${id}`, patchData);
+      await axios.patch(`https://api.akbsproduction.com/stock/all/${id}`, patchData);
   
       // Check if new quantity is less than reorder level
       if (newQuantity < sale.Reorder_level) {
@@ -245,6 +262,7 @@ const RecordSale = () => {
                       Credit Given
                     </label>
                     <input
+                    disabled
                       type="number"
                       name="Credit"
                       value={formData.Credit}
@@ -269,9 +287,10 @@ const RecordSale = () => {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-bold text-gray-700">
-                      Amount
+                      Amount Paid
                     </label>
                     <input
+                       required
                       type="number"
                       name="Amount"
                       value={formData.Amount}
@@ -280,29 +299,28 @@ const RecordSale = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Payment Method
-                    </label>
-                    <input
-                      type="text"
-                      name="Payment_method"
-                      value={formData.Payment_method}
-                      onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
-                  </div>
+                <label className="block text-sm font-bold text-gray-700">
+                  Payment Method
+                </label>
+                <select
+                  name="Payment_method"
+                  value={formData.Payment_method}
+                  onChange={handleChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                >
+                  <option value="" disabled>Select Payment Method</option>
+                  <option value="Cash">Cash</option>
+                  <option value="Bank Transfer">Bank Transfer</option>
+                  <option value="Tele Birr">Tele Birr</option>
+                  <option value="E Birr">E Birr</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
                   <div className="mb-4 w-1/2">
                     <label className="block text-sm font-bold text-gray-700">
                       Receipt
                     </label>
-                    {/* <input
-                      type="file"
-                      id="Receipt"
-                      name="Receipt"
-                      onChange={(e) => handleFileChange(e, setReceipt)}
-                      className="hidden"
-                      accept=".pdf, .docs, .doc"
-                    /> */}
+
                     <input
                       type="file"
                       id="Receipt"
@@ -315,7 +333,6 @@ const RecordSale = () => {
                       className="hidden"
                       accept=".png, .jpg, .jpeg"
                     />
-                    {/* <input type="text" name="Receipt" placeholder="Receipt" value={formData.Receipt} onChange={handleChange} /> */}
 
                     <div className="flex items-center">
                       <div className="bg-[#]">
@@ -338,6 +355,7 @@ const RecordSale = () => {
                       Total Payment
                     </label>
                     <input
+                    disabled
                       type="number"
                       name="Total_amount"
                       value={formData.Total_amount}
