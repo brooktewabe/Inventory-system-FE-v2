@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import axios from "../axiosInterceptor";
 
 const IncomeSection = () => {
-  const [stockVal, setstockVal] = useState(0);
+  const [stockVal, setStockVal] = useState(0);
+  const [normalSum, setNormalSum] = useState(0);
+  const [faultySum, setFaultySum] = useState(0);
+  
   const currentDate = new Date(); // Get current date
-
   const formattedDate = currentDate.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -20,28 +22,51 @@ const IncomeSection = () => {
     fetchIncome(period);
   };
 
-  // Function to fetch income data based on the selected period
+  // Function to fetch normal return income data
+  const fetchNormalIncome = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/sales/total-sum/normal");
+      const data = response.data.totalSum;
+      setNormalSum(data);
+    } catch (error) {
+      console.error("Error fetching normal income data:", error);
+    }
+  };
+
+  // Function to fetch faulty return income data
+  const fetchFaultyIncome = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/sales/total-sum/faulty");
+      const data = response.data.totalSum;
+      setFaultySum(data);
+    } catch (error) {
+      console.error("Error fetching faulty income data:", error);
+    }
+  };
+
+  // Function to fetch stock value
   const fetchIncome = async (period) => {
     try {
-      const response = await axios.get(`https://api.akbsproduction.com/stock/total/total-stock`);
+      const response = await axios.get(`http://localhost:5000/stock/total/total-stock`);
       const data = response.data.totalSum;
-      
-      setstockVal(data);
+      setStockVal(data);
     } catch (error) {
       console.error("Error fetching income data:", error);
     }
   };
-  fetchIncome()
-  // Fetch initial income data
+
+  // Fetch initial income and return values on mount
   useEffect(() => {
-    fetchIncome(activePeriod);
-  }, [activePeriod]);
+    fetchNormalIncome();
+    fetchFaultyIncome();
+    fetchIncome(activePeriod); // Call this only if needed for specific periods.
+  }, []);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-bold">Total Inventory value</h3>
-        <div className="flex">
+    <div className="flex justify-between items-center mb-4">
+      <h3 className="text-lg font-bold">Total Inventory Value</h3>
+      <div className="flex">
           {((period) => (
             <button
               key={period}
@@ -53,14 +78,20 @@ const IncomeSection = () => {
               {period.charAt(0).toUpperCase() + period.slice(1)}
             </button>
           ))}
-        </div>
       </div>
-      <div className="mt-4">
-        <p className="text-2xl font-extrabold">{stockVal}</p>
-      </div>
-      <p className="mb-6 text-sm font-bold">Total Value</p>
-      <p className="mb-6 text-sm">{formattedDate}</p>
     </div>
+    
+    <div className="flex justify-between items-start mt-4">
+      <p className="text-2xl font-extrabold">{stockVal}</p>
+      <div className="text-right">
+        <p className="text-lg font-bold">Returns: {-1 * normalSum}</p>
+        <p className="text-lg font-bold">Faulty Returns: {-1 * faultySum}</p>
+      </div>
+    </div>
+
+    <p className="mb-6 text-sm font-bold">Total Value</p>
+    <p className="mb-6 text-sm">{formattedDate}</p>
+  </div>
   );
 };
 

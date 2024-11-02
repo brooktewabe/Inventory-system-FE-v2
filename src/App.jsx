@@ -18,6 +18,7 @@ import Notification from "./Pages/Notification";
 import Report from "./Pages/Report";
 import UserAdmin from "./Pages/UserAdmin";
 import Settings from "./Pages/Settings";
+import BatchSale from "./Pages/BatchSale";
 
 const App = () => {
   
@@ -28,6 +29,7 @@ const App = () => {
         <Route path='/inventory' element={<Inventory/>}/>
         <Route path='/sales' element={<Sales/>}/>
         <Route path='/report' element={<Report/>}/>
+        <Route path='/batch-sale' element={<BatchSale/>}/>
         <Route path='/sales-history' element={<SalesHistory/>}/>
         <Route path='/stock-movement' element={<StockMovement/>}/>
         <Route path='/notification' element={<Notification/>}/>
