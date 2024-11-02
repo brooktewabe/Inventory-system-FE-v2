@@ -25,7 +25,7 @@ const IncomeSection = () => {
   // Function to fetch normal return income data
   const fetchNormalIncome = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/sales/total-sum/normal");
+      const response = await axios.get("https://api.akbsproduction.com/sales/total-sum/normal");
       const data = response.data.totalSum;
       setNormalSum(data);
     } catch (error) {
@@ -36,7 +36,7 @@ const IncomeSection = () => {
   // Function to fetch faulty return income data
   const fetchFaultyIncome = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/sales/total-sum/faulty");
+      const response = await axios.get("https://api.akbsproduction.com/sales/total-sum/faulty");
       const data = response.data.totalSum;
       setFaultySum(data);
     } catch (error) {
@@ -47,7 +47,7 @@ const IncomeSection = () => {
   // Function to fetch stock value
   const fetchIncome = async (period) => {
     try {
-      const response = await axios.get(`http://localhost:5000/stock/total/total-stock`);
+      const response = await axios.get(`https://api.akbsproduction.com/stock/total/total-stock`);
       const data = response.data.totalSum;
       setStockVal(data);
     } catch (error) {

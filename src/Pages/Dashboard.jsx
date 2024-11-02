@@ -3,6 +3,7 @@ import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
 import Revenue from "../Components/Revenue";
 import Total from "../Components/Total"
+import Chart from "../Components/Chart"
 const Dashboard = () => {
   const [stocks, setStocks] = useState([]);
 
@@ -32,13 +33,16 @@ const Dashboard = () => {
           </div>
 
           {/* Two equally sized grids */}
-          <div className="flex flex-col sm:grid sm:grid-cols-2 gap-6">
+          <div className="flex flex-col sm:grid sm:grid-cols-3 gap-6">
 
             <div className="px-6">
               <Revenue />
             </div>
             <div className="px-1">
               <Total />
+            </div>
+            <div className="px-1">
+              <Chart />
             </div>
           </div>
 
@@ -54,6 +58,7 @@ const Dashboard = () => {
                   <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">No.</td>
                   <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">Product ID</td>
                   <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">Category</td>
+                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">Type</td>
                   <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">Name</td>
                   <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">Price</td>
                   <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">Current Stock Level</td>
@@ -69,6 +74,7 @@ const Dashboard = () => {
                     <td className="py-2 px-4 border-b">{index + 1}</td>
                     <td className="py-2 px-4 border-b"> {formatProductId(stock.id)}</td>
                     <td className="py-2 px-4 border-b"> {stock.Category}</td>
+                    <td className="py-2 px-4 border-b"> {stock.Type}</td>
                     <td className="py-2 px-4 border-b"> {stock.Name}</td>
                     <td className="py-2 px-4 border-b"> {stock.Price}</td>
                     <td className="py-2 px-4 border-b"> {stock.Curent_stock}</td>
