@@ -233,7 +233,7 @@ const UserAdmin = () => {
                         )}
                       </div>
                       <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-gray-400">
                       Role
                     </label>
 
@@ -241,7 +241,7 @@ const UserAdmin = () => {
                     name="role"
                     value={role}
                     onChange={(e)=> setRole(e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-lg p-2" 
+                    className="mt-1 block w-full border border-gray-400 rounded-lg p-2" 
                     >
                     <option value="">Choose Role</option>
                     <option value="admin">Admin</option>

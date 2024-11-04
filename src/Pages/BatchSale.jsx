@@ -8,6 +8,8 @@ import { GoImage } from "react-icons/go";
 const RecordSale = () => {
   const navigate = useNavigate();
   const [sale, setSale] = useState(null);
+  const [salesTotal, setSalesTotal] = useState(0);
+  const [salesCredit, setSalesCredit] = useState(0);
   const [items, setItems] = useState([
     {
       itemName: "",
@@ -119,7 +121,7 @@ const RecordSale = () => {
       return; // Exit the function if validation fails
     }
     // Check if Credit is +ve
-    if (currentItem.credit < 0 ) {
+    if (currentItem.credit < 0) {
       Swal.fire({
         title: "Error!",
         text: "Credit shouldn't be Negative.",
@@ -191,7 +193,6 @@ const RecordSale = () => {
 
     try {
       // Send the POST request for the current item
-      // Send the POST request for each sale
       await axios.post("https://api.akbsproduction.com/sales/create", saleData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -208,8 +209,16 @@ const RecordSale = () => {
           priority: "High",
         });
       }
-
-      // Clear only the order data for the last added item
+      // // Calculate and update salesTotal and salesCredit
+      setSalesTotal((prevTotal) => prevTotal + currentItem.totalAmount);
+      setSalesCredit((prevCredit) => {
+        if (currentItem.credit > 1) {
+          return prevCredit + currentItem.credit;
+        }
+        return prevCredit;
+      });
+      console.log(currentItem.credit)
+      console.log(salesCredit)
       setItems([
         ...items.slice(0, -1),
         {
@@ -342,7 +351,7 @@ const RecordSale = () => {
 
                   <div>
                     <label className="block text-sm font-bold text-gray-700">
-                     Amount Paid 
+                      Amount Paid
                     </label>
                     <input
                       type="number"
@@ -391,7 +400,6 @@ const RecordSale = () => {
                 </button>
               </div>
 
-             
               <h3 className="text-md font-bold mb-4 mt-6">
                 Payment Information
               </h3>
@@ -419,7 +427,9 @@ const RecordSale = () => {
                     onChange={handleChange}
                     className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
                   >
-                    <option value="" disabled>Select Method</option>
+                    <option value="" disabled>
+                      Select Method
+                    </option>
                     <option value="Cash">Cash</option>
                     <option value="Bank Transfer">Bank Transfer</option>
                     <option value="Tele Birr">Tele Birr</option>
@@ -460,7 +470,35 @@ const RecordSale = () => {
                     </label>
                   </div>
                 </div>
-                <div className="mt-6 flex justify-around space-x-2">
+                <div className="flex md:grid-cols-2 gap-6 mb-4 ">
+                  {/* Display Sales Total */}
+                  {/* <div></div> */}
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700">
+                      Total Sales
+                    </label>
+                    <input
+                      type="number"
+                      value={salesTotal}
+                      disabled
+                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
+                    />
+                  </div>
+                  {/* Display Sales Credit */}
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700">
+                      Total Credit
+                    </label>
+                    <input
+                      type="number"
+                      value={salesCredit}
+                      disabled
+                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
+                    />
+                  </div>
+                </div>
+                <div></div>
+                <div className="mt-6 flex  space-x-2">
                   <button
                     type="button"
                     onClick={handleCancel}
