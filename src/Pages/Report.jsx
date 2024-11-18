@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
+import { FaCreditCard } from "react-icons/fa";
 
 const Report = () => {
   const navigate = useNavigate();
@@ -75,7 +76,9 @@ const Report = () => {
       console.error("Error fetching income data:", error);
     }
   };
-
+  const handleCreditNavigation = () => {
+    navigate("/credits");
+  };
   // Fetch initial income data
   useEffect(() => {
     fetchIncome(activePeriod);
@@ -84,14 +87,32 @@ const Report = () => {
   return (
     <section className="bg-[#edf0f0b9] h-screen">
       <div className="container m-auto ">
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-2">
           {/* First small full-width grid */}
           <div className="bg-white p-4">
             <h3 className="text-xl font-bold">Analytics</h3>
           </div>
 
-          {/* Two equally sized grids */}
-          <div className="gap-6">
+          <div className="py-4 px-8">
+            <div>
+              <div className="flex justify-between items-center mb-4 flex-wrap">
+                <h3 className="flex-shrink-0">
+                  <div>
+                    <div
+                      className="bg-[#eceaeaec] p-6 w-80 rounded-lg ml-20 shadow-md cursor-pointer"
+                      onClick={handleCreditNavigation}
+                    >
+                      <div className="items-center mb-6 flex flex-col">
+                        <FaCreditCard size={40} />
+                        <p>Credits Report</p>
+                      </div>
+                    </div>
+                  </div>
+                </h3>
+              </div>
+            </div>
+          </div>
+          <div className="gap-2">
             <div className="px-6">
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex justify-between items-center mb-4">

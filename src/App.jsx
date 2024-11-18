@@ -19,6 +19,8 @@ import Report from "./Pages/Report";
 import UserAdmin from "./Pages/UserAdmin";
 import Settings from "./Pages/Settings";
 import BatchSale from "./Pages/BatchSale";
+import Credits from "./Pages/Credits";
+import AddRawMaterial from "./Pages/AddRawMaterial";
 
 const App = () => {
   
@@ -29,6 +31,7 @@ const App = () => {
         <Route path='/inventory' element={<Inventory/>}/>
         <Route path='/sales' element={<Sales/>}/>
         <Route path='/report' element={<Report/>}/>
+        <Route path='/credits' element={<Credits/>}/>
         <Route path='/batch-sale' element={<BatchSale/>}/>
         <Route path='/sales-history' element={<SalesHistory/>}/>
         <Route path='/stock-movement' element={<StockMovement/>}/>
@@ -36,6 +39,7 @@ const App = () => {
         <Route path='/movement-detail/:id' element={<ViewMovementDetail/>}/>
         <Route path='/sales-detail/:id' element={<ViewSaleDetail/>}/>
         <Route path='/add-product' element={<AddProduct/>}/>
+        <Route path='/add-raw-material' element={<AddRawMaterial/>}/>
         <Route path='/return-product/:id' element={<ReturnProduct/>}/>
         <Route path='*' element={<NotFoundPage />} />
         <Route path='/edit-product/:id' element={<EditProduct />} />

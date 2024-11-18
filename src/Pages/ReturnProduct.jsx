@@ -202,6 +202,7 @@ const EditProduct = () => {
                       <div className="text-red-600 text-sm">{formik.errors.Return_reason}</div>
                     )}
                   </div>
+                  <p>* Faulty ones aren't added back to stock</p>
                 </div>
                 <div className="space-y-4">
                   <div>
@@ -258,6 +259,7 @@ const EditProduct = () => {
               </div>
             </form>
           </div>
+          
         </div>
       </div>
       <ToastContainer />
