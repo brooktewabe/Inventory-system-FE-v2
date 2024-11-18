@@ -48,7 +48,7 @@ const AddProduct = () => {
     Name: Yup.string().required("Required"),
     Location: Yup.string().required("Required"),
     Category: Yup.string().required("Required"),
-    Type: Yup.string().required("Required"),
+    // Type: Yup.string().required("Required"),
     Price: Yup.number()
       .required("Required")
       .positive("Must be greater than zero"),
@@ -75,7 +75,7 @@ const AddProduct = () => {
     formData.append("Price", values.Price);
     formData.append("Curent_stock", values.Curent_stock);
     formData.append("Reorder_level", values.Reorder_level);
-    formData.append("Type", values.Type);
+    formData.append("Type", "Finished Product");
     formData.append("files", Product_image);
 
     try {
@@ -209,7 +209,7 @@ const AddProduct = () => {
                           className="text-red-600 text-sm"
                         />
                       </div>
-                      <div>
+                      {/* <div>
                         <label className="block text-sm font-medium text-gray-700">
                           Type
                         </label>
@@ -227,7 +227,7 @@ const AddProduct = () => {
                           component="div"
                           className="text-red-600 text-sm"
                         />
-                      </div>
+                      </div> */}
                     </div>
 
                     {/* Left Side */}

@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useBeforeUnload } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
 import { toast, ToastContainer } from "react-toastify";
@@ -9,17 +9,24 @@ const RecordSale = () => {
   const navigate = useNavigate();
   const [sale, setSale] = useState(null);
   const [salesTotal, setSalesTotal] = useState(0);
+  const [salesNames, setSalesName] = useState("");
+  const [salesQuantity, setSalesQuantity] = useState(0);
   const [salesCredit, setSalesCredit] = useState(0);
+  const [salesQUan, setSalesQUan] = useState("");
   const [items, setItems] = useState([
     {
       itemName: "",
-      quantity: "",
+      quantity: 0,
       totalAmount: 0,
       amount: 0,
       credit: 0,
-      credit_due: "",
+      credit_due: null,
     },
   ]);
+  const getSelectedIds = () => {
+    if (!salesNames) return [];
+    return salesNames.split(',').map(id => id.trim());
+  };
   const [formData, setFormData] = useState({
     Full_name: "",
     Contact: "",
@@ -28,6 +35,7 @@ const RecordSale = () => {
     Receipt: "",
     Transaction_id: "",
     Sale_type: "Batch",
+    EachQuantity:""
   });
 
   useEffect(() => {
@@ -41,7 +49,46 @@ const RecordSale = () => {
     };
     fetchStock();
   }, []);
+  const handleBeforeUnload = useCallback(
+    (event) => {
+      if (salesTotal !== 0) {
+        event.preventDefault();
+        event.returnValue = "";
+      }
+    },
+    [salesTotal]
+  );
 
+  useEffect(() => {
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [handleBeforeUnload]);
+
+  const handleNavigation = useCallback(
+    (path) => {
+      if (salesTotal !== 0) {
+        Swal.fire({
+          title: "Unsaved Changes",
+          text: "You have unsaved changes. Leaving now will make your sales history inconsistent. Are you sure you want to leave?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, leave",
+          cancelButtonText: "Stay",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate(path);
+          }
+        });
+      } else {
+        navigate(path);
+      }
+    },
+    [navigate, salesTotal]
+  );
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
@@ -187,9 +234,11 @@ const RecordSale = () => {
       Amount: currentItem.amount,
       Credit: currentItem.credit,
       Credit_due: currentItem.credit_due,
+      EachQuantity: "Only for batch"
+
     };
 
-    console.log("Sending sale data:", saleData); // Console log each sale data
+    // console.log("Sending sale data:", saleData); // Console log each sale data
 
     try {
       // Send the POST request for the current item
@@ -211,43 +260,92 @@ const RecordSale = () => {
       }
       // // Calculate and update salesTotal and salesCredit
       setSalesTotal((prevTotal) => prevTotal + currentItem.totalAmount);
+      setSalesQuantity(
+        (prevTotal) => prevTotal + parseInt(currentItem.quantity, 10)
+      );
+      setSalesQUan((prevTotal) => prevTotal ? prevTotal + "," + currentItem.quantity : currentItem.quantity);
+      setSalesName((prevNames) =>
+        prevNames
+          ? `${prevNames}, ${currentItem.itemName}`
+          : currentItem.itemName
+      );
       setSalesCredit((prevCredit) => {
         if (currentItem.credit > 1) {
           return prevCredit + currentItem.credit;
         }
         return prevCredit;
       });
-      console.log(currentItem.credit)
-      console.log(salesCredit)
+      // console.log(salesTotal)
+      // console.log(salesQuantity)
+      // console.log(salesNames)
+      // console.log(salesCredit)
+      // console.log(currentItem.credit)
+      // console.log(salesCredit)
       setItems([
         ...items.slice(0, -1),
         {
           itemName: "",
-          quantity: "",
+          quantity: 0,
           totalAmount: 0,
           credit: 0,
           credit_due: "",
           amount: 0,
         },
       ]); // Keep existing items and add a new empty one
-
-      Swal.fire({
-        title: "Success!",
-        text: "Sale recorded successfully.",
-        icon: "success",
-        confirmButtonColor: "#3085d6",
-        confirmButtonText: "OK",
-      });
     } catch (error) {
       console.error("Error creating sale:", error);
       toast.error("Error recording sale. Try again later.");
     }
   };
 
-  const handleCancel = () => {
-    navigate("/");
-  };
+  // const handleCancel = () => {
+  //   navigate("/");
+  // };
+  const handleSave = async () => {
+    const combinedData = {
+      Full_name: formData.Full_name,
+      Contact: formData.Contact,
+      Payment_method: formData.Payment_method,
+      Transaction_id: formData.Transaction_id,
+      Receipt: formData.Receipt,
+      Sale_type: "Batch Sale",
+      Product_id: salesNames,
+      Credit: salesCredit,
+      Quantity: salesQuantity,
+      Credit_due: null,
+      Amount: salesTotal - salesCredit,
+      Total_amount: salesTotal,
+      EachQuantity: salesQUan
+    };
 
+    try {
+      const response = await axios.post(
+        "https://api.akbsproduction.com/sales/create",
+        combinedData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      if (response.status === 201) {
+        Swal.fire({
+          title: "Success!",
+          text: "Sale saved successfully.",
+          icon: "success",
+          confirmButtonColor: "#3085d6",
+          confirmButtonText: "OK",
+        });
+        // Reset the form or navigate away as needed
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Error saving sales:", error);
+      toast.error("Error saving  sales. Please try again.");
+    }
+  };
+  const handleCancel = () => {
+    handleNavigation("/");
+  };
   if (!sale) return <div>Loading...</div>;
 
   return (
@@ -306,24 +404,31 @@ const RecordSale = () => {
                       Item Name
                     </label>
                     <select
-                      name="itemName"
-                      value={item.itemName}
-                      onChange={(e) => handleItemChange(index, e)}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+              name="itemName"
+              value={item.itemName}
+              onChange={(e) => handleItemChange(index, e)}
+              className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+            >
+              <option value="" disabled>
+                Select Item
+              </option>
+              {Array.isArray(sale) && sale.length > 0 ? (
+                sale.map((sl) => {
+                  const isDisabled = getSelectedIds().includes(sl.id.toString());
+                  return (
+                    <option 
+                      key={sl.id} 
+                      value={sl.id}
+                      disabled={isDisabled && item.itemName !== sl.id.toString()}
                     >
-                      <option value="" disabled>
-                        Select Item
-                      </option>
-                      {Array.isArray(sale) && sale.length > 0 ? (
-                        sale.map((sl) => (
-                          <option key={sl.id} value={sl.id}>
-                            {sl.Name}
-                          </option>
-                        ))
-                      ) : (
-                        <option disabled>No items available</option>
-                      )}
-                    </select>
+                      {sl.Name} {isDisabled ? '(Already Selected)' : ''}
+                    </option>
+                  );
+                })
+              ) : (
+                <option disabled>No items available</option>
+              )}
+            </select>
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-gray-700">
@@ -396,7 +501,7 @@ const RecordSale = () => {
                   onClick={addMoreItem}
                   className="bg-[#16033a] text-white px-4 py-2 rounded-lg"
                 >
-                  Add More Item
+                  Add To Sale
                 </button>
               </div>
 
@@ -471,8 +576,6 @@ const RecordSale = () => {
                   </div>
                 </div>
                 <div className="flex md:grid-cols-2 gap-6 mb-4 ">
-                  {/* Display Sales Total */}
-                  {/* <div></div> */}
                   <div>
                     <label className="block text-sm font-bold text-gray-700">
                       Total Sales
@@ -496,18 +599,41 @@ const RecordSale = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
                     />
                   </div>
+                  {/* <div>
+                    <label className="block text-sm font-bold text-gray-700">
+                      Quantity
+                    </label>
+                    <input
+                      type="text"
+                      value={salesQUan}
+                      disabled
+                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
+                    />
+                  </div> */}
                 </div>
                 <div></div>
-                <div className="mt-6 flex  space-x-2">
+                <div className="mt-6 flex  space-x-4">
                   <button
                     type="button"
                     onClick={handleCancel}
-                    className="border border-gray-400 text-gray-700 px-16 py-2 rounded-lg"
+                    className="border border-gray-400 text-gray-700 px-8 py-2 rounded-lg"
                   >
                     Cancel
                   </button>
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    className="border border-gray-400 text-white bg-[#16033a] px-8 py-2 rounded-lg"
+                  >
+                    Save sale
+                  </button>
                 </div>
               </div>
+              {salesTotal !== 0 && (
+                <div>
+                <p>* You have unsaved changes. Leaving now will make your sales history inconsistent.</p>
+                </div>
+              )}
             </div>
           </form>
           <ToastContainer />

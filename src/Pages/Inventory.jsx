@@ -104,6 +104,9 @@ const Inventory = () => {
   const handleAddNavigation = () => {
     navigate("/add-product");
   };
+  const handleAddRawNavigation = () => {
+    navigate("/add-raw-material");
+  };
   const handleReturnNavigation = (id) => {
     navigate(`/return-product/${id}`);
   };
@@ -121,7 +124,7 @@ const Inventory = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ">
             <div>
               <div
                 className="bg-[#eceaeaec] p-6 max-w-sm rounded-lg ml-20 shadow-md cursor-pointer"
@@ -130,6 +133,17 @@ const Inventory = () => {
                 <div className="items-center mb-4 flex flex-col">
                   <FaPlus size={40} />
                   <p>Create Product</p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div
+                className="bg-[#eceaeaec] p-6 max-w-sm rounded-lg ml-20 shadow-md cursor-pointer"
+                onClick={handleAddRawNavigation}
+              >
+                <div className="items-center mb-4 flex flex-col">
+                  <FaPlus size={40} />
+                  <p>Add Raw Material</p>
                 </div>
               </div>
             </div>
