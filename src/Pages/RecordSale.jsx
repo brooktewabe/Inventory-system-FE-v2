@@ -20,7 +20,7 @@ const RecordSale = () => {
     Amount: "",
     Payment_method: "",
     Total_amount: "",
-    Credit_due: "",
+    Credit_due: null,
     Credit: "0",
     Receipt: "",
     Transaction_id: "",

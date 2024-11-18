@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import {  FaSearch } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import { AiOutlineHourglass } from "react-icons/ai";
 import { GrMultiple } from "react-icons/gr";
 const Sales = () => {
@@ -14,7 +14,6 @@ const Sales = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filteredStocks, setFilteredStocks] = useState([]);
-
 
   useEffect(() => {
     const fetchStocks = async () => {
@@ -47,7 +46,7 @@ const Sales = () => {
 
     setFilteredStocks(updatedStocks);
   }, [searchTerm, filterStatus, stocks]);
-  
+
   const formatProductId = (id) => {
     if (id.length <= 10) return id; // Return the id if it's less than or equal to 10 characters
     return `${id.slice(0, 3)}...${id.slice(-5)}`; // Format as 'xxxxx...xxxxx'
@@ -136,7 +135,9 @@ const Sales = () => {
                   <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
                     Category
                   </td>
-                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">Type</td>
+                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
+                    Type
+                  </td>
 
                   <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
                     Name
@@ -153,10 +154,9 @@ const Sales = () => {
                   <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
                     Location
                   </td>
-                    <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
-                      Action
-                    </td>
-
+                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
+                    Action
+                  </td>
                 </tr>
               </thead>
               <tbody>
@@ -164,37 +164,29 @@ const Sales = () => {
                   <tr key={stock.id}>
                     <td className="py-2 px-4 border-b">{index + 1}</td>
                     <td className="py-2 px-4 border-b">
-                    {formatProductId( stock.id)}
+                      {formatProductId(stock.id)}
                     </td>
-                    <td className="py-2 px-4 border-b">
-                    {stock.Category}
-                    </td>
+                    <td className="py-2 px-4 border-b">{stock.Category}</td>
                     <td className="py-2 px-4 border-b"> {stock.Type}</td>
 
+                    <td className="py-2 px-4 border-b">{stock.Name}</td>
+                    <td className="py-2 px-4 border-b">{stock.Price}</td>
+                    <td className="py-2 px-4 border-b">{stock.Curent_stock}</td>
                     <td className="py-2 px-4 border-b">
-                    {stock.Name}
+                      {stock.Reorder_level}
                     </td>
-                    <td className="py-2 px-4 border-b">
-                    {stock.Price}
-                    </td>
-                    <td className="py-2 px-4 border-b">
-                    {stock.Curent_stock}
-                    </td>
-                    <td className="py-2 px-4 border-b">
-                    {stock.Reorder_level}
-                    </td>
-                    
-                    <td className="py-2 px-4 border-b">
-                      {stock.Location}
-                    </td>
+
+                    <td className="py-2 px-4 border-b">{stock.Location}</td>
                     <td className="py-3 px-4 border-b space-x-2">
-                        <button
-                          onClick={() => onEditStock(stock.id)}
-                          className="text-blue-500 underline hover:text-blue-700"
-                        >
-                          Record Sale
-                        </button>
-                      </td>
+                      <button
+                        onClick={() => onEditStock(stock.id)}
+                        className="text-blue-500 underline hover:text-blue-700"
+                      >
+                        {stock.Type === "Raw Material"
+                          ? "Record Usage"
+                          : "Record Sale"}
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

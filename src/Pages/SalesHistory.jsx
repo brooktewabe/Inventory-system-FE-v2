@@ -160,7 +160,8 @@ const SalesHistory = () => {
                 </tr>
               </thead>
               <tbody>
-                {sales?.map((sale, index) => (
+                {sales
+                .map((sale, index) => (
                   <tr key={sale.id}>
                     <td className="py-2 px-4 border-b">
                       {(currentPage - 1) * itemsPerPage + index + 1}
