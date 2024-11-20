@@ -54,7 +54,13 @@ const IncomeSection = () => {
       console.error("Error fetching income data:", error);
     }
   };
-
+  // Function to format numbers with commas and two decimal places
+  const formatNumber = (num) => {
+    return new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(num);
+  };
   // Fetch initial income and return values on mount
   useEffect(() => {
     fetchNormalIncome();
@@ -82,7 +88,7 @@ const IncomeSection = () => {
     </div>
     
     <div className="flex justify-between items-start mt-4">
-      <p className="text-2xl font-extrabold">{stockVal}</p>
+      <p className="text-2xl font-extrabold">{formatNumber(stockVal)}</p>
       <div className="text-right">
         <p className="text-lg font-bold">Returns: {-1 * normalSum}</p>
         <p className="text-lg font-bold">Faulty Returns: {-1 * faultySum}</p>

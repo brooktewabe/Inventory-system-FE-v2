@@ -41,7 +41,7 @@ const IncomeSection = () => {
       }
 
       const response = await axios.get(endpoint);
-      const data = response.data.total; 
+      const data = response.data.total;
       const totalAmount = parseFloat(data) || 0;
 
       if (period === "daily") {
@@ -57,7 +57,7 @@ const IncomeSection = () => {
   };
 
   useEffect(() => {
-    fetchIncome(activePeriod); 
+    fetchIncome(activePeriod);
   }, [activePeriod]);
 
   return (
@@ -70,7 +70,9 @@ const IncomeSection = () => {
               key={period}
               onClick={() => handleToggle(period)}
               className={`py-1 px-4 rounded-lg mb-2 md:mb-0 md:mr-2 ${
-                activePeriod === period ? "bg-black text-white" : "bg-[#e0e9ec] text-black"
+                activePeriod === period
+                  ? "bg-black text-white"
+                  : "bg-[#e0e9ec] text-black"
               }`}
             >
               {period.charAt(0).toUpperCase() + period.slice(1)}
@@ -81,10 +83,19 @@ const IncomeSection = () => {
       <div className="mt-4">
         <p className="text-2xl font-extrabold">
           {activePeriod === "daily"
-            ? currentDateIncome.toFixed(2)
+            ? currentDateIncome.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })
             : activePeriod === "monthly"
-            ? currentMonthIncome.toFixed(2)
-            : currentYearIncome.toFixed(2)}
+            ? currentMonthIncome.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })
+            : currentYearIncome.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
         </p>
       </div>
       <p className="mb-6 text-sm font-bold">Total Sales</p>
