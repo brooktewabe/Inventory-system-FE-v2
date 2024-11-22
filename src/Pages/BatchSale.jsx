@@ -632,6 +632,7 @@ const RecordSale = () => {
               {salesTotal !== 0 && (
                 <div>
                 <p>* You have unsaved changes. Leaving now will make your sales history inconsistent.</p>
+                <p>* Don&apos;t forget to add your last item to sale.</p>
                 </div>
               )}
             </div>
