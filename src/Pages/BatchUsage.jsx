@@ -360,11 +360,11 @@ const RecordSale = () => {
       <div className="container m-auto">
         <div className="grid grid-cols-1 gap-6">
           <div className="bg-white p-4">
-            <h3 className="text-xl font-bold">Record Batch Sale</h3>
+            <h3 className="text-xl font-bold">Record Batch Usage</h3>
           </div>
           <form onSubmit={(e) => e.preventDefault()}>
             <div className="bg-white p-6 rounded-lg shadow-md max-w-[70%] ml-20">
-              <h3 className="text-xl font-bold mb-4">Record Sales</h3>
+              <h3 className="text-xl font-bold mb-4">Record Usage</h3>
               <hr />
               <h3 className="text-md font-bold mb-4">Buyer Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -476,9 +476,7 @@ const RecordSale = () => {
                 </div>
               )}
               <h3 className="text-md font-bold mb-4">Order Information</h3>
-              {items
-              // ?.filter((item) => item.Type === "Finished Products" ||  item.Type === "Finished Product")
-              .map((item, index) => (
+              {items.map((item, index) => (
                 <div
                   key={index}
                   className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4"
@@ -498,7 +496,7 @@ const RecordSale = () => {
                       </option>
                       {Array.isArray(sale) && sale.length > 0 ? (
                         sale
-                        .filter(sl => sl.Type === "Finished Products" || sl.Type === "Finished Product")
+                        .filter(sl => sl.Type === "Raw Material")
                         .map((sl) => {
                           const isDisabled = getSelectedIds().includes(sl.id.toString());
                           return (

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
 import { FaCreditCard } from "react-icons/fa";
+import SalesHisory from "../Components/History"
 
 const Report = () => {
   const navigate = useNavigate();
@@ -163,6 +164,7 @@ const Report = () => {
           </div>
         </div>
       </div>
+      <SalesHisory/>
     </section>
   );
 };

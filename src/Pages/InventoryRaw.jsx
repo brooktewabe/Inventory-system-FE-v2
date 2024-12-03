@@ -125,18 +125,18 @@ const Inventory = () => {
 
           {/* Action Buttons */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+
             <div>
               <div
                 className="bg-[#eceaeaec] p-6 max-w-sm rounded-lg ml-20 shadow-md cursor-pointer"
-                onClick={handleAddNavigation}
+                onClick={handleAddRawNavigation}
               >
                 <div className="items-center mb-4 flex flex-col">
                   <FaPlus size={40} />
-                  <p>Create Product</p>
+                  <p>Add Raw Material</p>
                 </div>
               </div>
             </div>
-
             <div>
               <div
                 className="bg-[#eceaeaec] p-6 max-w-sm rounded-lg ml-20 shadow-md cursor-pointer"
@@ -210,7 +210,7 @@ const Inventory = () => {
               </thead>
               <tbody>
                 {filteredStocks
-                ?.filter((stock) => stock.Type === "Finished Products"||stock.Type === "Finished Product")
+                ?.filter((stock) =>stock.Type === "Raw Material")
                 ?.map((stock, index) => (
                   <tr key={stock.id}>
                     <td className="py-2 px-4 border-b">{index + 1}</td>

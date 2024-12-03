@@ -160,7 +160,9 @@ const Sales = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredStocks?.map((stock, index) => (
+                {filteredStocks
+                ?.filter((stock) => stock.Type === "Finished Products"||stock.Type === "Finished Product")
+                .map((stock, index) => (
                   <tr key={stock.id}>
                     <td className="py-2 px-4 border-b">{index + 1}</td>
                     <td className="py-2 px-4 border-b">
@@ -182,9 +184,7 @@ const Sales = () => {
                         onClick={() => onEditStock(stock.id)}
                         className="text-blue-500 underline hover:text-blue-700"
                       >
-                        {stock.Type === "Raw Material"
-                          ? "Record Usage"
-                          : "Record Sale"}
+                          Record Sale
                       </button>
                     </td>
                   </tr>

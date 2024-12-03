@@ -21,6 +21,9 @@ import Settings from "./Pages/Settings";
 import BatchSale from "./Pages/BatchSale";
 import Credits from "./Pages/Credits";
 import AddRawMaterial from "./Pages/AddRawMaterial";
+import SalesRaw from "./Pages/SalesRaw";
+import BatchUsage from "./Pages/BatchUsage";
+import InventoryRaw from "./Pages/InventoryRaw";
 
 const App = () => {
   
@@ -29,10 +32,13 @@ const App = () => {
         <Route path='/' element={<Layout />}>
         <Route index element={<HomePage />} />
         <Route path='/inventory' element={<Inventory/>}/>
+        <Route path='/inventory-raw' element={<InventoryRaw/>}/>
         <Route path='/sales' element={<Sales/>}/>
+        <Route path='/sales-raw' element={<SalesRaw/>}/>
         <Route path='/report' element={<Report/>}/>
         <Route path='/credits' element={<Credits/>}/>
         <Route path='/batch-sale' element={<BatchSale/>}/>
+        <Route path='/batch-usage' element={<BatchUsage/>}/>
         <Route path='/sales-history' element={<SalesHistory/>}/>
         <Route path='/stock-movement' element={<StockMovement/>}/>
         <Route path='/notification' element={<Notification/>}/>

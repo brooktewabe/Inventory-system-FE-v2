@@ -6,11 +6,13 @@ import {
   AiOutlineBars,
   AiOutlineSwap,
   AiTwotonePlusCircle,
+  AiFillPlusSquare,
   AiTwotoneReconciliation,
   AiFillSetting
 } from "react-icons/ai";
 import { CiLogout, CiViewList } from "react-icons/ci";
 import { useNavigate, NavLink, Outlet, useLocation } from "react-router-dom";
+import { MdOutlineDocumentScanner } from "react-icons/md";
 import { BiSolidDashboard } from "react-icons/bi";
 import Cookies from "js-cookie";
 import axios from "../axiosInterceptor";
@@ -62,9 +64,21 @@ const Navbar = () => {
       className: { linkClass },
     },
     {
+      icon: <AiFillPlusSquare size={25} className="mr-4" />,
+      text: " Raw Material Inventory",
+      link: "/inventory-raw",
+      className: { linkClass },
+    },
+    {
       icon: <AiTwotoneReconciliation size={25} className="mr-4" />,
       text: "Record Sales",
       link: "/sales",
+      className: { linkClass },
+    },
+    {
+      icon: <MdOutlineDocumentScanner  size={25} className="mr-4" />,
+      text: "Record Usage",
+      link: "/sales-raw",
       className: { linkClass },
     },
     {
@@ -89,9 +103,21 @@ const Navbar = () => {
       className: { linkClass },
     },
     {
+      icon: <AiFillPlusSquare size={25} className="mr-4" />,
+      text: " Raw Material Inventory",
+      link: "/inventory-raw",
+      className: { linkClass },
+    },
+    {
       icon: <AiTwotoneReconciliation size={25} className="mr-4" />,
       text: "Record Sales",
       link: "/sales",
+      className: { linkClass },
+    },
+    {
+      icon: <MdOutlineDocumentScanner  size={25} className="mr-4" />,
+      text: "Record Usage",
+      link: "/sales-raw",
       className: { linkClass },
     },
     {

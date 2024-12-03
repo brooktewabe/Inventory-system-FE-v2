@@ -1,14 +1,11 @@
 import { useState, useEffect } from "react";
-import Swal from "sweetalert2";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import { FaEdit, FaTrash, FaSearch, FaPlus } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import { AiOutlineHourglass } from "react-icons/ai";
-import { PiKeyReturnBold } from "react-icons/pi";
-
-const Inventory = () => {
+import { GrMultiple } from "react-icons/gr";
+const Sales = () => {
   const navigate = useNavigate();
 
   const [stocks, setStocks] = useState([]);
@@ -21,9 +18,7 @@ const Inventory = () => {
   useEffect(() => {
     const fetchStocks = async () => {
       try {
-        const response = await axios.get(
-          "https://api.akbsproduction.com/stock/all"
-        );
+        const response = await axios.get(`https://api.akbsproduction.com/stock/all`);
         setStocks(response.data.data);
         setFilteredStocks(response.data.data);
       } catch (error) {
@@ -51,106 +46,60 @@ const Inventory = () => {
 
     setFilteredStocks(updatedStocks);
   }, [searchTerm, filterStatus, stocks]);
+
   const formatProductId = (id) => {
     if (id.length <= 10) return id; // Return the id if it's less than or equal to 10 characters
     return `${id.slice(0, 3)}...${id.slice(-5)}`; // Format as 'xxxxx...xxxxx'
   };
-  const onDelete = async (id) => {
-    Swal.fire({
-      text: "Are you sure you want to delete this product?",
-      icon: "error",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      confirmButtonText: "Yes",
-      cancelButtonText: "Cancel",
-      customClass: {
-        cancelButton: "border border-gray-700 px-6 py-2 w-32 rounded-3xl ",
-        confirmButton: "bg-red-500 text-white px-6 py-2 w-32 rounded-3xl",
-      },
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const response = await axios.get(
-            `https://api.akbsproduction.com/stock/all/${id}`
-          );
-          const stockToDelete = response.data;
-          await axios.delete(`https://api.akbsproduction.com/stock/all/${id}`);
-          setStocks(stocks.filter((stock) => stock.id !== id));
-          const notifData = new FormData();
-          notifData.append("message", `${stockToDelete.Name} is deleted.`);
-          notifData.append("priority", "High");
-
-          // Post notification data
-          await axios.post(
-            "https://api.akbsproduction.com/notification/create",
-            notifData,
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
-          toast.success("Deleted Successfully");
-        } catch (error) {
-          toast.error("Error deleting stock. Try again later.");
-        }
-      }
-    });
-  };
-
   const onEditStock = (id) => {
-    navigate(`/edit-product/${id}`);
+    navigate(`/record-sale/${id}`);
   };
+  // const onEditStock = (id) => {
+  //   navigate('/record-sale', { state: { id } }); // Pass the product id via state/props
+  // };
   const handleAddNavigation = () => {
-    navigate("/add-product");
+    navigate("/sales-history");
   };
-  const handleAddRawNavigation = () => {
-    navigate("/add-raw-material");
-  };
-  const handleReturnNavigation = (id) => {
-    navigate(`/return-product/${id}`);
-  };
-  const handleMovementNavigation = () => {
-    navigate("/stock-movement");
+  const handleBatchNavigation = () => {
+    navigate("/batch-usage");
   };
 
   return (
     <section className="bg-[#edf0f0b9] min-h-screen">
-      <div className="container mx-auto">
+      <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-6">
           {/* First small full-width grid */}
           <div className="bg-white p-4  ">
-            <h3 className="text-xl font-bold">Stock System</h3>
+            <h3 className="text-xl font-bold">Raw Material Usage System</h3>
           </div>
 
-          {/* Action Buttons */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+          {/* Two equally sized grids */}
+          <div className="flex flex-col sm:grid sm:grid-cols-2 gap-6">
             <div>
               <div
-                className="bg-[#eceaeaec] p-6 max-w-sm rounded-lg ml-20 shadow-md cursor-pointer"
+                className="bg-[#eceaeaec] p-6 w-52 rounded-lg ml-32 shadow-md cursor-pointer"
+                onClick={handleBatchNavigation}
+              >
+                <div className="items-center mb-4 flex flex-col">
+                  <GrMultiple size={40} />
+                  <p>Multiple Item usage</p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div
+                className="bg-[#eceaeaec] p-6 w-52 rounded-lg ml-20 shadow-md cursor-pointer"
                 onClick={handleAddNavigation}
               >
                 <div className="items-center mb-4 flex flex-col">
-                  <FaPlus size={40} />
-                  <p>Create Product</p>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div
-                className="bg-[#eceaeaec] p-6 max-w-sm rounded-lg ml-20 shadow-md cursor-pointer"
-                onClick={handleMovementNavigation}
-              >
-                <div className="items-center mb-4 flex flex-col">
                   <AiOutlineHourglass size={40} />
-                  <p>Stock Movement</p>
+                  <p>View History</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/*full-width grid */}
+          {/* full-width grid */}
           <div className="bg-white p-6 rounded-lg shadow-md ml-6 ">
             <div className="flex justify-between items-center mb-6">
               <h3 className=" text-lg font-bold">Stock List</h3>
@@ -161,13 +110,12 @@ const Inventory = () => {
                 >
                   <FaSearch size={20} />
                 </button>
-
               </div>
             </div>
             {searchVisible && (
               <input
                 type="text"
-                placeholder="Search by name"
+                placeholder="Search Product"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full mb-4 p-2 border border-gray-300 rounded"
@@ -187,7 +135,10 @@ const Inventory = () => {
                   <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
                     Category
                   </td>
-                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">Type</td>
+                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
+                    Type
+                  </td>
+
                   <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
                     Name
                   </td>
@@ -210,8 +161,8 @@ const Inventory = () => {
               </thead>
               <tbody>
                 {filteredStocks
-                ?.filter((stock) => stock.Type === "Finished Products"||stock.Type === "Finished Product")
-                ?.map((stock, index) => (
+                ?.filter((stock) =>stock.Type === "Raw Material")
+                .map((stock, index) => (
                   <tr key={stock.id}>
                     <td className="py-2 px-4 border-b">{index + 1}</td>
                     <td className="py-2 px-4 border-b">
@@ -219,6 +170,7 @@ const Inventory = () => {
                     </td>
                     <td className="py-2 px-4 border-b">{stock.Category}</td>
                     <td className="py-2 px-4 border-b"> {stock.Type}</td>
+
                     <td className="py-2 px-4 border-b">{stock.Name}</td>
                     <td className="py-2 px-4 border-b">{stock.Price}</td>
                     <td className="py-2 px-4 border-b">{stock.Curent_stock}</td>
@@ -227,25 +179,12 @@ const Inventory = () => {
                     </td>
 
                     <td className="py-2 px-4 border-b">{stock.Location}</td>
-
                     <td className="py-3 px-4 border-b space-x-2">
                       <button
-                        onClick={() => handleReturnNavigation(stock.id)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        <PiKeyReturnBold  />
-                      </button>
-                      <button
                         onClick={() => onEditStock(stock.id)}
-                        className="text-blue-500 hover:text-blue-700"
+                        className="text-blue-500 underline hover:text-blue-700"
                       >
-                        <FaEdit />
-                      </button>
-                      <button
-                        onClick={() => onDelete(stock.id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <FaTrash />
+                          Record Usage
                       </button>
                     </td>
                   </tr>
@@ -259,5 +198,5 @@ const Inventory = () => {
   );
 };
 
-export { Inventory };
-export default withAuth(Inventory);
+export { Sales };
+export default withAuth(Sales);
