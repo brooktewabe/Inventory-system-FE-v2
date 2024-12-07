@@ -582,7 +582,7 @@ const RecordSale = () => {
                   onClick={addMoreItem}
                   className="bg-[#16033a] text-white px-4 py-2 rounded-lg"
                 >
-                  Add To Sale
+                  Add To Used
                 </button>
               </div>
 
@@ -689,9 +689,15 @@ const RecordSale = () => {
                   <button
                     type="button"
                     onClick={handleSave}
-                    className="border border-gray-400 text-white bg-[#16033a] px-8 py-2 rounded-lg"
+                    disabled={salesTotal === 0}
+                    title={salesTotal === 0 ? "Sales total must be greater than 0 to save." : ""}
+                    className={`border border-gray-400 px-8 py-2 rounded-lg ${
+                      salesTotal === 0
+                        ? "bg-[#16033a] text-white cursor-not-allowed"
+                        : "bg-[#16033a] text-white"
+                    }`}
                   >
-                    Save sale
+                    Save usage
                   </button>
                 </div>
               </div>

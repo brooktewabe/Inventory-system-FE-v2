@@ -186,7 +186,7 @@ const Navbar = () => {
         className={`fixed top-0 left-0 h-screen bg-[#06030b] min-h-full z-50 duration-300 
           ${nav ? "w-[90px]" : "w-[13%]"} flex flex-col justify-between`}
       >
-        <div className="bg-[#06030b] rounded-t-xl p-4 flex flex-col">
+        <div className="bg-[#06030b] rounded-t-xl p-3 flex flex-col">
           {!nav && (
             <>
               <div className="flex">
@@ -224,7 +224,7 @@ const Navbar = () => {
                 <li key={index} className="my-2">
                   <NavLink
                     to={link}
-                    className="flex items-center text-xl hover:bg-[#424243] rounded-lg p-2"
+                    className="flex items-center text-xl hover:bg-[#424243] rounded-lg p-1.5"
                     onClick={() => setNav(false)}
                   >
                     {icon}
@@ -237,7 +237,7 @@ const Navbar = () => {
                 <li key={index} className="my-4">
                   <NavLink
                     to={link}
-                    className="flex items-center text-lg  hover:bg-[#424243] rounded-lg p-2"
+                    className="flex items-center text-lg  hover:bg-[#424243] rounded-lg p-1.5"
                     onClick={() => setNav(false)}
                   >
                     {icon}
