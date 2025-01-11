@@ -10,8 +10,8 @@ import {
   AiTwotoneReconciliation,
   AiFillSetting
 } from "react-icons/ai";
-import { CiLogout, CiViewList } from "react-icons/ci";
-import { useNavigate, NavLink, Outlet, useLocation } from "react-router-dom";
+import { CiLogout } from "react-icons/ci";
+import { useNavigate, NavLink, useLocation } from "react-router-dom";
 import { MdOutlineDocumentScanner } from "react-icons/md";
 import { BiSolidDashboard } from "react-icons/bi";
 import Cookies from "js-cookie";
@@ -59,28 +59,40 @@ const Navbar = () => {
     },
     {
       icon: <AiTwotonePlusCircle size={25} className="mr-4" />,
-      text: "Inventory",
-      link: "/inventory",
-      className: { linkClass },
-    },
-    {
-      icon: <AiFillPlusSquare size={25} className="mr-4" />,
-      text: " Raw Material Inventory",
-      link: "/inventory-raw",
+      text: "Inventory Management",
+      link: "/inventory-layout",
       className: { linkClass },
     },
     {
       icon: <AiTwotoneReconciliation size={25} className="mr-4" />,
-      text: "Record Sales",
-      link: "/sales",
+      text: "Recording System",
+      link: "/record-layout",
       className: { linkClass },
     },
-    {
-      icon: <MdOutlineDocumentScanner  size={25} className="mr-4" />,
-      text: "Record Usage",
-      link: "/sales-raw",
-      className: { linkClass },
-    },
+    // {
+    //   icon: <AiTwotonePlusCircle size={25} className="mr-4" />,
+    //   text: "Inventory",
+    //   link: "/inventory",
+    //   className: { linkClass },
+    // },
+    // {
+    //   icon: <AiFillPlusSquare size={25} className="mr-4" />,
+    //   text: " Raw Material Inventory",
+    //   link: "/inventory-raw",
+    //   className: { linkClass },
+    // },
+    // {
+    //   icon: <AiTwotoneReconciliation size={25} className="mr-4" />,
+    //   text: "Record Sales",
+    //   link: "/sales",
+    //   className: { linkClass },
+    // },
+    // {
+    //   icon: <MdOutlineDocumentScanner  size={25} className="mr-4" />,
+    //   text: "Record Usage",
+    //   link: "/sales-raw",
+    //   className: { linkClass },
+    // },
     {
       icon: <AiOutlineBars size={25} className="mr-4" />,
       text: "Report",
@@ -98,28 +110,40 @@ const Navbar = () => {
     },
     {
       icon: <AiTwotonePlusCircle size={25} className="mr-4" />,
-      text: "Inventory",
-      link: "/inventory",
-      className: { linkClass },
-    },
-    {
-      icon: <AiFillPlusSquare size={25} className="mr-4" />,
-      text: " Raw Material Inventory",
-      link: "/inventory-raw",
+      text: "Inventory Management",
+      link: "/inventory-layout",
       className: { linkClass },
     },
     {
       icon: <AiTwotoneReconciliation size={25} className="mr-4" />,
-      text: "Record Sales",
-      link: "/sales",
+      text: "Recording System",
+      link: "/record-layout",
       className: { linkClass },
     },
-    {
-      icon: <MdOutlineDocumentScanner  size={25} className="mr-4" />,
-      text: "Record Usage",
-      link: "/sales-raw",
-      className: { linkClass },
-    },
+    // {
+    //   icon: <AiTwotonePlusCircle size={25} className="mr-4" />,
+    //   text: "Inventory",
+    //   link: "/inventory",
+    //   className: { linkClass },
+    // },
+    // {
+    //   icon: <AiFillPlusSquare size={25} className="mr-4" />,
+    //   text: " Raw Material Inventory",
+    //   link: "/inventory-raw",
+    //   className: { linkClass },
+    // },
+    // {
+    //   icon: <AiTwotoneReconciliation size={25} className="mr-4" />,
+    //   text: "Record Sales",
+    //   link: "/sales",
+    //   className: { linkClass },
+    // },
+    // {
+    //   icon: <MdOutlineDocumentScanner  size={25} className="mr-4" />,
+    //   text: "Record Usage",
+    //   link: "/sales-raw",
+    //   className: { linkClass },
+    // },
     {
       icon: <AiOutlineBars size={25} className="mr-4" />,
       text: "Report",
