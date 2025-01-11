@@ -297,7 +297,7 @@ const RecordSale = () => {
           quantity: 0,
           totalAmount: 0,
           credit: 0,
-          credit_due: "",
+          credit_due: null,
           amount: 0,
         },
       ]); // Keep existing items and add a new empty one

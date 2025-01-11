@@ -36,7 +36,7 @@ const RecordSale = () => {
     // Credit_due: "",
     Receipt: "",
     Transaction_id: "",
-    Sale_type: "Batch",
+    Sale_type: "Batch part",
     EachQuantity:""
   });
 
@@ -139,8 +139,8 @@ const RecordSale = () => {
     const requiredFields = [
       "Full_name",
       "Contact",
-      "Payment_method",
-      "Transaction_id",
+      // "Payment_method",
+      // "Transaction_id",
       // "Quantity",
       // "Amount",
     ];
@@ -159,16 +159,16 @@ const RecordSale = () => {
     }
 
     // Check if Amount Paid is provided and Credit Due is required
-    if (currentItem.credit > 1 && !currentItem.credit_due) {
-      Swal.fire({
-        title: "Error!",
-        text: "Credit Due is required when Credit is provided.",
-        icon: "error",
-        confirmButtonColor: "#d33",
-        confirmButtonText: "OK",
-      });
-      return; // Exit the function if validation fails
-    }
+    // if (currentItem.credit > 1 && !currentItem.credit_due) {
+    //   Swal.fire({
+    //     title: "Error!",
+    //     text: "Credit Due is required when Credit is provided.",
+    //     icon: "error",
+    //     confirmButtonColor: "#d33",
+    //     confirmButtonText: "OK",
+    //   });
+    //   return; // Exit the function if validation fails
+    // }
     // Check if Credit is +ve
     if (currentItem.credit < 0) {
       Swal.fire({
@@ -233,11 +233,10 @@ const RecordSale = () => {
       Product_id: selectedItem.id,
       Quantity: currentItem.quantity,
       Total_amount: currentItem.totalAmount,
-      Amount: currentItem.amount,
-      Credit: currentItem.credit,
-      Credit_due: currentItem.credit_due,
-      EachQuantity: "Only for batch"
-
+      Amount: currentItem.totalAmount,
+      Credit:0,
+      Credit_due: null,
+      EachQuantity: "Only for batch usage"
     };
 
     // console.log("Sending sale data:", saleData); // Console log each sale data
@@ -285,7 +284,7 @@ const RecordSale = () => {
           quantity: currentItem.quantity,
           totalAmount: currentItem.totalAmount,
           credit: currentItem.credit,
-          amount: currentItem.amount,
+          amount: currentItem.totalAmount,
           credit_due: currentItem.credit_due,
         },
       ]);
@@ -314,9 +313,9 @@ const RecordSale = () => {
       Payment_method: formData.Payment_method,
       Transaction_id: formData.Transaction_id,
       Receipt: formData.Receipt,
-      Sale_type: "Batch Sale",
+      Sale_type: "Batch Usage",
       Product_id: salesNames,
-      Credit: salesCredit,
+      Credit: 0,
       Quantity: salesQuantity,
       Credit_due: null,
       Amount: salesTotal - salesCredit,
@@ -366,7 +365,7 @@ const RecordSale = () => {
             <div className="bg-white p-6 rounded-lg shadow-md max-w-[70%] ml-20">
               <h3 className="text-xl font-bold mb-4">Record Usage</h3>
               <hr />
-              <h3 className="text-md font-bold mb-4">Buyer Information</h3>
+              <h3 className="text-md font-bold mb-4">Basic Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
@@ -438,7 +437,7 @@ const RecordSale = () => {
                           className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
                         />
                       </div>
-                      <div>
+                      {/* <div>
                         <label className="block text-sm font-bold text-gray-700">
                           Amount Paid
                         </label>
@@ -470,12 +469,12 @@ const RecordSale = () => {
                           readOnly
                           className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
                         />
-                      </div>
+                      </div> */}
                     </div>
                   ))}
                 </div>
               )}
-              <h3 className="text-md font-bold mb-4">Order Information</h3>
+              <h3 className="text-md font-bold mb-4">Usage Information</h3>
               {items.map((item, index) => (
                 <div
                   key={index}
@@ -537,7 +536,7 @@ const RecordSale = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
                     />
                   </div>
-                  <div>
+                  {/* <div>
                     <label className="block text-sm font-bold text-gray-700">
                       Amount Paid
                     </label>
@@ -573,8 +572,8 @@ const RecordSale = () => {
                       onChange={(e) => handleItemChange(index, e)}
                       className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
                     />
-                  </div>
-                </div>
+                  </div>*/}
+                </div> 
               ))}
               <div className="flex justify-end">
                 <button
@@ -586,11 +585,11 @@ const RecordSale = () => {
                 </button>
               </div>
 
-              <h3 className="text-md font-bold mb-4 mt-6">
+              {/* <h3 className="text-md font-bold mb-4 mt-6">
                 Payment Information
-              </h3>
+              </h3> */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
-                <div>
+                {/* <div>
                   <label className="block text-sm font-bold text-gray-700">
                     Transaction ID
                   </label>
@@ -601,9 +600,9 @@ const RecordSale = () => {
                     onChange={handleChange}
                     className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
                   />
-                </div>
+                </div> */}
 
-                <div>
+                {/* <div>
                   <label className="block text-sm font-bold text-gray-700">
                     Payment Method
                   </label>
@@ -622,9 +621,9 @@ const RecordSale = () => {
                     <option value="E Birr">E Birr</option>
                     <option value="Other">Other</option>
                   </select>
-                </div>
+                </div> */}
 
-                <div className="mb-4 w-1/2">
+                {/* <div className="mb-4 w-1/2">
                   <label className="block text-sm font-bold text-gray-700">
                     Receipt
                   </label>
@@ -652,11 +651,11 @@ const RecordSale = () => {
                       Upload Image <br />
                     </label>
                   </div>
-                </div>
+                </div> */}
                 <div className="flex md:grid-cols-2 gap-6 mb-4 ">
                   <div>
                     <label className="block text-sm font-bold text-gray-700">
-                      Total Sales
+                      Total 
                     </label>
                     <input
                       type="number"
@@ -665,7 +664,7 @@ const RecordSale = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
                     />
                   </div>
-                  <div>
+                  {/* <div>
                     <label className="block text-sm font-bold text-gray-700">
                       Total Credit
                     </label>
@@ -675,7 +674,7 @@ const RecordSale = () => {
                       disabled
                       className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
                     />
-                  </div>
+                  </div> */}
                 </div>
                 <div></div>
                 <div className="mt-6 flex  space-x-4">
