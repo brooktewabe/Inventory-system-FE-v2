@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import { FaEdit, FaTrash, FaSearch, FaPlus, FaTruck } from "react-icons/fa";
+import { FaEdit, FaTrash, FaSearch, FaPlus } from "react-icons/fa";
 import { AiOutlineHourglass } from "react-icons/ai";
 import { PiKeyReturnBold } from "react-icons/pi";
 
@@ -107,9 +107,6 @@ const Inventory = () => {
   const handleAddRawNavigation = () => {
     navigate("/add-raw-material");
   };
-  const handleAddKomcheNavigation = () => {
-    navigate("/add-komche");
-  };
   const handleReturnNavigation = (id) => {
     navigate(`/return-product/${id}`);
   };
@@ -127,30 +124,19 @@ const Inventory = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ">
-
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
             <div>
               <div
                 className="bg-[#eceaeaec] p-6 max-w-sm rounded-lg ml-20 shadow-md cursor-pointer"
-                onClick={handleAddRawNavigation}
+                onClick={handleAddNavigation}
               >
                 <div className="items-center mb-4 flex flex-col">
                   <FaPlus size={40} />
-                  <p>Add Raw Material</p>
+                  <p>Create Product</p>
                 </div>
               </div>
             </div>
-            <div>
-              <div
-                className="bg-[#eceaeaec] p-6 max-w-sm rounded-lg ml-20 shadow-md cursor-pointer"
-                onClick={handleAddKomcheNavigation}
-              >
-                <div className="items-center mb-4 flex flex-col">
-                  <FaTruck size={40} />
-                  <p>Add Komche</p>
-                </div>
-              </div>
-            </div>
+
             <div>
               <div
                 className="bg-[#eceaeaec] p-6 max-w-sm rounded-lg ml-20 shadow-md cursor-pointer"
@@ -224,7 +210,7 @@ const Inventory = () => {
               </thead>
               <tbody>
                 {filteredStocks
-                ?.filter((stock) =>stock.Type === "Raw Material")
+                ?.filter((stock) => stock.Type !== "Raw Material"||stock.Type !== "Raw Material")
                 ?.map((stock, index) => (
                   <tr key={stock.id}>
                     <td className="py-2 px-4 border-b">{index + 1}</td>

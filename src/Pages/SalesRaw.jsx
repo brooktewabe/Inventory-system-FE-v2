@@ -52,7 +52,7 @@ const Sales = () => {
     return `${id.slice(0, 3)}...${id.slice(-5)}`; // Format as 'xxxxx...xxxxx'
   };
   const onEditStock = (id) => {
-    navigate(`/record-sale/${id}`);
+    navigate(`/record-usage/${id}`);
   };
   // const onEditStock = (id) => {
   //   navigate('/record-sale', { state: { id } }); // Pass the product id via state/props

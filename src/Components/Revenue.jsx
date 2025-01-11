@@ -63,7 +63,7 @@ const IncomeSection = () => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <div className="flex justify-between items-center mb-4 flex-wrap">
-        <h3 className="text-lg font-bold flex-1">Revenue</h3>
+        <h3 className="text-lg font-bold flex-1">Sales Amount</h3>
         <div className="flex flex-col md:flex-row md:flex-1 justify-end">
           {["yearly", "monthly", "daily"]?.map((period) => (
             <button

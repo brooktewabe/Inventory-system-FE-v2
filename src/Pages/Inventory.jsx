@@ -210,7 +210,7 @@ const Inventory = () => {
               </thead>
               <tbody>
                 {filteredStocks
-                ?.filter((stock) => stock.Type === "Finished Products"||stock.Type === "Finished Product")
+                // ?.filter((stock) => stock.Type === "Finished Products"||stock.Type === "Finished Product")
                 ?.map((stock, index) => (
                   <tr key={stock.id}>
                     <td className="py-2 px-4 border-b">{index + 1}</td>
