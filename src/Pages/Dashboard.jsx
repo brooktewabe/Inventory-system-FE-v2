@@ -4,6 +4,7 @@ import withAuth from "../withAuth";
 import Revenue from "../Components/Revenue";
 import Total from "../Components/Total"
 import Chart from "../Components/Chart"
+import History from "../Components/History"
 const Dashboard = () => {
   const [stocks, setStocks] = useState([]);
 
@@ -47,7 +48,7 @@ const Dashboard = () => {
           </div>
 
           {/*  full-width grid */}
-          <div className="bg-white p-6 rounded-lg shadow-md ml-6 ">
+          {/* <div className="bg-white p-6 rounded-lg shadow-md ml-6 ">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-bold">Stock List</h3>
             </div>
@@ -69,8 +70,6 @@ const Dashboard = () => {
               <tbody>
                 {stocks?.map((stock, index) => (
                   <tr key={stock.id}>
-                    {/* Use index + 1 for numbering */}
-                    
                     <td className="py-2 px-4 border-b">{index + 1}</td>
                     <td className="py-2 px-4 border-b"> {formatProductId(stock.id)}</td>
                     <td className="py-2 px-4 border-b"> {stock.Category}</td>
@@ -84,7 +83,8 @@ const Dashboard = () => {
                 ))}
               </tbody>
             </table>
-          </div>
+          </div> */}
+          <History />
         </div>
       </div>
     </section>
