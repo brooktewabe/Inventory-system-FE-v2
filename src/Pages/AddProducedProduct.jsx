@@ -144,7 +144,7 @@ const AddProduct = () => {
 
           {/* Create Product Section */}
           <div className="bg-white p-6 rounded-lg shadow-md max-w-[70%] ml-20">
-            <h3 className="text-xl font-bold mb-4">Add New Product</h3>
+            <h3 className="text-xl font-bold mb-4">Record Production</h3>
 
             <Formik
               initialValues={{

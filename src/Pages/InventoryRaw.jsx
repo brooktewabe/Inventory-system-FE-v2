@@ -123,7 +123,7 @@ const Inventory = () => {
         <div className="grid grid-cols-1 gap-6">
           {/* First small full-width grid */}
           <div className="bg-white p-4  ">
-            <h3 className="text-xl font-bold">Stock System</h3>
+            <h3 className="text-xl font-bold">Raw Material Inventory</h3>
           </div>
 
           {/* Action Buttons */}

@@ -70,7 +70,7 @@ const Sales = () => {
         <div className="grid grid-cols-1 gap-6">
           {/* First small full-width grid */}
           <div className="bg-white p-4  ">
-            <h3 className="text-xl font-bold">Sales System</h3>
+            <h3 className="text-xl font-bold">Record Sales</h3>
           </div>
 
           {/* Two equally sized grids */}
