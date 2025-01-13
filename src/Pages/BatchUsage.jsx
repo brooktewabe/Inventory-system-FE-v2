@@ -158,18 +158,7 @@ const RecordSale = () => {
       }
     }
 
-    // Check if Amount Paid is provided and Credit Due is required
-    // if (currentItem.credit > 1 && !currentItem.credit_due) {
-    //   Swal.fire({
-    //     title: "Error!",
-    //     text: "Credit Due is required when Credit is provided.",
-    //     icon: "error",
-    //     confirmButtonColor: "#d33",
-    //     confirmButtonText: "OK",
-    //   });
-    //   return; // Exit the function if validation fails
-    // }
-    // Check if Credit is +ve
+
     if (currentItem.credit < 0) {
       Swal.fire({
         title: "Error!",
@@ -437,39 +426,7 @@ const RecordSale = () => {
                           className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
                         />
                       </div>
-                      {/* <div>
-                        <label className="block text-sm font-bold text-gray-700">
-                          Amount Paid
-                        </label>
-                        <input
-                          type="number"
-                          value={item.amount}
-                          readOnly
-                          className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-bold text-gray-700">
-                          Credit Given
-                        </label>
-                        <input
-                          type="number"
-                          value={item.credit}
-                          readOnly
-                          className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-bold text-gray-700">
-                          Credit Due
-                        </label>
-                        <input
-                          type="date"
-                          value={item.credit_due}
-                          readOnly
-                          className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
-                        />
-                      </div> */}
+                    
                     </div>
                   ))}
                 </div>
@@ -536,43 +493,7 @@ const RecordSale = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
                     />
                   </div>
-                  {/* <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Amount Paid
-                    </label>
-                    <input
-                      type="number"
-                      name="amount"
-                      value={item.amount}
-                      onChange={(e) => handleItemChange(index, e)}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Credit Given
-                    </label>
-                    <input
-                      type="number"
-                      disabled
-                      name="credit"
-                      value={item.credit}
-                      onChange={(e) => handleItemChange(index, e)}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Credit Due
-                    </label>
-                    <input
-                      type="date"
-                      name="credit_due"
-                      value={item.credit_due}
-                      onChange={(e) => handleItemChange(index, e)}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
-                  </div>*/}
+     
                 </div> 
               ))}
               <div className="flex justify-end">
@@ -589,69 +510,7 @@ const RecordSale = () => {
                 Payment Information
               </h3> */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
-                {/* <div>
-                  <label className="block text-sm font-bold text-gray-700">
-                    Transaction ID
-                  </label>
-                  <input
-                    type="text"
-                    name="Transaction_id"
-                    value={formData.Transaction_id}
-                    onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                  />
-                </div> */}
-
-                {/* <div>
-                  <label className="block text-sm font-bold text-gray-700">
-                    Payment Method
-                  </label>
-                  <select
-                    name="Payment_method"
-                    value={formData.Payment_method}
-                    onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                  >
-                    <option value="" disabled>
-                      Select Method
-                    </option>
-                    <option value="Cash">Cash</option>
-                    <option value="Bank Transfer">Bank Transfer</option>
-                    <option value="Tele Birr">Tele Birr</option>
-                    <option value="E Birr">E Birr</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div> */}
-
-                {/* <div className="mb-4 w-1/2">
-                  <label className="block text-sm font-bold text-gray-700">
-                    Receipt
-                  </label>
-
-                  <input
-                    type="file"
-                    id="Receipt"
-                    name="Receipt"
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      setFormData({ ...formData, Receipt: file });
-                    }}
-                    className="hidden"
-                    accept=".png, .jpg, .jpeg"
-                  />
-
-                  <div className="flex items-center">
-                    <div className="bg-[#]">
-                      <GoImage size={30} />
-                    </div>
-                    <label
-                      htmlFor="Receipt"
-                      className="text-white bg-[#16033a] py-2 px-6  mx-2 cursor-pointer border rounded-2xl"
-                    >
-                      Upload Image <br />
-                    </label>
-                  </div>
-                </div> */}
+               
                 <div className="flex md:grid-cols-2 gap-6 mb-4 ">
                   <div>
                     <label className="block text-sm font-bold text-gray-700">
@@ -664,17 +523,7 @@ const RecordSale = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
                     />
                   </div>
-                  {/* <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Total Credit
-                    </label>
-                    <input
-                      type="number"
-                      value={salesCredit}
-                      disabled
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
-                    />
-                  </div> */}
+
                 </div>
                 <div></div>
                 <div className="mt-6 flex  space-x-4">

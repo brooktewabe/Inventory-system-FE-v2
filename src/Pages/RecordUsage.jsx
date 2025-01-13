@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { useNavigate, useParams,useLocation  } from "react-router-dom";
+import { useNavigate, useParams  } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import { GoImage } from "react-icons/go";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 
 const RecordSale = () => {
   // const location = useLocation();
@@ -49,13 +48,6 @@ const RecordSale = () => {
       updatedFormData.Total_amount = quantity * price;
     }
   
-    // Update Credit as Total_amount - Amount
-    // if (name === "Amount" || name === "Quantity") {
-    //   const totalAmount = updatedFormData.Total_amount
-    //   const amount = updatedFormData.Amount
-    //   updatedFormData.Credit = totalAmount - amount;
-    // }
-  
     setFormData(updatedFormData);
   };
   
@@ -88,37 +80,7 @@ const RecordSale = () => {
       }
     }
   
-    // Check if Credit is provided and Credit_due is required
-    // if (formData.Credit &&  formData.Credit >1 && (formData.Credit_due === null || formData.Credit_due === "")) {
-    //   Swal.fire({
-    //     title: "Error!",
-    //     text: "Credit Due is required when Credit is provided.",
-    //     icon: "error",
-    //     confirmButtonColor: "#d33",
-    //     confirmButtonText: "OK",
-    //   });
-    //   return; // Exit the function if validation fails
-    // }
 
-      // Check if Credit_due is in the future
-  // if (formData.Credit_due) {
-  //   const dueDate = new Date(formData.Credit_due);
-  //   const today = new Date();
-
-  //   // Set time of today to 00:00:00 for accurate comparison
-  //   today.setHours(0, 0, 0, 0);
-
-  //   if (dueDate <= today) {
-  //     Swal.fire({
-  //       title: "Error!",
-  //       text: "Credit Due must be a future date.",
-  //       icon: "error",
-  //       confirmButtonColor: "#d33",
-  //       confirmButtonText: "OK",
-  //     });
-  //     return; // Exit the function if validation fails
-  //   }
-  // }
     // Check if the new quantity would be negative
     if (newQuantity < 0) {
       Swal.fire({
@@ -258,97 +220,9 @@ const RecordSale = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
                     />
                   </div>
-                  {/* <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Credit Given
-                    </label>
-                    <input
-                    disabled
-                      type="number"
-                      name="Credit"
-                      value="0"
-                      onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
-                  </div> */}
-                  {/* <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Transaction ID
-                    </label>
-                    <input
-                      type="text"
-                      name="Transaction_id"
-                      value=""
-                      onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
-                  </div> */}
+
                 </div>
-                {/* 2nd Side */}
-                {/* <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Amount Paid
-                    </label>
-                    <input
-                       required
-                      type="number"
-                      name="Amount"
-                      value="0"
-                      onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
-                  </div>
-                  <div>
-                <label className="block text-sm font-bold text-gray-700">
-                  Payment Method
-                </label>
-                <select
-                  name="Payment_method"
-                  value=""
-                  onChange={handleChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                >
-                  <option value="" disabled>Select Payment Method</option>
-                  <option value="Cash">Cash</option>
-                  <option value="Bank Transfer">Bank Transfer</option>
-                  <option value="Tele Birr">Tele Birr</option>
-                  <option value="E Birr">E Birr</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-                  <div className="mb-4 w-1/2">
-                    <label className="block text-sm font-bold text-gray-700">
-                      Receipt
-                    </label>
-
-                    <input
-                      type="file"
-                      id="Receipt"
-                      name="Receipt"
-                      // value={formData.Receipt}
-                      onChange={(e) => {
-                        const file = e.target.files[0];
-                        setFormData({ ...formData, Receipt: file });
-                      }}
-                      className="hidden"
-                      accept=".png, .jpg, .jpeg"
-                    />
-
-                    <div className="flex items-center">
-                      <div className="bg-[#]">
-                        <GoImage size={30} />
-                      </div>
-                      <label
-                        htmlFor="Receipt"
-                        className="text-white bg-[#16033a] py-2 px-6  mx-2 cursor-pointer border rounded-2xl"
-                      >
-                        Upload Image <br />
-                        {/* <span className="text-[#98b4c7]">(Required)</span> 
-                      </label>
-                    </div>
-                  </div>
-                </div> */}
+         
                 {/* 3rd Side */}
                 <div className="space-y-4">
                   <div>
@@ -364,21 +238,9 @@ const RecordSale = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
                     />
                   </div>
-                  {/* <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Credit due
-                    </label>
-                    <input
-                      type="date"
-                      name="Credit_due"
-                      value={formData.Credit_due}
-                      onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
-                  </div> */}
+
                 </div>
               </div>
-              {/* Buttons */}
               <div className="flex justify-around space-x-4 mt-6">
                 <button
                   onClick={handleCancel}
@@ -403,3 +265,6 @@ const RecordSale = () => {
 
 export { RecordSale };
 export default withAuth(RecordSale);
+
+
+git commit -m "nav and usage cleanup"
