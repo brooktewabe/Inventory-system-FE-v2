@@ -266,5 +266,3 @@ const RecordSale = () => {
 export { RecordSale };
 export default withAuth(RecordSale);
 
-
-git commit -m "nav and usage cleanup"
