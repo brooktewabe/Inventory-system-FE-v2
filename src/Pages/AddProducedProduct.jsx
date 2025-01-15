@@ -4,20 +4,15 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import { GoImage } from "react-icons/go";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
 const AddProduct = () => {
-  const [Product_image, setProduct_image] = useState(null);
   const [user, setUser] = useState(null);
-  const [categories, setCategories] = useState([]);
+  const [stockItems, setStockItems] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
   const navigate = useNavigate();
   const uid = localStorage.getItem("uid");
-
-  const handleFileChange = (e, setFile) => {
-    setFile(e.target.files[0]);
-  };
 
   useEffect(() => {
     const fetchInfo = async () => {
@@ -25,107 +20,69 @@ const AddProduct = () => {
         const response = await axios.get(`https://api.akbsproduction.com/user/${uid}`);
         setUser(response.data);
       } catch (error) {
-        console.error("Error fetching details:", error);
+        console.error("Error fetching user details:", error);
+        toast.error("Failed to fetch user details");
       }
     };
     fetchInfo();
   }, [uid]);
+
   useEffect(() => {
-    // Fetch categories from the API endpoint
-    const fetchCategories = async () => {
+    const fetchStockItems = async () => {
       try {
-        const response = await axios.get("https://api.akbsproduction.com/category/all");
-        setCategories(response.data);
+        const response = await axios.get("https://api.akbsproduction.com/stock/all");
+        setStockItems(response.data.data || []);
       } catch (error) {
-        console.error("Error fetching categories:", error);
+        console.error("Error fetching stock items:", error);
+        toast.error("Failed to fetch stock items");
+        setStockItems([]);
       }
     };
-
-    fetchCategories();
+    fetchStockItems();
   }, []);
-  // Validation schema
+
   const validationSchema = Yup.object({
-    Name: Yup.string().required("Required"),
-    Location: Yup.string().required("Required"),
-    Category: Yup.string().required("Required"),
-    // Type: Yup.string().required("Required"),
-    Price: Yup.number()
-      .required("Required")
-      .positive("Must be greater than zero"),
-    Curent_stock: Yup.number()
-      .required("Required")
-      .positive("Must be greater than zero"),
-    Reorder_level: Yup.number()
+    selectedItemId: Yup.string().required("Please select a product"),
+    addedStock: Yup.number()
       .required("Required")
       .positive("Must be greater than zero")
-      .lessThan(
-        Yup.ref("Curent_stock"),
-        "Stock must be greater than reorder level"
-      ),
+      .integer("Must be a whole number"),
   });
 
-  const handleSubmit = async (values, { setSubmitting }) => {
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     setSubmitting(true);
-
-    // Create formData for product creation
-    const formData = new FormData();
-    formData.append("Name", values.Name);
-    formData.append("Location", values.Location);
-    formData.append("Category", values.Category);
-    formData.append("Price", values.Price);
-    formData.append("Curent_stock", values.Curent_stock);
-    formData.append("Reorder_level", values.Reorder_level);
-    formData.append("Type", "Produced Product");
-    formData.append("files", Product_image);
-
     try {
-      // Create the product
-      const productResponse = await axios.post(
-        "https://api.akbsproduction.com/stock/create",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const item = stockItems.find((item) => item.id === values.selectedItemId);
+      if (!item) {
+        throw new Error("Selected item not found");
+      }
 
-      // Create movement data
-      const mvtData = {
-        User: `${user.fname} ${user.lname}`,
-        Name: values.Name,
-        Adjustment: values.Curent_stock,
-        Type: "Addition",
-      };
+      const updatedStock = item.Curent_stock + parseInt(values.addedStock, 10);
 
-      // Post movement data
-      const movementResponse = await axios.post(
-        "https://api.akbsproduction.com/movement/create",
-        mvtData,
+      // Patch request to update stock
+      await axios.patch(
+        `https://api.akbsproduction.com/stock/all/${values.selectedItemId}`,
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          Curent_stock: updatedStock,
         }
       );
 
       Swal.fire({
         title: "Success!",
-        text: "Product added successfully.",
+        text: "Stock updated successfully.",
         icon: "success",
         confirmButtonColor: "#3085d6",
         confirmButtonText: "OK",
       }).then(() => {
+        resetForm();
+        setSelectedItem(null);
         navigate("/");
-        toast.success("Created Successfully");
+        toast.success("Stock Updated Successfully");
       });
     } catch (error) {
-      console.error("Error creating stock or movement:", error);
-      toast.error(
-        "Error creating stock. Make sure all fields are filled appropriately."
-      );
+      console.error("Error updating stock or creating movement:", error);
+      toast.error("Error updating stock. Please try again.");
     }
-
     setSubmitting(false);
   };
 
@@ -134,161 +91,104 @@ const AddProduct = () => {
   };
 
   return (
-    <section className="bg-[#edf0f0b9] min-h-screen">
-      <div className="container m-auto ">
-        <div className="grid grid-cols-1 gap-6">
-          {/* First small full-width grid */}
-          <div className="bg-white p-4  ">
-            <h3 className="text-xl font-bold">Create Produced Product</h3>
-          </div>
-
-          {/* Create Product Section */}
-          <div className="bg-white p-6 rounded-lg shadow-md max-w-[70%] ml-20">
+    <section className="bg-gray-100 min-h-screen">
+      {/* First small full-width grid */}
+      <div className="bg-white p-4  ">
+        <h3 className="text-xl font-bold">Create Produced Product</h3>
+      </div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-xl mx-auto bg-white rounded-lg shadow-md overflow-hidden ml-32">
+          <div className="p-6">
             <h3 className="text-xl font-bold mb-4">Record Production</h3>
-
             <Formik
               initialValues={{
-                Name: "",
-                Location: "",
-                Category: "",
-                Price: "",
-                Curent_stock: "",
-                Reorder_level: "",
-                Type:""
+                selectedItemId: "",
+                addedStock: "",
               }}
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
-              {({ isSubmitting }) => (
-                <Form>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Right Side */}
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Product Title
-                        </label>
-                        <Field
-                          name="Name"
-                          type="text"
-                          className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                        />
-                        <ErrorMessage
-                          name="Name"
-                          component="div"
-                          className="text-red-600 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Location
-                        </label>
-                        <Field
-                          name="Location"
-                          type="text"
-                          className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                        />
-                        <ErrorMessage
-                          name="Location"
-                          component="div"
-                          className="text-red-600 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Reorder Level
-                        </label>
-                        <Field
-                          name="Reorder_level"
-                          type="number"
-                          className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                        />
-                        <ErrorMessage
-                          name="Reorder_level"
-                          component="div"
-                          className="text-red-600 text-sm"
-                        />
-                      </div>
-                      {/* <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Type
-                        </label>
-                        <Field
-                          as="select"
-                          name="Type"
-                          className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                        >
-                          <option value="">Select type</option>
-                          <option value="Finished Product">Finished Product</option>
-                          <option value="Raw Material">Raw Material</option>
-                        </Field>
-                        <ErrorMessage
-                          name="Type"
-                          component="div"
-                          className="text-red-600 text-sm"
-                        />
-                      </div> */}
-                    </div>
-
-                    {/* Left Side */}
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Category
-                        </label>
-                        <Field
-                          as="select"
-                          name="Category"
-                          className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                        >
-                          <option value="">Select category</option>
-                          {categories.map((category) => (
-                            <option key={category.id} value={category.category}>
-                              {category.category}
-                            </option>
-                          ))}
-                        </Field>
-                        <ErrorMessage
-                          name="Category"
-                          component="div"
-                          className="text-red-600 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Stock Amount
-                        </label>
-                        <Field
-                          name="Curent_stock"
-                          type="number"
-                          className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                        />
-                        <ErrorMessage
-                          name="Curent_stock"
-                          component="div"
-                          className="text-red-600 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Price
-                        </label>
-                        <Field
-                          name="Price"
-                          type="number"
-                          className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                        />
-                        <ErrorMessage
-                          name="Price"
-                          component="div"
-                          className="text-red-600 text-sm"
-                        />
-                      </div>
-                    </div>
+              {({ isSubmitting, setFieldValue }) => (
+                <Form className="space-y-6">
+                  <div>
+                    <label
+                      htmlFor="selectedItemId"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Select Product
+                    </label>
+                    <Field
+                      as="select"
+                      id="selectedItemId"
+                      name="selectedItemId"
+                      className="mt-1 block w-full border border-gray-400 rounded-lg p-2"
+                      onChange={(e) => {
+                        setFieldValue("selectedItemId", e.target.value);
+                        const item = stockItems.find(
+                          (item) => item.id === e.target.value
+                        );
+                        setSelectedItem(item);
+                      }}
+                    >
+                      <option value="">Select a product</option>
+                      {Array.isArray(stockItems) &&
+                        stockItems
+                        .filter(sl => sl.Type === "Produced Product")
+                        .map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.Name}
+                          </option>
+                        ))}
+                    </Field>
+                    <ErrorMessage
+                      name="selectedItemId"
+                      component="div"
+                      className="mt-1 text-sm text-red-600"
+                    />
                   </div>
-                    <p className="text-sm">* If a produced item has already been once recorded you should edit it not create a new one</p>
-                  {/* Buttons */}
-                  <div className="flex justify-around space-x-4 mt-6">
+
+                  {/* {selectedItem && (
+                    <div className="bg-gray-50 p-4 rounded-md">
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        Selected Product Details
+                      </h3>
+                      <p>
+                        <strong>Name:</strong> {selectedItem.Name}
+                      </p>
+                      <p>
+                        <strong>Category:</strong> {selectedItem.Category}
+                      </p>
+                      <p>
+                        <strong>Current Stock:</strong>{" "}
+                        {selectedItem.Curent_stock}
+                      </p>
+                      <p>
+                        <strong>Price:</strong> {selectedItem.Price}
+                      </p>
+                    </div>
+                  )} */}
+
+                  <div>
+                    <label
+                      htmlFor="addedStock"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Stock Amount
+                    </label>
+                    <Field
+                      type="number"
+                      id="addedStock"
+                      name="addedStock"
+                      className="shadow appearance-none rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+                    />
+                    <ErrorMessage
+                      name="addedStock"
+                      component="div"
+                      className="mt-1 text-sm text-red-600"
+                    />
+                  </div>
+
+                  <div className="flex justify-end space-x-3">
                     <button
                       type="button"
                       onClick={handleCancel}
@@ -301,7 +201,7 @@ const AddProduct = () => {
                       disabled={isSubmitting}
                       className="bg-[#16033a] text-white px-16 py-2 rounded-lg"
                     >
-                      Add
+                      Add To Stock
                     </button>
                   </div>
                 </Form>
