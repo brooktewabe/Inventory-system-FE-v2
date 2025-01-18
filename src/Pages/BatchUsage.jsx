@@ -5,6 +5,7 @@ import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
 import { toast, ToastContainer } from "react-toastify";
 import { GoImage } from "react-icons/go";
+import Spinner from "../Components/Spinner";
 
 const RecordSale = () => {
   const navigate = useNavigate();
@@ -341,7 +342,7 @@ const RecordSale = () => {
     handleNavigation("/");
   };
 
-  if (!sale) return <div>Loading...</div>;
+  if (!sale) return <div><Spinner/></div>;
 
   return (
     <section className="bg-[#edf0f0b9] h-full">

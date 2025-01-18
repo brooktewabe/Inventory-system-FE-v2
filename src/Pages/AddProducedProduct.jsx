@@ -141,7 +141,7 @@ const AddProduct = () => {
                     <option value="">Select a product</option>
                     {Array.isArray(stockItems) &&
                       stockItems
-                      .filter(sl => sl.Type === "Produced Product")
+                      .filter(sl => sl.Type !== "Raw Material")
                       .map((item) => (
                         <option key={item.id} value={item.id}>
                           {item.Name}

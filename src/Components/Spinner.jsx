@@ -1,4 +1,4 @@
-import ClipLoader from 'react-spinners/ClipLoader';
+import PuffLoader from 'react-spinners/PuffLoader';
 
 const override ={
   display: 'block',
@@ -8,8 +8,8 @@ const override ={
 // eslint-disable-next-line react/prop-types
 const  Spinner= ({loading}) => {
   return (
-    <ClipLoader 
-    color='#4338ca'
+    <PuffLoader
+    color='#000000'
     loading={ loading }
     cssOverride={override}
     size={150}
