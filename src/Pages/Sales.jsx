@@ -58,7 +58,7 @@ const Sales = () => {
   //   navigate('/record-sale', { state: { id } }); // Pass the product id via state/props
   // };
   const handleAddNavigation = () => {
-    navigate("/sales-history");
+    navigate("/sales-history", { state: { from: '/sales' } });
   };
   const handleBatchNavigation = () => {
     navigate("/batch-sale");
