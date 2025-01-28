@@ -12,6 +12,7 @@ const RecordSale = () => {
   const [sale, setSale] = useState(null);
   const [salesTotal, setSalesTotal] = useState(0);
   const [salesNames, setSalesName] = useState("");
+  const [SalesItems, setSalesItems] = useState("");
   const [salesQuantity, setSalesQuantity] = useState(0);
   const [salesCredit, setSalesCredit] = useState(0);
   const [salesQUan, setSalesQUan] = useState("");
@@ -271,6 +272,11 @@ const RecordSale = () => {
           ? `${prevNames}, ${currentItem.itemName}`
           : currentItem.itemName
       );
+      setSalesItems((prevNames) =>
+        prevNames
+          ? `${prevNames}, ${selectedItem.Name}`
+          : selectedItem.Name
+      );
       setSalesCredit((prevCredit) => {
         if (currentItem.credit > 1) {
           return prevCredit + currentItem.credit;
@@ -322,7 +328,8 @@ const RecordSale = () => {
       Credit_due: null,
       Amount: salesTotal - salesCredit,
       Total_amount: salesTotal,
-      EachQuantity: salesQUan
+      EachQuantity: salesQUan,
+      Item_name: SalesItems,
     };
 
     try {

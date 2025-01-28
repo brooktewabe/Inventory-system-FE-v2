@@ -15,6 +15,7 @@ const RecordSale = () => {
   const [salesQuantity, setSalesQuantity] = useState(0);
   const [salesCredit, setSalesCredit] = useState(0);
   const [salesQUan, setSalesQUan] = useState("");
+  const [SalesItems, setSalesItems] = useState("");
   const [addedItems, setAddedItems] = useState([]);
   const [items, setItems] = useState([
     {
@@ -32,7 +33,7 @@ const RecordSale = () => {
   };
   const [formData, setFormData] = useState({
     Full_name: "",
-    Contact: "",
+    Contact: "0000",
     Payment_method: "",
     // Credit_due: "",
     Receipt: "",
@@ -139,11 +140,6 @@ const RecordSale = () => {
     // Check for required fields
     const requiredFields = [
       "Full_name",
-      "Contact",
-      // "Payment_method",
-      // "Transaction_id",
-      // "Quantity",
-      // "Amount",
     ];
 
     for (let field of requiredFields) {
@@ -259,6 +255,11 @@ const RecordSale = () => {
           ? `${prevNames}, ${currentItem.itemName}`
           : currentItem.itemName
       );
+      setSalesItems((prevNames) =>
+        prevNames
+          ? `${prevNames}, ${selectedItem.Name}`
+          : selectedItem.Name
+      );
       setSalesCredit((prevCredit) => {
         if (currentItem.credit > 1) {
           return prevCredit + currentItem.credit;
@@ -310,7 +311,8 @@ const RecordSale = () => {
       Credit_due: null,
       Amount: salesTotal - salesCredit,
       Total_amount: salesTotal,
-      EachQuantity: salesQUan
+      EachQuantity: salesQUan,
+      Item_name: SalesItems,
     };
 
     try {
@@ -371,7 +373,7 @@ const RecordSale = () => {
                     />
                   </div>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-4 hidden">
                   <div>
                     <label className="block text-sm font-bold text-gray-700">
                       Phone Number
