@@ -17,7 +17,7 @@ const SalesHistory = () => {
 
   const fetchSalesByPage = async (page) => {
     try {
-      const response = await axios.get(`https://api.akbsproduction.com/sales/all?page=${page}&limit=${itemsPerPage}`);
+      const response = await axios.get(`https://api.akbsproduction.com/sales/all-sales?page=${page}&limit=${itemsPerPage}`);
       setSales(response.data.data);
       // Ensure the API returns totalCount for calculating total pages
       const totalCount = response.data.total;
@@ -71,7 +71,8 @@ const SalesHistory = () => {
     }
   }, [searchTerm, filterDate]);
 
-  const formatProductId = (id) => {
+  const formatProduct = (id) => {
+    if (!id) return ''; // Handle null or undefined values
     if (id.length <= 10) return id;
     return `${id.slice(0, 5)}...${id.slice(-5)}`;
   };
@@ -165,7 +166,12 @@ const SalesHistory = () => {
                     <td className="py-2 px-4 border-b">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
-                    <td className="py-2 px-4 border-b">{sale.Item_name || "Batch"}</td>
+                    <td className="py-2 px-4 border-b relative group">
+                      {formatProduct(sale.Item_name)}
+                      <span className="absolute hidden group-hover:flex bg-gray-700 text-white text-sm rounded  z-10 left-1/2 transform -translate-x-1/2 mt-1">
+                        {sale.Item_name}
+                      </span>
+                    </td>
                     <td className="py-2 px-4 border-b">{sale.Full_name}</td>
                     <td className="py-2 px-4 border-b">{sale.Amount}</td>
                     <td className="py-2 px-4 border-b">{sale.Total_amount}</td>

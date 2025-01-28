@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
 import { FaSearch, FaCalendar } from "react-icons/fa";
 
 const SalesHistory = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate();  
+  const location = useLocation();
+  let endpoint = 'all-sales'
+  const previousPage = location.state?.from || "No previous page information"
   const [sales, setSales] = useState([]);
   const [searchVisible, setSearchVisible] = useState(false);
   const [filterVisible, setFilterVisible] = useState(false);
@@ -15,9 +18,15 @@ const SalesHistory = () => {
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 15;
 
+  if (previousPage === '/sales') {  
+    endpoint = 'all-sales'
+  }
+  else{
+    endpoint = 'all-usage'
+  }
   const fetchSalesByPage = async (page) => {
     try {
-      const response = await axios.get(`https://api.akbsproduction.com/sales/all?page=${page}&limit=${itemsPerPage}`);
+      const response = await axios.get(`https://api.akbsproduction.com/sales/${endpoint}?page=${page}&limit=${itemsPerPage}`);
       setSales(response.data.data);
       // Ensure the API returns totalCount for calculating total pages
       const totalCount = response.data.total;
@@ -53,6 +62,12 @@ const SalesHistory = () => {
     }
   };
 
+  const formatProduct = (id) => {
+    if (!id) return ''; // Handle null or undefined values
+    if (id.length <= 10) return id;
+    return `${id.slice(0, 5)}...${id.slice(-5)}`;
+  };
+  
   // Fetch sales on initial load or when page changes
   useEffect(() => {
     if (!searchTerm && !filterDate) {
@@ -71,11 +86,6 @@ const SalesHistory = () => {
     }
   }, [searchTerm, filterDate]);
 
-  const formatProductId = (id) => {
-    if (id.length <= 10) return id;
-    return `${id.slice(0, 5)}...${id.slice(-5)}`;
-  };
-
   const onEdit = (id) => {
     navigate(`/sales-detail/${id}`);
   };
@@ -86,18 +96,22 @@ const SalesHistory = () => {
       setCurrentPage(page);
     }
   };
-
   return (
     <section className="bg-[#edf0f0b9] min-h-screen">
       <div className="container m-auto">
         <div className="grid grid-cols-1 gap-6">
-          <div className="bg-white p-4">
-            <h3 className="text-xl font-bold">Sales History</h3>
-          </div>
+        <div className="bg-white p-4">
+          <h3 className="text-xl font-bold">
+            {endpoint === 'all-usage' ? 'Usage' : 'Sales History'}
+          </h3>
+        </div>
+
 
           <div className="bg-white p-6 rounded-lg shadow-md ml-6">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-bold">Sales</h3>
+            <h3 className="text-xl font-bold">
+            {endpoint === 'all-usage' ? 'Usage' : 'Sales'}
+          </h3>
               <div className="flex items-center space-x-4">
                 <button
                   onClick={() => setSearchVisible(!searchVisible)}
@@ -140,9 +154,9 @@ const SalesHistory = () => {
                 <tr>
                   {[
                     "No.",
-                    "Product ID",
+                    "Product",
                     "Client",
-                    "Amount Paid",
+                    (endpoint == 'all-sales')?"Amount Paid": "Quantity",
                     "Total amount",
                     "Payment",
                     "Type",
@@ -167,14 +181,13 @@ const SalesHistory = () => {
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
                     <td className="py-2 px-4 border-b relative group">
-                      {formatProductId(sale.Product_id)}
+                      {formatProduct(sale.Item_name)}
                       <span className="absolute hidden group-hover:flex bg-gray-700 text-white text-sm rounded  z-10 left-1/2 transform -translate-x-1/2 mt-1">
-                        {sale.Product_id}
+                        {sale.Item_name}
                       </span>
                     </td>
-
                     <td className="py-2 px-4 border-b">{sale.Full_name}</td>
-                    <td className="py-2 px-4 border-b">{sale.Amount}</td>
+                    <td className="py-2 px-4 border-b">{(endpoint == 'all-sales')?sale.Amount: sale.Quantity}</td>
                     <td className="py-2 px-4 border-b">{sale.Total_amount}</td>
                     <td className="py-2 px-4 border-b">
                       {sale.Payment_method}
