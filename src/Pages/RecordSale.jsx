@@ -25,6 +25,7 @@ const RecordSale = () => {
     Credit: "0",
     Receipt: "",
     Transaction_id: "",
+    Item_name: "",
   });
 
   useEffect(() => {
@@ -32,6 +33,7 @@ const RecordSale = () => {
       try {
         const response = await axios.get(`https://api.akbsproduction.com/stock/all/${id}`);
         setSale(response.data);
+        console.log(sale.Name)
       } catch (error) {
         console.error("Error fetching:", error);
       }
@@ -41,7 +43,10 @@ const RecordSale = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     let updatedFormData = { ...formData, [name]: value };
-  
+
+    if (sale) {
+      updatedFormData.Item_name = sale.Name;
+    }
     // Update Total_amount based on Quantity and sale.Price
     if (name === "Quantity" && sale?.Price) {
       const quantity = value;
@@ -74,7 +79,6 @@ const RecordSale = () => {
       "Total_amount",
       "Transaction_id",
     ];
-  
     for (let field of requiredFields) {
       if (!formData[field]) {
         Swal.fire({
@@ -174,13 +178,14 @@ const RecordSale = () => {
         Contact: "",
         Quantity: "",
         Amount: "",
-        sale_type:"Single",
+        Sale_type:"Single",
         Payment_method: "",
         Total_amount: "",
         Credit_due: null,
         Credit: "",
         Receipt: "",
         Transaction_id: "",
+        Item_name: "",
       });
     } catch (error) {
       console.error("Error creating sale:", error);
@@ -391,7 +396,7 @@ const RecordSale = () => {
                   onClick={handleSubmit}
                   className="bg-[#16033a]  text-white px-16 py-2 rounded-lg"
                 >
-                  Add
+                  Sale
                 </button>
               </div>
             </div>

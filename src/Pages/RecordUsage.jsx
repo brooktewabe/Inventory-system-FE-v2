@@ -14,7 +14,7 @@ const RecordSale = () => {
   const [formData, setFormData] = useState({
     Product_id: id,
     Full_name: "",
-    Contact: "",
+    Contact: "0000",
     Quantity: "",
     Amount: 0,
     Sale_type: "Single Usage",
@@ -24,6 +24,7 @@ const RecordSale = () => {
     Credit: 0,
     Receipt: "",
     Transaction_id: "",
+    Item_name: "",
   });
 
   useEffect(() => {
@@ -40,7 +41,9 @@ const RecordSale = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     let updatedFormData = { ...formData, [name]: value };
-  
+    if (sale) {
+      updatedFormData.Item_name = sale.Name;
+    }
     // Update Total_amount based on Quantity and sale.Price
     if (name === "Quantity" && sale?.Price) {
       const quantity = value;
@@ -142,6 +145,8 @@ const RecordSale = () => {
         Credit: "",
         Receipt: "",
         Transaction_id: "",
+        Sale_type: "Single Usage",
+        Item_name: "",
       });
     } catch (error) {
       console.error("Error creating sale:", error);
@@ -167,7 +172,7 @@ const RecordSale = () => {
           {/* Create Product Section */}
           <form onSubmit={handleSubmit}>
             <div className="bg-white p-6 rounded-lg shadow-md max-w-[70%] ml-20">
-              <h3 className="text-xl font-bold mb-4">Record Sales</h3>
+              <h3 className="text-xl font-bold mb-4">Record Usage</h3>
               <hr />
               <h3 className="text-md font-bold mb-4">Buyer Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -187,7 +192,7 @@ const RecordSale = () => {
                   </div>
                 </div>
                 {/* Left Side */}
-                <div className="space-y-4">
+                <div className="space-y-4 hidden">
                   <div>
                     <label className="block text-sm font-bold text-gray-700">
                       Phone Number
