@@ -29,7 +29,6 @@ const Dashboard = () => {
             <h3 className="text-xl font-bold">Dashboard</h3>
           </div>
 
-          {/* Two equally sized grids */}
           <div className="flex flex-col sm:grid sm:grid-cols-3 gap-6">
 
             <div className="px-6">
