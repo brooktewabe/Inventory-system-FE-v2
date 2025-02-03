@@ -238,11 +238,13 @@ const RecordSale = () => {
       Amount: currentItem.amount,
       Credit: currentItem.credit,
       Credit_due: currentItem.credit_due,
-      EachQuantity: "Only for batch"
-
+      EachQuantity: "Only for batch" 
+      //beside each sales, on save it saves
+      // one additional sale called batch sale which is displayed
+      // on the sales history page and report but whats used for 
+      // the total sales( Sale_type: "Batch") is the sum of each sales excluding the batch sale 
+      // setSalesItems, setSalesQUan, setSalesName are used for just displaying batch
     };
-
-    // console.log("Sending sale data:", saleData); // Console log each sale data
 
     try {
       // Send the POST request for the current item
