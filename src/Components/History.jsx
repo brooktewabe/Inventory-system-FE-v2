@@ -142,7 +142,7 @@ const SalesHistory = () => {
                     "No.",
                     "Product",
                     "Client",
-                    "Amount Paid",
+                    "Quantity",
                     "Total amount",
                     "Payment",
                     "Type",
@@ -173,7 +173,7 @@ const SalesHistory = () => {
                       </span>
                     </td>
                     <td className="py-2 px-4 border-b">{sale.Full_name}</td>
-                    <td className="py-2 px-4 border-b">{sale.Amount}</td>
+                    <td className="py-2 px-4 border-b">{sale.Quantity}</td>
                     <td className="py-2 px-4 border-b">{sale.Total_amount}</td>
                     <td className="py-2 px-4 border-b">
                       {sale.Payment_method}

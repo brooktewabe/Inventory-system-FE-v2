@@ -243,9 +243,10 @@ const UserAdmin = () => {
                     onChange={(e)=> setRole(e.target.value)}
                     className="mt-1 block w-full border border-gray-400 rounded-lg p-2" 
                     >
-                    <option value="">Choose Role</option>
-                    <option value="admin">Admin</option>
-                    <option value="user">User</option>
+                    <option disabled value="">Choose Role</option>
+                    <option value="admin">Administrator</option>
+                    <option value="manager">Production Manager</option>
+                    <option value="user">Data Clerk</option>
                   </select>
                     {errors.role && (
                       <div className="text-red-600 text-sm">{errors.role}</div>

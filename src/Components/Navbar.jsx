@@ -52,12 +52,6 @@ const Navbar = () => {
 
   const userMenu = [
     {
-      icon: <BiSolidDashboard size={25} className="mr-4" />,
-      text: "Dashboard",
-      link: "/",
-      className: { linkClass },
-    },
-    {
       icon: <AiTwotonePlusCircle size={25} className="mr-4" />,
       text: "Inventory Management",
       link: "/inventory-layout",
@@ -67,12 +61,6 @@ const Navbar = () => {
       icon: <AiTwotoneReconciliation size={25} className="mr-4" />,
       text: "Recording System",
       link: "/record-layout",
-      className: { linkClass },
-    },
-    {
-      icon: <AiOutlineBars size={25} className="mr-4" />,
-      text: "Report",
-      link: "/report",
       className: { linkClass },
     },
   ];
@@ -122,6 +110,20 @@ const Navbar = () => {
       className: { linkClass },
     },
   ];
+  const ManagerMenu = [
+    {
+      icon: <AiTwotonePlusCircle size={25} className="mr-4" />,
+      text: "Inventory Management",
+      link: "/inventory-layout",
+      className: { linkClass },
+    },
+    {
+      icon: <AiTwotoneReconciliation size={25} className="mr-4" />,
+      text: "Recording System",
+      link: "/record-layout",
+      className: { linkClass },
+    },
+  ];
 
   const handleLogout = async () => {
     try {
@@ -152,7 +154,7 @@ const Navbar = () => {
     setNav(JSON.parse(localStorage.getItem("navCollapsed") || "false"));
   }, [location]);
 
-  if (role !== "admin" && role !== "user") {
+  if (role !== "admin" && role !== "user" && role !== "manager") {
     return null;
   }
 
@@ -198,6 +200,19 @@ const Navbar = () => {
           <ul className="flex flex-col p-4 text-white">
             {role === "user" &&
               userMenu?.map(({ icon, text, link }, index) => (
+                <li key={index} className="my-2">
+                  <NavLink
+                    to={link}
+                    className="flex items-center text-xl hover:bg-[#424243] rounded-lg p-1.5"
+                    onClick={() => setNav(false)}
+                  >
+                    {icon}
+                    {!nav && <span className="ml-1">{text}</span>}
+                  </NavLink>
+                </li>
+              ))}
+            {role === "manager" &&
+              ManagerMenu?.map(({ icon, text, link }, index) => (
                 <li key={index} className="my-2">
                   <NavLink
                     to={link}
