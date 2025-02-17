@@ -376,6 +376,7 @@ const RecordSale = () => {
                     </label>
                     <input
                       type="date"
+                      // disabled={formData.Credit < 1} // disable if Credit is not provided
                       name="Credit_due"
                       value={formData.Credit_due}
                       onChange={handleChange}
