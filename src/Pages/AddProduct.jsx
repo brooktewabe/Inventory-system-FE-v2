@@ -288,7 +288,7 @@ const AddProduct = () => {
                   </div>
 
                   {/* Buttons */}
-                  <div className="flex justify-around space-x-4 mt-6">
+                  <div className="flex flex-col md:flex-row justify-end space-y-3 md:space-y-0 md:space-x-3">
                     <button
                       type="button"
                       onClick={handleCancel}

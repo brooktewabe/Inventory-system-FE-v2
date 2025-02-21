@@ -4,21 +4,16 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import { GoImage } from "react-icons/go";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
 const AddProduct = () => {
-  const [Product_image, setProduct_image] = useState(null);
   const [user, setUser] = useState(null);
   const [stockItems, setStockItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const navigate = useNavigate();
   const uid = localStorage.getItem("uid");
 
-  const handleFileChange = (e, setFile) => {
-    setFile(e.target.files[0]);
-  };
 
   useEffect(() => {
     const fetchInfo = async () => {
@@ -175,7 +170,7 @@ const AddProduct = () => {
                   />
                 </div>
 
-                <div className="flex justify-end space-x-3">
+                <div className="flex flex-col md:flex-row justify-end space-y-3 md:space-y-0 md:space-x-3">
                   <button
                     type="button"
                     onClick={handleCancel}

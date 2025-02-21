@@ -1,20 +1,23 @@
-import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { BiShow, BiHide } from "react-icons/bi";
-import { toast } from "react-toastify";
-import * as Yup from "yup";
-import axios from "axios";
-import Cookies from "js-cookie";
-import { AiOutlineUser, AiFillSecurityScan } from "react-icons/ai";
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { BiShow, BiHide } from "react-icons/bi"
+import { toast } from "react-toastify"
+import * as Yup from "yup"
+import axios from "axios"
+import Cookies from "js-cookie"
+import { AiOutlineUser, AiFillSecurityScan } from "react-icons/ai"
 
-const ValidatedLoginForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
-
+// Add reload script to head before React mounts
+if (typeof window !== "undefined") {
+  const script = document.createElement("script")
+  script.textContent = `
+    if (!sessionStorage.getItem('app_loaded')) {
+      sessionStorage.setItem('app_loaded', '1');
+      window.location.reload();
+    }
+  `
+  document.head.appendChild(script)
+}
   // // Integrate Eruda
   // useEffect(() => {
   //   const script = document.createElement("script");
@@ -26,55 +29,60 @@ const ValidatedLoginForm = () => {
   //   };
   //   document.body.appendChild(script);
   // }, []);
+  
+const ValidatedLoginForm = () => {
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [errors, setErrors] = useState({})
+  const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!validateForm()) {
-      return;
+      return
     }
 
     try {
       const response = await axios.post("https://api.akbsproduction.com/login", {
         email,
         password,
-      });
+      })
 
-      Cookies.set("jwt", response.data.jwt, { expires: 1 });
-      localStorage.setItem("role", response.data.role);
-      localStorage.setItem("uid", response.data.id);
+      Cookies.set("jwt", response.data.jwt, { expires: 1 })
+      localStorage.setItem("role", response.data.role)
+      localStorage.setItem("uid", response.data.id)
 
-      setEmail("");
-      setPassword("");
-      navigate("/");
-      window.location.reload();
+      setEmail("")
+      setPassword("")
+      navigate("/")
+      window.location.reload()
     } catch (error) {
-      console.error("Login error:", error.response ? error.response.data : error);
-      toast.error("Invalid email or password");
+      console.error("Login error:", error.response ? error.response.data : error)
+      toast.error("Invalid email or password")
     }
-  };
+  }
 
   const validateForm = () => {
     const schema = Yup.object().shape({
       email: Yup.string().required("Email is required"),
-      password: Yup.string()
-        .required("Password is required")
-        .min(8, "Password must be at least 8 characters"),
-    });
+      password: Yup.string().required("Password is required").min(8, "Password must be at least 8 characters"),
+    })
 
     try {
-      schema.validateSync({ email, password }, { abortEarly: false });
-      setErrors({});
-      return true;
+      schema.validateSync({ email, password }, { abortEarly: false })
+      setErrors({})
+      return true
     } catch (error) {
-      const newErrors = {};
+      const newErrors = {}
       error.inner.forEach((err) => {
-        newErrors[err.path] = err.message;
-      });
-      setErrors(newErrors);
-      return false;
+        newErrors[err.path] = err.message
+      })
+      setErrors(newErrors)
+      return false
     }
-  };
+  }
 
   return (
     <div className="flex items-center h-screen bg-black p-4 md:p-0">
@@ -83,9 +91,7 @@ const ValidatedLoginForm = () => {
           <p className="font-bold text-2xl">Login</p>
           <p className="text-stone-500">Hello - Login to your panel</p>
         </div>
-        {errors.login && (
-          <div className="text-red-500 text-sm text-center">{errors.login}</div>
-        )}
+        {errors.login && <div className="text-red-500 text-sm text-center">{errors.login}</div>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm mb-2">
@@ -105,9 +111,7 @@ const ValidatedLoginForm = () => {
                 }`}
               />
             </div>
-            {errors.email && (
-              <div className="text-red-500 text-sm">{errors.email}</div>
-            )}
+            {errors.email && <div className="text-red-500 text-sm">{errors.email}</div>}
           </div>
 
           <div className="mb-6">
@@ -136,24 +140,20 @@ const ValidatedLoginForm = () => {
                   {showPassword ? <BiHide /> : <BiShow />}
                 </button>
               </div>
-              {errors.password && (
-                <div className="text-red-500 text-sm mt-2">{errors.password}</div>
-              )}
+              {errors.password && <div className="text-red-500 text-sm mt-2">{errors.password}</div>}
             </div>
           </div>
 
           <div className="text-center">
-            <button
-              type="submit"
-              className="bg-[#131756] hover:bg-blue-700 w-full py-2 px-4 rounded font-bold"
-            >
+            <button type="submit" className="bg-[#131756] hover:bg-blue-700 w-full py-2 px-4 rounded font-bold">
               Login
             </button>
           </div>
         </form>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ValidatedLoginForm;
+export default ValidatedLoginForm
+
