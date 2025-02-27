@@ -15,6 +15,8 @@ const RecordSale = () => {
   const [SalesItems, setSalesItems] = useState("");
   const [salesQuantity, setSalesQuantity] = useState(0);
   const [salesCredit, setSalesCredit] = useState(0);
+  const [salesCreditDue, setSalesCreditDue] = useState("");
+  const [salesAmtPaid, setSalesAmtPaid] = useState("");
   const [salesQUan, setSalesQUan] = useState("");
   const [addedItems, setAddedItems] = useState([]);
   const [items, setItems] = useState([
@@ -35,9 +37,8 @@ const RecordSale = () => {
     Full_name: "",
     Contact: "",
     Payment_method: "",
-    // Credit_due: "",
-    Receipt: "",
     Transaction_id: "",
+    Receipt: "",
     Sale_type: "Batch",
     EachQuantity:""
   });
@@ -53,6 +54,14 @@ const RecordSale = () => {
     };
     fetchStock();
   }, []);
+  
+  // Calculate credit based on total amount and amount paid
+  useEffect(() => {
+    const amountPaid = parseFloat(salesAmtPaid) || 0;
+    const calculatedCredit = salesTotal - amountPaid;
+    setSalesCredit(calculatedCredit > 0 ? calculatedCredit : 0);
+  }, [salesTotal, salesAmtPaid]);
+
   const handleBeforeUnload = useCallback(
     (event) => {
       if (salesTotal !== 0) {
@@ -93,9 +102,18 @@ const RecordSale = () => {
     },
     [navigate, salesTotal]
   );
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    if (name === "salesAmtPaid") {
+      setSalesAmtPaid(value);
+    } else {
+      setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    }
+    
+    if (name === "salesCreditDue") {
+      setSalesCreditDue(value);
+    }
   };
 
   const handleItemChange = (index, e) => {
@@ -116,9 +134,7 @@ const RecordSale = () => {
           updatedItems[index].totalAmount = 0;
         }
       }
-      // Calculate credit based on total amount and amount paid
-      const amountPaid = parseFloat(updatedItems[index].amount) || 0;
-      updatedItems[index].credit = updatedItems[index].totalAmount - amountPaid;
+      
       return updatedItems;
     });
   };
@@ -141,10 +157,6 @@ const RecordSale = () => {
     const requiredFields = [
       "Full_name",
       "Contact",
-      "Payment_method",
-      "Transaction_id",
-      // "Quantity",
-      // "Amount",
     ];
 
     for (let field of requiredFields) {
@@ -158,29 +170,6 @@ const RecordSale = () => {
         });
         return; // Exit the function if validation fails
       }
-    }
-
-    // Check if Amount Paid is provided and Credit Due is required
-    if (currentItem.credit > 1 && !currentItem.credit_due) {
-      Swal.fire({
-        title: "Error!",
-        text: "Credit Due is required when Credit is provided.",
-        icon: "error",
-        confirmButtonColor: "#d33",
-        confirmButtonText: "OK",
-      });
-      return; // Exit the function if validation fails
-    }
-    // Check if Credit is +ve
-    if (currentItem.credit < 0) {
-      Swal.fire({
-        title: "Error!",
-        text: "Credit shouldn't be Negative.",
-        icon: "error",
-        confirmButtonColor: "#d33",
-        confirmButtonText: "OK",
-      });
-      return; // Exit the function if validation fails
     }
 
     // Calculate new quantity based on current stock
@@ -210,40 +199,17 @@ const RecordSale = () => {
       });
       return; // Exit the function to prevent further actions
     }
-    // Check if Credit_due is in the future
-    if (currentItem.credit_due) {
-      const dueDate = new Date(currentItem.credit_due);
-      const today = new Date();
 
-      // Set time of today to 00:00:00 for accurate comparison
-      today.setHours(0, 0, 0, 0);
-
-      if (dueDate <= today) {
-        Swal.fire({
-          title: "Error!",
-          text: "Credit Due must be a future date.",
-          icon: "error",
-          confirmButtonColor: "#d33",
-          confirmButtonText: "OK",
-        });
-        return; // Exit the function if validation fails
-      }
-    }
     // Prepare sale data for this specific item
     const saleData = {
       ...formData,
       Product_id: selectedItem.id,
       Quantity: currentItem.quantity,
       Total_amount: currentItem.totalAmount,
-      Amount: currentItem.amount,
-      Credit: currentItem.credit,
-      Credit_due: currentItem.credit_due,
+      Amount: 0, 
+      Credit: 0, 
+      Credit_due: null, // We'll handle the 3 at batch level
       EachQuantity: "Only for batch" 
-      //beside each sales, on save it saves
-      // one additional sale called batch sale which is displayed
-      // on the sales history page and report but whats used for 
-      // the total sales( Sale_type: "Batch") is the sum of each sales excluding the batch sale 
-      // setSalesItems, setSalesQUan, setSalesName are used for just displaying batch
     };
 
     try {
@@ -263,7 +229,8 @@ const RecordSale = () => {
           priority: "High",
         });
       }
-      // // Calculate and update salesTotal and salesCredit
+      
+      // Update sales totals
       setSalesTotal((prevTotal) => prevTotal + currentItem.totalAmount);
       setSalesQuantity(
         (prevTotal) => prevTotal + parseInt(currentItem.quantity, 10)
@@ -279,12 +246,6 @@ const RecordSale = () => {
           ? `${prevNames}, ${selectedItem.Name}`
           : selectedItem.Name
       );
-      setSalesCredit((prevCredit) => {
-        if (currentItem.credit > 1) {
-          return prevCredit + currentItem.credit;
-        }
-        return prevCredit;
-      });
 
       // Add the current item to the addedItems array
       setAddedItems((prevItems) => [
@@ -293,9 +254,6 @@ const RecordSale = () => {
           name: selectedItem.Name,
           quantity: currentItem.quantity,
           totalAmount: currentItem.totalAmount,
-          credit: currentItem.credit,
-          amount: currentItem.amount,
-          credit_due: currentItem.credit_due,
         },
       ]);
 
@@ -317,6 +275,10 @@ const RecordSale = () => {
   };
 
   const handleSave = async () => {
+    // Calculate amount paid and credit
+    const amountPaid = parseFloat(salesAmtPaid) || 0;
+    const calculatedCredit = salesTotal - amountPaid;
+    
     const combinedData = {
       Full_name: formData.Full_name,
       Contact: formData.Contact,
@@ -325,15 +287,88 @@ const RecordSale = () => {
       Receipt: formData.Receipt,
       Sale_type: "Batch Sale",
       Product_id: salesNames,
-      Credit: salesCredit,
+      Credit: calculatedCredit > 0 ? calculatedCredit : 0,
       Quantity: salesQuantity,
-      Credit_due: null,
-      Amount: salesTotal - salesCredit,
+      Credit_due: salesCreditDue,
+      Amount: amountPaid,
       Total_amount: salesTotal,
       EachQuantity: salesQUan,
       Item_name: SalesItems,
     };
+    
+    const requiredFields = [
+      "Payment_method",
+    ];
 
+    for (let field of requiredFields) {
+      if (!formData[field]) {
+        Swal.fire({
+          title: "Error!",
+          text: `${field.replace("_", " ")} is required.`,
+          icon: "error",
+          confirmButtonColor: "#d33",
+          confirmButtonText: "OK",
+        });
+        return; // Exit the function if validation fails
+      }
+    }
+
+    // Check if Amount Paid is provided
+    if (!salesAmtPaid) {
+      Swal.fire({
+        title: "Error!",
+        text: "Amount Paid is required.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
+    // Check if Credit Due is required when there's credit
+    if (calculatedCredit > 0 && !salesCreditDue) {
+      Swal.fire({
+        title: "Error!",
+        text: "Credit Due is required when Credit is provided.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+        confirmButtonText: "OK",
+      });
+      return; // Exit the function if validation fails
+    }
+    
+    // Check if Credit is +ve
+    if (calculatedCredit < 0) {
+      Swal.fire({
+        title: "Error!",
+        text: "Credit shouldn't be Negative.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+        confirmButtonText: "OK",
+      });
+      return; // Exit the function if validation fails
+    }
+    
+    // Check if Credit_due is in the future
+    if (salesCreditDue) {
+      const dueDate = new Date(salesCreditDue);
+      const today = new Date();
+
+      // Set time of today to 00:00:00 for accurate comparison
+      today.setHours(0, 0, 0, 0);
+
+      if (dueDate <= today) {
+        Swal.fire({
+          title: "Error!",
+          text: "Credit Due must be a future date.",
+          icon: "error",
+          confirmButtonColor: "#d33",
+          confirmButtonText: "OK",
+        });
+        return; // Exit the function if validation fails
+      }
+    }
+    
     try {
       const response = await axios.post(
         "https://api.akbsproduction.com/sales/create",
@@ -448,47 +483,12 @@ const RecordSale = () => {
                           className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
                         />
                       </div>
-                      <div>
-                        <label className="block text-sm font-bold text-gray-700">
-                          Amount Paid
-                        </label>
-                        <input
-                          type="number"
-                          value={item.amount}
-                          readOnly
-                          className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-bold text-gray-700">
-                          Credit Given
-                        </label>
-                        <input
-                          type="number"
-                          value={item.credit}
-                          readOnly
-                          className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-bold text-gray-700">
-                          Credit Due
-                        </label>
-                        <input
-                          type="date"
-                          value={item.credit_due}
-                          readOnly
-                          className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
-                        />
-                      </div>
                     </div>
                   ))}
                 </div>
               )}
               <h3 className="text-md font-bold mb-4">Order Information</h3>
-              {items
-              // ?.filter((item) => item.Type === "Finished Products" ||  item.Type === "Finished Product")
-              .map((item, index) => (
+              {items.map((item, index) => (
                 <div
                   key={index}
                   className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4"
@@ -549,43 +549,6 @@ const RecordSale = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Amount Paid
-                    </label>
-                    <input
-                      type="number"
-                      name="amount"
-                      value={item.amount}
-                      onChange={(e) => handleItemChange(index, e)}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Credit Given
-                    </label>
-                    <input
-                      type="number"
-                      disabled
-                      name="credit"
-                      value={item.credit}
-                      onChange={(e) => handleItemChange(index, e)}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Credit Due
-                    </label>
-                    <input
-                      type="date"
-                      name="credit_due"
-                      value={item.credit_due}
-                      onChange={(e) => handleItemChange(index, e)}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
-                  </div>
                 </div>
               ))}
               <div className="flex justify-end">
@@ -636,7 +599,7 @@ const RecordSale = () => {
                   </select>
                 </div>
 
-                <div className="mb-4 w-1/2">
+                <div className="w-1/2">
                   <label className="block text-sm font-bold text-gray-700">
                     Receipt
                   </label>
@@ -665,6 +628,42 @@ const RecordSale = () => {
                     </label>
                   </div>
                 </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700">
+                    Amount Paid
+                  </label>
+                  <input
+                    type="number"
+                    name="salesAmtPaid"
+                    value={salesAmtPaid}
+                    onChange={handleChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700">
+                    Credit Given
+                  </label>
+                  <input
+                    type="number"
+                    disabled
+                    name="credit"
+                    value={salesCredit}
+                    className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700">
+                    Credit Due
+                  </label>
+                  <input
+                    type="date"
+                    name="salesCreditDue"
+                    value={salesCreditDue}
+                    onChange={handleChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                  />
+                </div>
                 <div className="flex md:grid-cols-2 gap-6 mb-4 ">
                   <div>
                     <label className="block text-sm font-bold text-gray-700">
@@ -677,20 +676,9 @@ const RecordSale = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Total Credit
-                    </label>
-                    <input
-                      type="number"
-                      value={salesCredit}
-                      disabled
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
-                    />
-                  </div>
                 </div>
                 <div></div>
-                <div className="mt-6 flex  space-x-4">
+                <div className="mt-6 flex space-x-4">
                   <button
                     type="button"
                     onClick={handleCancel}

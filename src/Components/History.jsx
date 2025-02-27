@@ -17,7 +17,9 @@ const SalesHistory = () => {
 
   const fetchSalesByPage = async (page) => {
     try {
-      const response = await axios.get(`https://api.akbsproduction.com/sales/all-sales?page=${page}&limit=${itemsPerPage}`);
+      const response = await axios.get(
+        `https://api.akbsproduction.com/sales/all-sales?page=${page}&limit=${itemsPerPage}`
+      );
       setSales(response.data.data);
       // Ensure the API returns totalCount for calculating total pages
       const totalCount = response.data.total;
@@ -72,7 +74,7 @@ const SalesHistory = () => {
   }, [searchTerm, filterDate]);
 
   const formatProduct = (id) => {
-    if (!id) return ''; // Handle null or undefined values
+    if (!id) return ""; // Handle null or undefined values
     if (id.length <= 10) return id;
     return `${id.slice(0, 5)}...${id.slice(-5)}`;
   };
@@ -139,7 +141,6 @@ const SalesHistory = () => {
               <thead>
                 <tr>
                   {[
-                    "No.",
                     "Product",
                     "Client",
                     "Quantity",
@@ -152,7 +153,18 @@ const SalesHistory = () => {
                   ]?.map((header) => (
                     <td
                       key={header}
-                      className="py-2 text-[#9aa3a7] text-sm px-4 border-b"
+                      className={`py-2 text-[#9aa3a7] text-sm px-4 border-b ${
+                        [
+                          "Client",
+                          "Total amount",
+                          "Payment",
+                          "Type",
+                          "Credit",
+                          "Contact",
+                        ].includes(header)
+                          ? "hidden md:table-cell"
+                          : ""
+                      }`}
                     >
                       {header}
                     </td>
@@ -160,27 +172,36 @@ const SalesHistory = () => {
                 </tr>
               </thead>
               <tbody>
-                {sales
-                .map((sale, index) => (
+                {sales.map((sale) => (
                   <tr key={sale.id}>
-                    <td className="py-2 px-4 border-b">
-                      {(currentPage - 1) * itemsPerPage + index + 1}
-                    </td>
+                    {/* Product - Always Visible */}
                     <td className="py-2 px-4 border-b relative group">
                       {formatProduct(sale.Item_name)}
-                      <span className="absolute hidden group-hover:flex bg-gray-700 text-white text-sm rounded  z-10 left-1/2 transform -translate-x-1/2 mt-1">
+                      <span className="absolute hidden group-hover:flex bg-gray-700 text-white text-sm rounded z-10 left-1/2 transform -translate-x-1/2 mt-1">
                         {sale.Item_name}
                       </span>
                     </td>
-                    <td className="py-2 px-4 border-b">{sale.Full_name}</td>
+
+                    <td className="py-2 px-4 border-b hidden md:table-cell">
+                      {sale.Full_name}
+                    </td>
                     <td className="py-2 px-4 border-b">{sale.Quantity}</td>
-                    <td className="py-2 px-4 border-b">{sale.Total_amount}</td>
-                    <td className="py-2 px-4 border-b">
+                    <td className="py-2 px-4 border-b hidden md:table-cell">
+                      {sale.Total_amount}
+                    </td>
+                    <td className="py-2 px-4 border-b hidden md:table-cell">
                       {sale.Payment_method}
                     </td>
-                    <td className="py-2 px-4 border-b">{sale.Sale_type}</td>
-                    <td className="py-2 px-4 border-b">{sale.Credit}</td>
-                    <td className="py-2 px-4 border-b">{sale.Contact}</td>
+                    <td className="py-2 px-4 border-b hidden md:table-cell">
+                      {sale.Sale_type}
+                    </td>
+                    <td className="py-2 px-4 border-b hidden md:table-cell">
+                      {sale.Credit}
+                    </td>
+                    <td className="py-2 px-4 border-b hidden md:table-cell">
+                      {sale.Contact}
+                    </td>
+                    {/* View Button - Always Visible */}
                     <td className="py-3 px-4 border-b space-x-2">
                       <button
                         onClick={() => onEdit(sale.id)}
