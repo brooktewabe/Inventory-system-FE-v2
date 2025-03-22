@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
 import { FaCreditCard } from "react-icons/fa";
-import SalesHisory from "../Components/History"
+import SalesHistory from "../Components/History";
 
 const Report = () => {
   const navigate = useNavigate();
@@ -11,6 +11,8 @@ const Report = () => {
   const [currentDateIncome, setCurrentDateIncome] = useState(0);
   const [currentMonthIncome, setCurrentMonthIncome] = useState(0);
   const [currentYearIncome, setCurrentYearIncome] = useState(0);
+  const [activeProdPeriod, setActiveProdPeriod] = useState("monthly");
+  const [productionData, setProductionData] = useState([]);
   const currentDate = new Date(); // Get current date
   const [stock, setStock] = useState([]);
 
@@ -38,6 +40,10 @@ const Report = () => {
   const handleToggle = (period) => {
     setActivePeriod(period);
     fetchIncome(period); // Fetch income based on the selected period
+  };
+  const handleProdToggle = (period) => {
+    setActiveProdPeriod(period);
+    fetchProduction(period); // Fetch income based on the selected period
   };
 
   // Function to fetch income data based on the selected period
@@ -77,16 +83,40 @@ const Report = () => {
       console.error("Error fetching income data:", error);
     }
   };
+  const fetchProduction = async (period) => {
+    try {
+      let endpoint;
+      switch (period) {
+        case "daily":
+          endpoint = "https://api.akbsproduction.com/movement/stats/daily";
+          break;
+        case "monthly":
+          endpoint = "https://api.akbsproduction.com/movement/stats/monthly";
+          break;
+        case "yearly":
+          endpoint = "https://api.akbsproduction.com/movement/stats/yearly";
+          break;
+        default:
+          endpoint = "https://api.akbsproduction.com/movement/stats/monthly"; // Default to monthly
+      }
+
+      const response = await axios.get(endpoint);
+      setProductionData(response.data);
+    } catch (error) {
+      console.error("Error fetching Prod data:", error);
+    }
+  };
   const handleCreditNavigation = () => {
     navigate("/credits");
   };
-  // Fetch initial income data
+  // Fetch initial Prod data
   useEffect(() => {
     fetchIncome(activePeriod);
-  }, [activePeriod]);
+    fetchProduction(activeProdPeriod);
+  }, [activePeriod, activeProdPeriod]);
 
   return (
-    <section className="bg-[#edf0f0b9] h-screen">
+    <section className="bg-[#edf0f0b9] h-full">
       <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-2">
           {/* First small full-width grid */}
@@ -160,11 +190,64 @@ const Report = () => {
                 <p className="mb-6 text-sm font-bold">Total Sales</p>
                 <p className="mb-6 text-sm">{formattedDate}</p>
               </div>
+              <br />
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <div className="flex justify-between items-center mb-4 flex-wrap">
+                  <h3 className="text-lg font-bold flex-shrink-0">
+                    Production Report
+                  </h3>
+                  <div className="flex flex-col sm:flex-row justify-end items-start sm:items-center">
+                    {["yearly", "monthly", "daily"].map((period) => (
+                      <button
+                        key={period}
+                        onClick={() => handleProdToggle(period)}
+                        className={`py-1 px-4 rounded-lg mb-2 sm:mb-0 sm:mr-2 ${
+                          activeProdPeriod === period
+                            ? "bg-black text-white"
+                            : "bg-[#e0e9ec] text-black"
+                        }`}
+                      >
+                        {period.charAt(0).toUpperCase() + period.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {/* Show Aggregated Production Data */}
+                <div className="mt-4">
+                  {productionData.length > 0 ? (
+                    <div>
+                      {/* Table Header */}
+                      <div className="grid grid-cols-2 text-[#9aa3a7] text-sm border-b pb-2 px-10">
+                        <span>Name</span>
+                        <span>Total Production</span>
+                      </div>
+
+                      {/* Table Body */}
+                      <ul>
+                        {productionData.map((item, index) => (
+                          <li
+                            key={index}
+                            className="grid grid-cols-2 border-b py-4 px-10"
+                          >
+                            <span>
+                              {index + 1}.{" "}
+                              <span>{item.Name}</span>
+                            </span>
+                            <span>{item.TotalAdjustment}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : (
+                    <p>No production data available</p>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <SalesHisory/>
+      <SalesHistory />
     </section>
   );
 };

@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import { FaEdit, FaTrash, FaSearch, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrash, FaSearch, FaPlus, FaPlusSquare } from "react-icons/fa";
 import { AiOutlineHourglass } from "react-icons/ai";
 import { PiKeyReturnBold } from "react-icons/pi";
 
@@ -104,8 +104,8 @@ const Inventory = () => {
   const handleAddNavigation = () => {
     navigate("/add-product");
   };
-  const handleAddRawNavigation = () => {
-    navigate("/add-raw-material");
+  const handleCreateNavigation = () => {
+    navigate("/create-produced-product");
   };
   const handleReturnNavigation = (id) => {
     navigate(`/return-product/${id}`);
@@ -124,10 +124,10 @@ const Inventory = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ">
             <div>
               <div
-                className="bg-[#eceaeaec] p-6 max-w-sm rounded-lg ml-20 shadow-md cursor-pointer"
+                className="bg-[#eceaeaec] p-6 max-w-sm rounded-lg ml-10 shadow-md cursor-pointer"
                 onClick={handleAddNavigation}
               >
                 <div className="items-center mb-4 flex flex-col">
@@ -136,10 +136,21 @@ const Inventory = () => {
                 </div>
               </div>
             </div>
+            <div>
+              <div
+                className="bg-[#eceaeaec] p-6 max-w-sm rounded-lg ml-10 shadow-md cursor-pointer"
+                onClick={handleCreateNavigation}
+              >
+                <div className="items-center mb-4 flex flex-col">
+                  <FaPlusSquare size={40} />
+                  <p>Create Produced Product</p>
+                </div>
+              </div>
+            </div>
 
             <div>
               <div
-                className="bg-[#eceaeaec] p-6 max-w-sm rounded-lg ml-20 shadow-md cursor-pointer"
+                className="bg-[#eceaeaec] p-6 max-w-sm rounded-lg ml-16 shadow-md cursor-pointer"
                 onClick={handleMovementNavigation}
               >
                 <div className="items-center mb-4 flex flex-col">

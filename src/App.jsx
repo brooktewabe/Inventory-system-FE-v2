@@ -29,6 +29,7 @@ import FinishedInventory from "./Pages/FinishedInventory";
 import InventoryLayout from "./Pages/InventoryLayout";
 import RecordingLayout from "./Pages/RecordingLayout";
 import AddProducedProduct from "./Pages/AddProducedProduct";
+import CreateProducedProduct from "./Pages/CreateProducedProduct";
 import AddRawMaterialKomche from "./Pages/AddRawMaterialKomche";
 
 const App = () => {
@@ -55,6 +56,7 @@ const App = () => {
         <Route path='/sales-detail/:id' element={<ViewSaleDetail/>}/>
         <Route path='/add-product' element={<AddProduct/>}/>
         <Route path='/add-produced-product' element={<AddProducedProduct/>}/>
+        <Route path='/create-produced-product' element={<CreateProducedProduct/>}/>
         <Route path='/add-raw-material' element={<AddRawMaterial/>}/>
         <Route path='/add-komche' element={<AddRawMaterialKomche/>}/>
         <Route path='/return-product/:id' element={<ReturnProduct/>}/>

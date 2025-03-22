@@ -289,7 +289,7 @@ const RecordSale = () => {
       Product_id: salesNames,
       Credit: calculatedCredit > 0 ? calculatedCredit : 0,
       Quantity: salesQuantity,
-      Credit_due: salesCreditDue,
+      Credit_due: salesCreditDue ? salesCreditDue : null, 
       Amount: amountPaid,
       Total_amount: salesTotal,
       EachQuantity: salesQUan,

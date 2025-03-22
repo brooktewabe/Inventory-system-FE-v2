@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import { GoImage } from "react-icons/go";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
@@ -14,10 +13,6 @@ const AddProduct = () => {
   const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
   const uid = localStorage.getItem("uid");
-
-  const handleFileChange = (e, setFile) => {
-    setFile(e.target.files[0]);
-  };
 
   useEffect(() => {
     const fetchInfo = async () => {
@@ -75,7 +70,7 @@ const AddProduct = () => {
     formData.append("Price", values.Price);
     formData.append("Curent_stock", values.Curent_stock);
     formData.append("Reorder_level", values.Reorder_level);
-    formData.append("Type", "Finished Product");
+    formData.append("Type", "Produced Product");
     formData.append("files", Product_image);
 
     try {
@@ -99,7 +94,7 @@ const AddProduct = () => {
       };
 
       // Post movement data
-      const movementResponse = await axios.post(
+       await axios.post(
         "https://api.akbsproduction.com/movement/create",
         mvtData,
         {
@@ -144,7 +139,7 @@ const AddProduct = () => {
 
           {/* Create Product Section */}
           <div className="bg-white p-6 rounded-lg shadow-md max-w-[70%] ml-20">
-            <h3 className="text-xl font-bold mb-4">Add New Product</h3>
+            <h3 className="text-xl font-bold mb-4">Add New Produced Product</h3>
 
             <Formik
               initialValues={{
