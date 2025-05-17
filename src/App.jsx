@@ -1,18 +1,18 @@
 import { Route, createBrowserRouter, createRoutesFromElements, RouterProvider } from "react-router-dom";
+import PropTypes from "prop-types";
 import HomePage from "./Pages/HomePage";
 import Layout from "./Components/Layout";
 import NotFoundPage from "./Pages/NotFoundPage";
 import ValidatedLoginForm from "./Pages/Login";
 import Dashboard from "./Pages/Dashboard"
 import EditProduct from './Pages/EditProduct'
-import Inventory from "./Pages/Inventory";
-import AddProduct from "./Pages/AddProduct";
+import AddProductStore from "./Pages/AddProductStore";
+import AddProductWarehouse from "./Pages/AddProductWarehouse";
 import ReturnProduct from "./Pages/ReturnProduct";
 import StockMovement from "./Pages/StockMovement";
 import ViewMovementDetail from './Pages/ViewMovementDetail'
 import Sales from "./Pages/Sales";
 import RecordSale from "./Pages/RecordSale";
-import RecordUsage from "./Pages/RecordUsage";
 import SalesHistory from "./Pages/SalesHistory";
 import ViewSaleDetail from "./Pages/ViewSaleDetail";
 import Notification from "./Pages/Notification";
@@ -20,60 +20,155 @@ import Report from "./Pages/Report";
 import UserAdmin from "./Pages/UserAdmin";
 import Settings from "./Pages/Settings";
 import BatchSale from "./Pages/BatchSale";
-import Credits from "./Pages/Credits";
-import AddRawMaterial from "./Pages/AddRawMaterial";
-import SalesRaw from "./Pages/SalesRaw";
-import BatchUsage from "./Pages/BatchUsage";
-import InventoryRaw from "./Pages/InventoryRaw";
-import FinishedInventory from "./Pages/FinishedInventory";
-import InventoryLayout from "./Pages/InventoryLayout";
-import RecordingLayout from "./Pages/RecordingLayout";
-import AddProducedProduct from "./Pages/AddProducedProduct";
-import CreateProducedProduct from "./Pages/CreateProducedProduct";
-import AddRawMaterialKomche from "./Pages/AddRawMaterialKomche";
+import ChooseMethod from "./Pages/ChooseMethod";
+import SelectMethod from "./Pages/SelectMethods";
+import ImportExcel from "./Pages/ImportExcel";
+import Fields from "./Pages/Fields";
+import CMSList from "./Pages/CMSList";
+import CMSDetails from "./Pages/CMSDetails";
+import ManageOptions from "./Pages/ManageOptions";
+import StockDetails from "./Pages/StockDetails";
+import WarehouseDashboard from "./Pages/WarehouseDashboard";
+import UnauthorizedAccess from "./Components/UnauthorizedAccess";
 
 const App = () => {
-  
+
   const router = createBrowserRouter(
     createRoutesFromElements(
-        <Route path='/' element={<Layout />}>
+      
+      <Route path='/' element={<Layout />}>
+        <Route path='/login' element={<ValidatedLoginForm />} />
         <Route index element={<HomePage />} />
-        <Route path='/inventory' element={<Inventory/>}/>
-        <Route path='/finished-inventory' element={<FinishedInventory/>}/>
-        <Route path='/inventory-layout' element={<InventoryLayout/>}/>
-        <Route path='/record-layout' element={<RecordingLayout/>}/>
-        <Route path='/inventory-raw' element={<InventoryRaw/>}/>
-        <Route path='/sales' element={<Sales/>}/>
-        <Route path='/sales-raw' element={<SalesRaw/>}/>
-        <Route path='/report' element={<Report/>}/>
-        <Route path='/credits' element={<Credits/>}/>
-        <Route path='/batch-sale' element={<BatchSale/>}/>
-        <Route path='/batch-usage' element={<BatchUsage/>}/>
-        <Route path='/sales-history' element={<SalesHistory/>}/>
-        <Route path='/stock-movement' element={<StockMovement/>}/>
-        <Route path='/notification' element={<Notification/>}/>
-        <Route path='/movement-detail/:id' element={<ViewMovementDetail/>}/>
-        <Route path='/sales-detail/:id' element={<ViewSaleDetail/>}/>
-        <Route path='/add-product' element={<AddProduct/>}/>
-        <Route path='/add-produced-product' element={<AddProducedProduct/>}/>
-        <Route path='/create-produced-product' element={<CreateProducedProduct/>}/>
-        <Route path='/add-raw-material' element={<AddRawMaterial/>}/>
-        <Route path='/add-komche' element={<AddRawMaterialKomche/>}/>
-        <Route path='/return-product/:id' element={<ReturnProduct/>}/>
-        <Route path='*' element={<NotFoundPage />} />
-        <Route path='/edit-product/:id' element={<EditProduct />} />
-        <Route path='/record-sale/:id' element={<RecordSale />} />
-        <Route path='/record-usage/:id' element={<RecordUsage />} />
-        {/* <Route path='/record-sale' element={<RecordSale />} />use as props */}
         <Route path='/dashboard' element={<Dashboard />}/>
-        <Route path='/user-admin' element={<UserAdmin />} />
-        <Route path='/settings' element={<Settings />} />
-        <Route path='/userlogin' element={<ValidatedLoginForm />} />
+        <Route path='/notification' element={<Notification/>}/>
+
+        {/* require 'add' permission */}
+        <Route
+          path='/add-store-product'
+          element={<ProtectedRoute element={AddProductStore} requiredPermissions={['add']} />}
+        />
+        <Route
+          path='/choose-method'
+          element={<ProtectedRoute element={ChooseMethod} requiredPermissions={['add']} />}
+        />
+        <Route
+          path='/add-warehouse-product'
+          element={<ProtectedRoute element={AddProductWarehouse} requiredPermissions={['add']} />}
+        />
+        <Route
+          path='/select-method'
+          element={<ProtectedRoute element={SelectMethod} requiredPermissions={['add']} />}
+        />
+        <Route
+          path='/import'
+          element={<ProtectedRoute element={ImportExcel} requiredPermissions={['add']} />}
+        />
+
+        {/* permission - store */}
+        <Route 
+          path='/sales' 
+          element={<ProtectedRoute element={Sales} requiredPermissions={['store']} />} 
+        />
+        <Route 
+          path='/stock-movement' 
+          element={<ProtectedRoute element={StockMovement} requiredPermissions={['store','inventory']} />} 
+        />
+        <Route 
+          path='/movement-detail/:id' 
+          element={<ProtectedRoute element={ViewMovementDetail} requiredPermissions={['store','inventory']} />} 
+        />
+        <Route 
+          path='/sales-detail/:id' 
+          element={<ProtectedRoute element={ViewSaleDetail} requiredPermissions={['store']} />} 
+        />
+        <Route 
+          path='/edit-product/:id' 
+          element={<ProtectedRoute element={EditProduct} requiredPermissions={['store','inventory']} />} 
+        />
+        <Route 
+          path='/stock-details/:id' 
+          element={<ProtectedRoute element={StockDetails} requiredPermissions={['store','inventory']} />} 
+        />
+        <Route 
+          path='/return-product/:id' 
+          element={<ProtectedRoute element={ReturnProduct} requiredPermissions={['store']} />} 
+        />
+        <Route 
+          path='/batch-sale' 
+          element={<ProtectedRoute element={BatchSale} requiredPermissions={['store']} />} 
+        />
+        <Route 
+          path='/record-sale' 
+          element={<ProtectedRoute element={RecordSale} requiredPermissions={['store']} />} 
+        />
+
+        {/* permission - inventory */}
+        <Route 
+          path='/warehouse' 
+          element={<ProtectedRoute element={WarehouseDashboard} requiredPermissions={['inventory']} />} 
+        />
+
+        {/* permission - cms */}
+        <Route 
+          path='/customer-details/:id' 
+          element={<ProtectedRoute element={CMSDetails} requiredPermissions={['cms']} />} 
+        />
+        <Route 
+          path='/customers-list' 
+          element={<ProtectedRoute element={CMSList} requiredPermissions={['cms']} />} 
+        />
+
+        {/* report - assuming these need store permission */}
+        <Route 
+          path='/sales-history' 
+          element={<ProtectedRoute element={SalesHistory} requiredPermissions={['store']} />} 
+        />
+        <Route 
+          path='/report' 
+          element={<ProtectedRoute element={Report} requiredPermissions={['store']} />} 
+        />
+
+        {/* permission - settings */}
+        <Route
+          path='/user-admin'
+          element={<ProtectedRoute element={UserAdmin} requiredPermissions={['settings']} />}
+        />
+        <Route 
+          path='/manage-options' 
+          element={<ProtectedRoute element={ManageOptions} requiredPermissions={['settings']} />} 
+        />
+        <Route 
+          path='/add-fields' 
+          element={<ProtectedRoute element={Fields} requiredPermissions={['settings']} />} 
+        />
+        <Route 
+          path='/settings' 
+          element={<ProtectedRoute element={Settings} requiredPermissions={['settings']} />} 
+        />
+
+        <Route path='*' element={<NotFoundPage />} />
       </Route>
     )
   );
 
   return <RouterProvider router={router} />;
 }
+
+const ProtectedRoute = ({ element: Component, requiredPermissions }) => {
+  const permissions = localStorage.getItem("permissions");
+
+  const hasAccess = requiredPermissions.some(p => permissions.includes(p));
+
+  if (!hasAccess) {
+    return <UnauthorizedAccess/>;
+  }
+
+  return <Component />;
+};
+
+ProtectedRoute.propTypes = {
+  element: PropTypes.elementType.isRequired,
+  requiredPermissions: PropTypes.arrayOf(PropTypes.string).isRequired,
+};
 
 export default App;

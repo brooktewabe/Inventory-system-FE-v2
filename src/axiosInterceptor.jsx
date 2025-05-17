@@ -36,15 +36,17 @@ axios.interceptors.response.use(
 // Logout function
 const handleLogout = async () => {
   try {
-    await axios.post(`https://api.akbsproduction.com/logout`);
+    await axios.post(`http://localhost:5000/logout`);
     // Remove cookies and local storage data
     Cookies.remove("jwt");
     localStorage.removeItem("role");
+    localStorage.removeItem("name");
     localStorage.removeItem("uid");
+    localStorage.removeItem("permissions");
 
     // Redirect to login page only if not already redirected
-    if (window.location.pathname !== "/userlogin") {
-      window.location.href = "/userlogin";
+    if (window.location.pathname !== "/login") {
+      window.location.href = "/login";
     }
   } catch (error) {
     console.error("Logout error:", error);
