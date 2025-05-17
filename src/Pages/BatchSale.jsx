@@ -9,6 +9,8 @@ import Spinner from "../Components/Spinner";
 
 const RecordSale = () => {
   const navigate = useNavigate();
+  const role = localStorage.getItem("role");
+  const name = localStorage.getItem("name");
   const [sale, setSale] = useState(null);
   const [salesTotal, setSalesTotal] = useState(0);
   const [salesIdFromNames, setSalesIdFromNames] = useState("");
@@ -16,8 +18,6 @@ const RecordSale = () => {
   const [salesQuantity, setSalesQuantity] = useState(0);
   const [salesQuantityList, setSalesQuantityList] = useState("");
   const [addedItems, setAddedItems] = useState([]);
-  const role = localStorage.getItem("role");
-  const name = localStorage.getItem("name");
   const [items, setItems] = useState([
     {
       itemName: "",
@@ -48,49 +48,46 @@ const RecordSale = () => {
         console.error("Error fetching stock:", error);
       }
     };
+
     fetchStock();
+
+    // Restore data if it exists
+    const stored = localStorage.getItem("batchSaleData");
+    if (stored) {
+      const {
+        addedItems,
+        salesTotal,
+        salesQuantity,
+        salesIdFromNames,
+        SalesItems,
+        salesQuantityList,
+        formData
+      } = JSON.parse(stored);
+
+      setAddedItems(addedItems);
+      setSalesTotal(salesTotal);
+      setSalesQuantity(salesQuantity);
+      setSalesIdFromNames(salesIdFromNames);
+      setSalesItems(SalesItems);
+      setSalesQuantityList(salesQuantityList);
+      setFormData(formData);
+    }
   }, []);
 
-  const handleBeforeUnload = useCallback(
-    (event) => {
-      if (salesTotal !== 0) {
-        event.preventDefault();
-        event.returnValue = "";
-      }
-    },
-    [salesTotal]
-  );
-
   useEffect(() => {
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [handleBeforeUnload]);
+    if (addedItems.length > 0) {
+      localStorage.setItem("batchSaleData", JSON.stringify({
+        addedItems,
+        salesTotal,
+        salesQuantity,
+        salesIdFromNames,
+        SalesItems,
+        salesQuantityList,
+        formData
+      }));
+    }
+  }, [addedItems, salesTotal, salesQuantity, salesIdFromNames, SalesItems, salesQuantityList, formData]);
 
-  const handleNavigation = useCallback(
-    (path) => {
-      if (salesTotal !== 0) {
-        Swal.fire({
-          title: "Unsaved Changes",
-          text: "You have unsaved changes. Leaving now will make your sales history inconsistent. Are you sure you want to leave?",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#2563eb",
-          cancelButtonColor: "#d33",
-          confirmButtonText: "Yes, leave",
-          cancelButtonText: "Stay",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            navigate(path);
-          }
-        });
-      } else {
-        navigate(path);
-      }
-    },
-    [navigate, salesTotal]
-  );
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -171,6 +168,16 @@ const RecordSale = () => {
       Swal.fire({
         title: "Error!",
         text: "Insufficient stock available.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+        confirmButtonText: "OK",
+      });
+      return; // Exit the function to prevent further actions
+    }
+    if (currentItem.quantity < 1) {
+      Swal.fire({
+        title: "Error!",
+        text: "Quantity can't be negative or zero.",
         icon: "error",
         confirmButtonColor: "#d33",
         confirmButtonText: "OK",
@@ -286,6 +293,7 @@ const RecordSale = () => {
       );
 
       if (response.status === 201) {
+        localStorage.removeItem("batchSaleData");
         Swal.fire({
           title: "Success!",
           text: "Sale saved successfully.",
@@ -302,7 +310,7 @@ const RecordSale = () => {
   };
 
   const handleCancel = () => {
-    handleNavigation("/");
+     navigate("/");
   };
 
   if (!sale)
@@ -553,14 +561,15 @@ const RecordSale = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex justify-end space-x-4">
-                <button
+             <div className="flex justify-end space-x-4">
+               {addedItems.length==0 &&  <button
                   type="button"
                   onClick={handleCancel}
                   className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-100 transition"
                 >
                   Cancel
                 </button>
+                }
                 <button
                   type="button"
                   onClick={handleSave}
@@ -575,16 +584,6 @@ const RecordSale = () => {
                 </button>
               </div>
 
-              {/* Unsaved Changes Warning */}
-              {salesTotal !== 0 && (
-                <div className="mt-6 text-red-600">
-                  <p>
-                    * You have unsaved changes. Leaving now will make your sales
-                    history inconsistent.
-                  </p>
-                  <p>* Don&apos;t forget to add your last item to sale.</p>
-                </div>
-              )}
             </div>
           </form>
           <ToastContainer />
