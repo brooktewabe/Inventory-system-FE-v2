@@ -5,13 +5,15 @@ import withAuth from "../withAuth";
 import { FaClock, FaPrint } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import html2pdf from "html2pdf.js";
+import icon from '../assets/user.png'
 
 const ViewSaleDetail = () => {
   const { id } = useParams();
   const [sale, setSale] = useState(null);
   const [stocks, setStocks] = useState([]); // Store multiple stock items
   const navigate = useNavigate();
-
+  const role = localStorage.getItem("role");
+  const name = localStorage.getItem("name");
   const handleReturn = () => {
     navigate("/");
   };
@@ -25,7 +27,7 @@ const ViewSaleDetail = () => {
   useEffect(() => {
     const fetchSale = async () => {
       try {
-        const response = await axios.get(`https://api.akbsproduction.com/sales/${id}`);
+        const response = await axios.get(`http://localhost:5000/sales/${id}`);
         setSale(response.data);
       } catch (error) {
         console.error("Error fetching sale details:", error);
@@ -40,7 +42,7 @@ const ViewSaleDetail = () => {
         try {
           const productIds = sale.Product_id.split(",").map((id) => id.trim());
           const stockPromises = productIds.map((productId) =>
-            axios.get(`https://api.akbsproduction.com/stock/all/${productId}`)
+            axios.get(`http://localhost:5000/stock/all/${productId}`)
           );
           const stockResponses = await Promise.all(stockPromises);
           const stockData = stockResponses.map((res) => res.data);
@@ -56,11 +58,21 @@ const ViewSaleDetail = () => {
   if (!sale) return <p>Loading sale details...</p>;
 
   return (
-    <section className="bg-[#edf0f0b9] h-screen">
+    <section className="bg-[#edf0f0b9] h-full">
       <div className="container m-auto">
         <div className="grid grid-cols-1 gap-6">
-          <div className="bg-white p-4">
-            <h3 className="text-xl font-bold">Sales History - Details</h3>
+          <div className="bg-white  flex justify-between">
+            <p className="text-xl font-bold">Sales History - Details</p>
+            <div className="flex items-center bg-blue-500 text-white rounded-lg w-48 mr-2">
+              <img
+                src={icon}
+                className="w-8 h-8 rounded-full object-cover mr-4"
+              />
+              <div>
+                <p className="font-semibold">{name}</p>
+                <p className="text-xs">{role}</p>
+              </div>
+            </div>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md ml-40 max-w-2xl">
@@ -152,14 +164,6 @@ const ViewSaleDetail = () => {
                 <span>{sale.Payment_method}</span>
               </div>
               <div className="flex items-center">
-                <strong className="w-60 text-[#8f8d8d]">Total Credit</strong>
-                <span>{sale.Credit}</span>
-              </div>
-              <div className="flex items-center">
-                <strong className="w-60 text-[#8f8d8d]">Credit Due</strong>
-                <span>{sale.Credit_due}</span>
-              </div>
-              <div className="flex items-center">
                 <strong className="w-60 text-[#8f8d8d]">Total</strong>
                 <span>{sale.Total_amount}</span>
               </div>
@@ -167,7 +171,7 @@ const ViewSaleDetail = () => {
                 <strong className="w-60 text-[#8f8d8d]">Receipt</strong>
                 {sale.Receipt && (
                   <img
-                    src={`https://api.akbsproduction.com/uploads/${sale.Receipt}`}
+                    src={`http://localhost:5000/uploads/${sale.Receipt}`}
                     alt="Receipt"
                     className="w-36 h-40"
                   />
@@ -176,7 +180,7 @@ const ViewSaleDetail = () => {
             </div>
             <button
               onClick={handleReturn}
-              className="bg-[#16033a] ml-40 text-white px-16 py-2 rounded-lg"
+              className="bg-blue-600 ml-40 text-white px-16 py-2 rounded-lg"
             >
               Done
             </button>

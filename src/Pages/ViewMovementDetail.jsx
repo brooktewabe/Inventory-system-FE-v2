@@ -3,11 +3,17 @@ import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
 import { useParams } from "react-router-dom";
 import { useNavigate} from "react-router-dom";
+import icon from '../assets/user.png'
+import Spinner from "../Components/Spinner";
+
 
 const ViewMovementDetail = () => {
   const { id } = useParams();
   const [movement, setMovement] = useState(null);
   const navigate = useNavigate();
+  const role = localStorage.getItem("role");
+  const name = localStorage.getItem("name");
+
   const handleReturn = async () => {
     try {
       navigate("/");
@@ -18,7 +24,7 @@ const ViewMovementDetail = () => {
   useEffect(() => {
     const fetchMovement= async () => {
       try {
-        const response = await axios.get(`https://api.akbsproduction.com/movement/${id}`);
+        const response = await axios.get(`http://localhost:5000/movement/${id}`);
         setMovement(response.data);
       } catch (error) {
         console.error("Error fetching details:", error);
@@ -27,15 +33,25 @@ const ViewMovementDetail = () => {
     fetchMovement();
   }, [id]);
 
-  if (!movement) return <p>Loading...</p>;
+  if (!movement) return <p><Spinner/>...</p>;
 
   return (
     <section className="bg-[#edf0f0b9] h-screen">
       <div className="container m-auto">
         <div className="grid grid-cols-1 gap-6">
           {/* First small full-width grid */}
-          <div className="bg-white p-4">
-            <h3 className="text-xl font-bold">Stock Movement - Details</h3>
+          <div className="bg-white  flex justify-between">
+            <p className="text-xl font-bold">Stock Movement</p>
+            <div className="flex items-center bg-blue-500 text-white rounded-lg w-48  mr-2">
+              <img
+                src={icon}
+                className="w-8 h-8 rounded-full object-cover mr-4"
+              />
+              <div>
+                <p className="font-semibold">{name}</p>
+                <p className="text-xs">{role}</p>
+              </div>
+            </div>
           </div>
 
           {/* full-width grid */}
@@ -67,7 +83,7 @@ const ViewMovementDetail = () => {
               <br />
               <button
                 onClick={handleReturn}
-                className="bg-[#16033a] ml-40  text-white px-16 py-2 rounded-lg"
+                className="bg-blue-600 ml-40  text-white px-16 py-2 rounded-lg"
               >
                 Done
               </button>

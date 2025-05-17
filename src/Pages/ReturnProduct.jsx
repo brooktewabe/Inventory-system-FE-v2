@@ -6,6 +6,9 @@ import withAuth from "../withAuth";
 import { toast, ToastContainer } from "react-toastify";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import Spinner from "../Components/Spinner";
+import icon from '../assets/user.png'
+
 
 const EditProduct = () => {
   const { id } = useParams();
@@ -13,10 +16,11 @@ const EditProduct = () => {
   const [stock, setStock] = useState(null);
   const [user, setUser] = useState(null);
   const uid = localStorage.getItem("uid");
+  const role = localStorage.getItem("role");
+  const name = localStorage.getItem("name");
 
   const validationSchema = Yup.object({
     returnAmt: Yup.number().required("Required").positive("Must be greater than zero"),
-    Category: Yup.string().required("Required"),
     Return_reason: Yup.string().required("Required"),
   });
 
@@ -32,16 +36,14 @@ const EditProduct = () => {
       const formData = new FormData();
       formData.append("Name", values.Name);
       formData.append("Location", values.Location);
-      formData.append("Category", values.Category);
       formData.append("Price", values.Price);
       formData.append("Curent_stock", updatedStock);
-      formData.append("Reorder_level", values.Reorder_level);
-      if (values.Product_image) formData.append("files", values.Product_image);
+      formData.append("Restock_level", values.Restock_level);
 
       try {
         if(formik.values.Return_reason!='faulty'){
           const response = await axios.patch(
-            `https://api.akbsproduction.com/stock/all/${id}`,
+            `http://localhost:5000/stock/all/${id}`,
             formData,
             {
               headers: {
@@ -63,31 +65,31 @@ const EditProduct = () => {
         salesData.append("Return_reason",  formik.values.Return_reason);
 
 
-        await axios.post("https://api.akbsproduction.com/sales/create", salesData, {
+        await axios.post("http://localhost:5000/sales/create", salesData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
 
         // Create movement data
         const mvtData = new FormData();
-        mvtData.append("User", `${user.fname} ${user.lname}`);
+        mvtData.append("User", `${name}`);
         mvtData.append("Name", values.Name);
         mvtData.append("Adjustment", returnAmount);
         mvtData.append("Type", "Return");
 
         // Post movement data
-        await axios.post("https://api.akbsproduction.com/movement/create", mvtData, {
+        await axios.post("http://localhost:5000/movement/create", mvtData, {
           headers: {
             'Content-Type': 'application/json',
           },
         });
         // Create notification data
-        if (values.Curent_stock < values.Reorder_level) {
+        if (values.Curent_stock < values.Restock_level) {
         const notifData = new FormData();
         notifData.append("message", `${stock.Name} is running low on stock.`);
         notifData.append("priority", "High");
 
         // Post notification data
-        await axios.post("https://api.akbsproduction.com/notification/create", notifData, {
+        await axios.post("http://localhost:5000/notification/create", notifData, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -113,15 +115,16 @@ const EditProduct = () => {
   useEffect(() => {
     const fetchStock = async () => {
       try {
-        const response = await axios.get(`https://api.akbsproduction.com/stock/all/${id}`);
+        const response = await axios.get(`http://localhost:5000/stock/all/${id}`);
         setStock(response.data);
         formik.setValues({
           Name: response.data.Name,
           Location: response.data.Location,
           Category: response.data.Category,
           Price: response.data.Price,
+          storageLocation: response.data.storageLocation,
           Curent_stock: response.data.Curent_stock,
-          Reorder_level: response.data.Reorder_level,
+          Restock_level: response.data.Restock_level,
           Product_image: response.data.Product_image,
           Return_reason: response.data.Return_reason,
         });
@@ -139,7 +142,7 @@ const EditProduct = () => {
   useEffect(() => {
     const fetchInfo = async () => {
       try {
-        const response = await axios.get(`https://api.akbsproduction.com/user/${uid}`);
+        const response = await axios.get(`http://localhost:5000/user/${uid}`);
         setUser(response.data);
       } catch (error) {
         console.error("Error fetching details:", error);
@@ -148,7 +151,7 @@ const EditProduct = () => {
     fetchInfo();
   }, [uid]);
 
-  if (!stock) return <div>Loading...</div>;
+  if (!stock) return <div><Spinner/>...</div>;
 
   const handleCancel = () => {
     navigate("/");
@@ -157,8 +160,18 @@ const EditProduct = () => {
     <section className="bg-[#edf0f0b9] h-screen">
       <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-6">
-          <div className="bg-white p-4 ">
-            <h3 className="text-xl font-bold">Return Product</h3>
+          <div className="bg-white  flex justify-between">
+            <p className="text-xl font-bold">Store Management System</p>
+            <div className="flex items-center bg-blue-500 text-white rounded-lg w-48  mr-2">
+              <img
+                src={icon}
+                className="w-8 h-8 rounded-full object-cover mr-4"
+              />
+              <div>
+                <p className="font-semibold">{name}</p>
+                <p className="text-xs">{role}</p>
+              </div>
+            </div>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md max-w-[70%] ml-20">
@@ -202,26 +215,10 @@ const EditProduct = () => {
                       <div className="text-red-600 text-sm">{formik.errors.Return_reason}</div>
                     )}
                   </div>
-                  <p>* Faulty ones aren't added back to stock</p>
+                  <p>* Faulty ones aren&apos;t added back to stock</p>
                 </div>
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Category
-                    </label>
-                    <input
-                      type="text"
-                      name="Category"
-                      disabled
-                      value={formik.values.Category}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
-                    {formik.touched.Category && formik.errors.Category && (
-                      <div className="text-red-600 text-sm">{formik.errors.Category}</div>
-                    )}
-                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Returned Stock Amount
@@ -229,6 +226,7 @@ const EditProduct = () => {
                     <input
                       type="number"
                       name="returnAmt"
+                      required
                       // value={formik.values.Curent_stock}
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
@@ -242,17 +240,10 @@ const EditProduct = () => {
               </div>
 
               {/* Buttons */}
-              <div className="flex justify-around space-x-4 mt-6">
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  className="border border-gray-400 text-gray-700 px-16 py-2 rounded-lg"
-                >
-                  Cancel
-                </button>
+              <div className="flex justify-center mt-6">
                 <button
                   type="submit"
-                  className="bg-[#16033a] text-white px-16 py-2 rounded-lg"
+                  className="bg-blue-600 text-white px-6 py-2 rounded-md"
                 >
                   Save
                 </button>
