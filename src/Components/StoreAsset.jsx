@@ -53,7 +53,7 @@ const IncomeSection = () => {
       <p className="text-2xl mb-10 font-extrabold">{formatNumber(stockVal)}</p>
     </div>
     <p className="text-sm font-bold ">Total Value</p>
-  <p className="text-sm text-gray-600">{formattedDate} - {formattedDatePlusOne}</p>
+  <p className="text-sm text-gray-600">{formattedDate}</p>
 
   </div>
   );

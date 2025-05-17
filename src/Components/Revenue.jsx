@@ -111,7 +111,7 @@ const IncomeSection = () => {
   </div>
 
   <p className="text-sm font-bold mt-3 sm:mt-4">Total Sales</p>
-  <p className="text-sm text-gray-600">{formattedDate} - {formattedDatePlusOne}</p>
+  <p className="text-sm text-gray-600">{formattedDate}</p>
 </div>
 
   );
