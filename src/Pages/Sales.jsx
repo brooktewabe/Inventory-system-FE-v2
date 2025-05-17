@@ -2,66 +2,96 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import { FaSearch } from "react-icons/fa";
-import { AiOutlineHourglass } from "react-icons/ai";
-import { GrMultiple } from "react-icons/gr";
+import { FaSearch, FaPlus, FaExchangeAlt, FaLayerGroup } from "react-icons/fa";
+
 const Sales = () => {
   const navigate = useNavigate();
 
+  const role = localStorage.getItem("role");
+  const name = localStorage.getItem("name");
+
   const [stocks, setStocks] = useState([]);
-  const [searchVisible, setSearchVisible] = useState(false);
-  const [filterVisible, setFilterVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
   const [filteredStocks, setFilteredStocks] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+  const itemsPerPage = 15;
+
+  const fetchStocks = async (page) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/stock/all/store?page=${page}&limit=${itemsPerPage}`
+      );
+      setStocks(response.data.data);
+      setFilteredStocks(response.data.data);
+      const totalCount = response.data.total;
+      setTotalPages(Math.ceil(totalCount / itemsPerPage));
+    } catch (error) {
+      console.error("Error fetching :", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchStocks = async () => {
+    if (!searchTerm) {
+      fetchStocks(currentPage);
+    }
+  }, [currentPage]);
+
+  // Debounce effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 400); // 400ms debounce time
+
+    return () => clearTimeout(timer); 
+  }, [searchTerm]);
+  
+  useEffect(() => {
+    const fetchFilteredStocks = async () => {
       try {
-        const response = await axios.get(`https://api.akbsproduction.com/stock/all`);
-        setStocks(response.data.data);
-        setFilteredStocks(response.data.data);
+        const response = await axios.get(
+          `http://localhost:5000/stock/search?query=${debouncedSearchTerm}&location=store`
+        );
+        setFilteredStocks(response.data);
       } catch (error) {
-        console.error("Error fetching :", error);
+        console.error("Error fetching filtered stocks:", error);
       }
     };
 
-    fetchStocks();
-  }, []);
-
-  useEffect(() => {
-    let updatedStocks = stocks;
-
-    if (searchTerm) {
-      updatedStocks = updatedStocks.filter((stock) =>
-        stock.Name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+    if (debouncedSearchTerm ) {
+      fetchFilteredStocks();
+    } else {
+      fetchStocks(currentPage); // fallback
     }
+  }, [debouncedSearchTerm, currentPage]);
 
-    if (filterStatus) {
-      updatedStocks = updatedStocks.filter(
-        (stock) => stock.Category === filterStatus
-      );
-    }
-
-    setFilteredStocks(updatedStocks);
-  }, [searchTerm, filterStatus, stocks]);
 
   const formatProductId = (id) => {
     if (id.length <= 10) return id; // Return the id if it's less than or equal to 10 characters
     return `${id.slice(0, 3)}...${id.slice(-5)}`; // Format as 'xxxxx...xxxxx'
   };
+
   const onEditStock = (id) => {
-    navigate(`/record-sale/${id}`);
+    navigate(`/record-sale`, { state: { id }});
   };
-  // const onEditStock = (id) => {
-  //   navigate('/record-sale', { state: { id } }); // Pass the product id via state/props
-  // };
-  const handleAddNavigation = () => {
-    navigate("/sales-history", { state: { from: '/sales' } });
-  };
-  const handleBatchNavigation = () => {
+
+  const handleMultiSales = () => {
     navigate("/batch-sale");
+  };
+
+  const handleAddProduct = () => {
+    navigate("/choose-method");
+  };
+
+  const handleViewStockMovement = () => {
+    navigate("/stock-movement");
+  };
+  // Pagination handler
+  const handlePageChange = (page) => {
+    if (page > 0 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   return (
@@ -69,129 +99,241 @@ const Sales = () => {
       <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-6">
           {/* First small full-width grid */}
-          <div className="bg-white p-4  ">
-            <h3 className="text-xl font-bold">Record Sales</h3>
-          </div>
-
-          {/* Two equally sized grids */}
-          <div className="flex flex-col sm:grid sm:grid-cols-2 gap-6">
-            <div>
-              <div
-                className="bg-[#eceaeaec] p-6 w-52 rounded-lg ml-32 shadow-md cursor-pointer"
-                onClick={handleBatchNavigation}
-              >
-                <div className="items-center mb-4 flex flex-col">
-                  <GrMultiple size={40} />
-                  <p>Multiple Item sale</p>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div
-                className="bg-[#eceaeaec] p-6 w-52 rounded-lg ml-20 shadow-md cursor-pointer"
-                onClick={handleAddNavigation}
-              >
-                <div className="items-center mb-4 flex flex-col">
-                  <AiOutlineHourglass size={40} />
-                  <p>View History</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* full-width grid */}
-          <div className="bg-white p-6 rounded-lg shadow-md ml-6 ">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className=" text-lg font-bold">Stock List</h3>
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => setSearchVisible(!searchVisible)}
-                  className="text-gray-600 hover:text-gray-900"
-                >
-                  <FaSearch size={20} />
-                </button>
-              </div>
-            </div>
-            {searchVisible && (
-              <input
-                type="text"
-                placeholder="Search Product"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full mb-4 p-2 border border-gray-300 rounded"
+          <div className="bg-white  flex justify-between">
+            <p className="text-xl font-bold">Store Management System</p>
+            <div className="flex items-center bg-blue-500 text-white rounded-lg w-48 mr-2">
+              <img
+                src="src\assets\user.png"
+                className="w-8 h-8 rounded-full object-cover mr-4"
               />
-            )}
-
-            <table className="min-w-full bg-white">
-              <thead>
-                <tr>
-                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
-                    No.
-                  </td>
-
-                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
-                    Product ID
-                  </td>
-                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
-                    Category
-                  </td>
-                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
-                    Type
-                  </td>
-
-                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
-                    Name
-                  </td>
-                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
-                    Price
-                  </td>
-                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
-                    Current Stock Level
-                  </td>
-                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
-                    Reorder Level
-                  </td>
-                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
-                    Location
-                  </td>
-                  <td className="py-2 text-[#9aa3a7] text-sm px-4 border-b">
-                    Action
-                  </td>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredStocks
-                ?.filter((stock) => stock.Type !== "Raw Material")
-                .map((stock, index) => (
-                  <tr key={stock.id}>
-                    <td className="py-2 px-4 border-b">{index + 1}</td>
-                    <td className="py-2 px-4 border-b">
-                      {formatProductId(stock.id)}
-                    </td>
-                    <td className="py-2 px-4 border-b">{stock.Category}</td>
-                    <td className="py-2 px-4 border-b"> {stock.Type}</td>
-
-                    <td className="py-2 px-4 border-b">{stock.Name}</td>
-                    <td className="py-2 px-4 border-b">{stock.Price}</td>
-                    <td className="py-2 px-4 border-b">{stock.Curent_stock}</td>
-                    <td className="py-2 px-4 border-b">
-                      {stock.Reorder_level}
-                    </td>
-
-                    <td className="py-2 px-4 border-b">{stock.Location}</td>
-                    <td className="py-3 px-4 border-b space-x-2">
-                      <button
-                        onClick={() => onEditStock(stock.id)}
-                        className="text-blue-500 underline hover:text-blue-700"
-                      >
-                          Record Sale
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+              <div>
+                <p className="font-semibold">{name}</p>
+                <p className="text-xs">{role}</p>
+              </div>
+            </div>
           </div>
+          <div className="ml-4">
+          <h2 className="text-xl font-semibold mb-4">Action</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mr-2">
+            <button 
+              onClick={handleMultiSales}
+              className="flex items-center justify-start gap-3 p-4 bg-white border border-gray-200 rounded-md hover:bg-gray-50"
+            >
+              <div className="bg-blue-600 text-white p-2 rounded-full">
+                <FaLayerGroup />
+              </div>
+              <span>Multi-Sales</span>
+            </button>
+            
+            <button 
+              onClick={handleAddProduct}
+              className="flex items-center justify-start gap-3 p-4 bg-white border border-gray-200 rounded-md hover:bg-gray-50"
+            >
+              <div className="bg-blue-600 text-white p-2 rounded-full">
+                <FaPlus />
+              </div>
+              <span>Add Product</span>
+            </button>
+            
+            <button 
+              onClick={handleViewStockMovement}
+              className="flex items-center justify-start gap-3 p-4 bg-white border border-gray-200 rounded-md hover:bg-gray-50"
+            >
+              <div className="bg-blue-600 text-white p-2 rounded-full">
+                <FaExchangeAlt />
+              </div>
+              <span>View Stock Movement</span>
+            </button>
+          </div>
+        </div>
+        
+        {/* Inventory Management Section */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4 ml-4">Inventory Managment</h2>
+          
+          {/* Search Bar */}
+          <div className="mb-4 relative w-full sm:w-3/5 md:w-3/5 mx-4">
+            <div className="absolute inset-y-0 left-0 flex items-center">
+              <div className="bg-blue-600 rounded-l-md px-3 py-2 text-white flex items-center justify-center">
+                <FaSearch size={18} className="w-4 h-4 sm:w-5 sm:h-5" />
+              </div>
+            </div>
+            <input
+              type="text"
+              placeholder="Search by Name, Product ID, Category, Model"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-14 pr-4 py-2.5 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+            />
+          </div>
+          
+          {/* Table */}
+          <div className="bg-white rounded-md shadow-sm overflow-hidden ml-4  mr-2">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="px-4 py-3 text-xs text-left font-medium text-gray-500">
+                      No
+                    </th>
+                    <th className="px-4 py-3 text-xs text-left font-medium text-gray-500">
+                      Product Image
+                    </th>
+                    <th className="px-4 py-3 text-xs text-left font-medium text-gray-500 ">
+                      ID
+                    </th>
+                    <th className="px-4 py-3 text-xs text-left font-medium text-gray-500">
+                      Price
+                    </th>
+                    <th className="px-4 py-3 text-xs text-left font-medium text-gray-500">
+                      Product Name
+                    </th>
+                    <th className="px-4 py-3 text-xs text-left font-medium text-gray-500">
+                      Category
+                    </th>
+                    <th className="px-4 py-3 text-xs text-left font-medium text-gray-500">
+                      Stock
+                    </th>
+                    <th className="px-4 py-3 text-xs font-medium text-gray-500">
+                      Restock Level
+                    </th>
+                    <th className="px-4 py-3 text-xs text-left font-medium text-gray-500">
+                      Region
+                    </th>
+                    <th className="px-4 py-3 text-xs text-left font-medium text-gray-500">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredStocks.map((stock, index) => (
+                    <tr key={stock.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                          {(currentPage - 1) * itemsPerPage + index + 1}
+                        </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                      <img className="size-10" src={stock.Product_image ? `http://localhost:5000/uploads/${stock.Product_image}` : '/src/assets/Placeholder.png'} alt="Stock Image" />
+                    </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                        {formatProductId(stock.id)}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                        {stock.Price}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                        {stock.Name}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                        {stock.Category || "Toyota-CHE"}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                        {stock.Curent_stock}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                        {stock.Restock_level}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                        {stock.Location || "Addis Ababa"}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-blue-600">
+                        <button
+                          onClick={() => onEditStock(stock.id)}
+                          className="text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                          Record Sale
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Pagination */}
+              {!searchTerm && (
+                <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200">
+                  <div className="flex-1 flex justify-between sm:hidden">
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    >
+                      Next
+                    </button>
+                  </div>
+                  <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                      <nav
+                        className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                        aria-label="Pagination"
+                      >
+                        <button
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          disabled={currentPage === 1}
+                          className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                        >
+                          Previous
+                        </button>
+
+                        {[...Array(Math.min(5, totalPages))].map((_, i) => (
+                          <button
+                            key={i}
+                            onClick={() => handlePageChange(i + 1)}
+                            className={`relative inline-flex items-center px-4 py-2 border ${
+                              currentPage === i + 1
+                                ? "z-10 bg-blue-50 border-blue-500 text-blue-600"
+                                : "border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
+                            } text-sm font-medium`}
+                          >
+                            {i + 1}
+                          </button>
+                        ))}
+
+                        {totalPages > 5 && (
+                          <>
+                            <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                              ...
+                            </span>
+                            <button
+                              onClick={() => handlePageChange(totalPages)}
+                              className={`relative inline-flex items-center px-4 py-2 border ${
+                                currentPage === totalPages
+                                  ? "z-10 bg-blue-50 border-blue-500 text-blue-600"
+                                  : "border-gray-300 bg-white text-gray-500 hover:bg-gray-50"
+                              } text-sm font-medium`}
+                            >
+                              {totalPages}
+                            </button>
+                          </>
+                        )}
+
+                        <button
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                          className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                        >
+                          Next
+                        </button>
+                      </nav>
+                    </div>
+                    <div className="text-sm text-gray-700">
+                      Page <span className="font-medium">{currentPage}</span> of{" "}
+                      <span className="font-medium">
+                        {totalPages > 0 ? totalPages : 1}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+          </div>
+        </div>
         </div>
       </div>
     </section>
