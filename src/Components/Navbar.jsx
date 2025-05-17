@@ -2,17 +2,16 @@ import { useState, useEffect, useRef } from "react";
 import Modal from "react-modal";
 import {
   AiOutlineMenu,
-  AiOutlineUser,
   AiOutlineBars,
-  AiOutlineSwap,
   AiTwotonePlusCircle,
-  AiFillPlusSquare,
-  AiTwotoneReconciliation,
-  AiFillSetting
+  AiFillSetting,
+  AiOutlineShop,
+  AiOutlineBell,
+  AiOutlineContacts
 } from "react-icons/ai";
+import { BiHorizontalCenter } from "react-icons/bi";
 import { CiLogout } from "react-icons/ci";
 import { useNavigate, NavLink, useLocation } from "react-router-dom";
-import { MdOutlineDocumentScanner } from "react-icons/md";
 import { BiSolidDashboard } from "react-icons/bi";
 import Cookies from "js-cookie";
 import axios from "../axiosInterceptor";
@@ -25,22 +24,43 @@ const Navbar = () => {
     const storedNavState = localStorage.getItem("navCollapsed");
     return storedNavState !== null ? JSON.parse(storedNavState) : false;
   });
+  
+  // Add state to track if we're on mobile
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [user, setUser] = useState("");
   const sidebarRef = useRef(null);
-  const linkClass = ({ isActive }) => (isActive ? "text-[#3b82f6]" : "");
-  const role = localStorage.getItem("role");
-  const uid = localStorage.getItem("uid");
   const location = useLocation();
   const navigate = useNavigate();
   const { id } = useParams();
+  const role = localStorage.getItem("role");
+  const uid = localStorage.getItem("uid");
+
+  // Add resize listener to detect mobile
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      // Auto-collapse on mobile
+      if (window.innerWidth < 768 && !nav) {
+        setNav(true);
+        localStorage.setItem("navCollapsed", "true");
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Check on initial load
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [nav]);
 
   useEffect(() => {
     const fetchInfo = async () => {
       try {
         const response = await axios.get(
-          `https://api.akbsproduction.com/user/${uid}`
+          `http://localhost:5000/user/${uid}`
         );
         setUser(response.data);
       } catch (error) {
@@ -48,94 +68,70 @@ const Navbar = () => {
       }
     };
     fetchInfo();
-  }, [id]);
+  }, [id, uid]);
 
-  const userMenu = [
+  // Menu sections based on the image
+  const menuSection = [
     {
-      icon: <AiTwotonePlusCircle size={25} className="mr-4" />,
-      text: "Inventory Management",
-      link: "/inventory-layout",
-      className: { linkClass },
+      icon: <BiSolidDashboard size={20} className={isMobile ? "" : "mr-4"} />,
+      text: "Inventory Dashboard",
+      link: "/dashboard",
     },
     {
-      icon: <AiTwotoneReconciliation size={25} className="mr-4" />,
-      text: "Recording System",
-      link: "/record-layout",
-      className: { linkClass },
+      icon: <AiOutlineShop size={20} className={isMobile ? "" : "mr-4"} />,
+      text: "Store Management",
+      link: "/sales",
     },
   ];
 
-  const adminMenu = [
+  const functionSection = [
     {
-      icon: <BiSolidDashboard size={25} className="mr-4" />,
-      text: "Dashboard",
-      link: "/",
-      className: { linkClass },
-    },
-    {
-      icon: <AiTwotonePlusCircle size={25} className="mr-4" />,
+      icon: <AiTwotonePlusCircle size={20} className={isMobile ? "" : "mr-4"} />,
       text: "Inventory Management",
-      link: "/inventory-layout",
-      className: { linkClass },
+      link: "/warehouse",
     },
     {
-      icon: <AiTwotoneReconciliation size={25} className="mr-4" />,
-      text: "Recording System",
-      link: "/record-layout",
-      className: { linkClass },
+      icon: <AiOutlineBars size={20} className={isMobile ? "" : "mr-4"} />,
+      text: "Inventory Report",
+      link: "/sales-history",
     },
+    {
+      icon: <BiHorizontalCenter size={25} className={isMobile ? "" : "mr-4"} />,
+      text: "Stock Movement",
+      link: "/stock-movement",
+    },
+    {
+      icon: <AiOutlineContacts size={20} className={isMobile ? "" : "mr-4"} />,
+      text: "CMS",
+      link: "/customers-list",
+    },
+  ];
 
+  const bottomSection = [
     {
-      icon: <AiOutlineBars size={25} className="mr-4" />,
-      text: "Report",
-      link: "/report",
-      className: { linkClass },
-    },
-    {
-      icon: <AiOutlineUser size={25} className="mr-4" />,
-      text: "User Admin",
-      link: "/user-admin",
-      className: { linkClass },
-    },
-    {
-      icon: <  AiFillSetting  size={25} className="mr-4" />,
-      text: "Categories",
-      link: "/settings",
-      className: { linkClass },
-    },
-    {
-      icon: <AiOutlineSwap size={25} className="mr-4" />,
+      icon: <AiOutlineBell size={20} className={isMobile ? "" : "mr-3"} />,
       text: "Notifications",
       link: "/notification",
-      className: { linkClass },
-    },
-  ];
-  const ManagerMenu = [
-    {
-      icon: <AiTwotonePlusCircle size={25} className="mr-4" />,
-      text: "Inventory Management",
-      link: "/inventory-layout",
-      className: { linkClass },
     },
     {
-      icon: <AiTwotoneReconciliation size={25} className="mr-4" />,
-      text: "Recording System",
-      link: "/record-layout",
-      className: { linkClass },
+      icon: <AiFillSetting size={20} className={isMobile ? "" : "mr-3"} />,
+      text: "Settings",
+      link: "/settings",
     },
   ];
 
   const handleLogout = async () => {
     try {
-      await axios.post(`https://api.akbsproduction.com/logout`, {
+      await axios.post(`http://localhost:5000/logout`, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
-      // Cookies.remove("userId");
       Cookies.remove("jwt");
       localStorage.removeItem("role");
+      localStorage.removeItem("name");
       localStorage.removeItem("uid");
-      navigate("/userlogin", { replace: true });
+      localStorage.removeItem("permissions");
+      navigate("/login", { replace: true });
       window.location.reload();
     } catch (error) {
       console.error("Logout error:", error);
@@ -143,6 +139,9 @@ const Navbar = () => {
   };
 
   const toggleNav = () => {
+    // On mobile, don't allow expanding the sidebar
+    if (isMobile) return;
+    
     setNav((prevNav) => {
       const newNavState = !prevNav;
       localStorage.setItem("navCollapsed", JSON.stringify(newNavState));
@@ -151,119 +150,106 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    setNav(JSON.parse(localStorage.getItem("navCollapsed") || "false"));
-  }, [location]);
+    if (!isMobile) {
+      setNav(JSON.parse(localStorage.getItem("navCollapsed") || "false"));
+    }
+  }, [location, isMobile]);
 
-  if (role !== "admin" && role !== "user" && role !== "manager") {
+  if (!role) {
     return null;
   }
+
+  const renderMenuItems = (items, sectionTitle) => (
+    <div className="mb-6">
+      {(!isMobile || !nav) && sectionTitle && (
+        <h3 className="text-xs font-semibold text-gray-500 mb-2 px-4">{sectionTitle}</h3>
+      )}
+      <ul className="space-y-1">
+        {items.map((item, index) => (
+          <li key={index}>
+            <NavLink
+              to={item.link}
+              className={({ isActive }) => 
+                `flex items-center ${isMobile ? "justify-center px-2" : "px-4"} py-2 text-sm rounded-md transition-colors ${
+                  isActive ? "bg-blue-100 text-black-700" : "text-gray-700 hover:bg-gray-100"
+                } ${nav && "justify-center"}`
+              }
+              title={isMobile ? item.text : ""}
+            >
+              <span className="flex items-center">{item.icon}</span>
+              {(!isMobile && !nav) && <span>{item.text}</span>}
+            </NavLink>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 
   return (
     <div className="flex">
       <div
         ref={sidebarRef}
-        className={`fixed top-0 left-0 h-screen bg-[#06030b] min-h-full z-50 duration-300 
-          ${nav ? "w-[90px]" : "w-[13%]"} flex flex-col justify-between`}
+        className={`fixed top-0 left-0 h-screen bg-white border-r border-gray-200 z-50 transition-all duration-300 flex flex-col
+          ${isMobile ? "w-[60px]" : nav ? "w-[100px]" : "w-[200px]"}`}
       >
-        <div className="bg-[#06030b] rounded-t-xl p-3 flex flex-col">
-          {!nav && (
-            <>
-              <div className="flex">
-                <p className="text-xl  hidden md:block text-white ml-2">Control Panel</p>
-                <AiOutlineMenu
-                  size={30}
-                  className="cursor-pointer text-white ml-auto"
-                  onClick={toggleNav}
-                />
-              </div>
-              <div className="text-white bg-black rounded-3xl flex items-center p-2 mt-8">
-                <AiOutlineUser size={25} className="mr-4 hidden md:block " />
-                <div>
-                  <h3 className="text-white hidden md:block ">
-                    {user.fname + " " + user.lname}
-                  </h3>
-                  <h3 className="text-neutral-800 hidden md:block ">{role}</h3>
-                </div>
-              </div>
-            </>
-          )}
-          {nav && (
+        {/* Header */}
+        <div className="bg-blue-600 py-4 px-4 flex items-center justify-between">
+          {!isMobile && !nav && <h1 className="text-white font-medium text-sm">Inventory Management</h1>}
+          {!isMobile && (
             <AiOutlineMenu
-              size={30}
-              className="cursor-pointer text-white ml-auto"
+              size={20}
+              className={`text-white cursor-pointer p-1 rounded hover:bg-blue-700 ${nav && "mx-auto"}`}
               onClick={toggleNav}
+            />
+          )}
+          {isMobile && (
+            <AiOutlineMenu
+              size={20}
+              className="text-white cursor-pointer p-1 rounded hover:bg-blue-700 mx-auto"
+              onClick={() => {}} // Disabled on mobile
             />
           )}
         </div>
 
-        <nav className="flex-1 overflow-y-auto scrollbar-hide">
-          <ul className="flex flex-col p-4 text-white">
-            {role === "user" &&
-              userMenu?.map(({ icon, text, link }, index) => (
-                <li key={index} className="my-2">
-                  <NavLink
-                    to={link}
-                    className="flex items-center text-xl hover:bg-[#424243] rounded-lg p-1.5"
-                    onClick={() => setNav(false)}
-                  >
-                    {icon}
-                    {!nav && <span className="ml-1">{text}</span>}
-                  </NavLink>
-                </li>
-              ))}
-            {role === "manager" &&
-              ManagerMenu?.map(({ icon, text, link }, index) => (
-                <li key={index} className="my-2">
-                  <NavLink
-                    to={link}
-                    className="flex items-center text-xl hover:bg-[#424243] rounded-lg p-1.5"
-                    onClick={() => setNav(false)}
-                  >
-                    {icon}
-                    {!nav && <span className="ml-1">{text}</span>}
-                  </NavLink>
-                </li>
-              ))}
-            {role === "admin" &&
-              adminMenu?.map(({ icon, text, link }, index) => (
-                <li key={index} className="my-4">
-                  <NavLink
-                    to={link}
-                    className="flex items-center text-lg  hover:bg-[#424243] rounded-lg p-1.5"
-                    onClick={() => setNav(false)}
-                  >
-                    {icon}
-                    {!nav && <span className="ml-1 hidden md:block ">{text}</span>}
-                  </NavLink>
-                </li>
-              ))}
-          </ul>
-        </nav>
+        {/* Navigation sections */}
+        <div className="flex-1 py-4">
+          {renderMenuItems(menuSection, "MENU")}
+          {renderMenuItems(functionSection, "FUNCTION")}
+        </div>
 
-        <div className="p-4">
-          <button
-            className="flex items-center text-white p-2 rounded-lg"
-            onClick={() => setModalIsOpen(true)}
-          >
-            <CiLogout size={30} />
-            {!nav && <span className="ml-4 hidden md:block ">Logout</span>}
-          </button>
+        {/* Bottom section */}
+        <div className="border-t border-gray-200 pt-4 pb-6">
+          {renderMenuItems(bottomSection)}
+
+          <div className="px-4 mt-4">
+            <button
+              onClick={() => setModalIsOpen(true)}
+              className={`flex items-center ${isMobile ? "justify-center" : ""} w-full px-2 py-2 text-sm rounded-md text-red-600 hover:bg-red-50 transition-colors
+                ${nav && "justify-center"}`}
+              title={isMobile ? "Logout" : ""}
+            >
+              <CiLogout size={20} className={isMobile || nav ? "mx-auto" : "mr-3"} />
+              {!isMobile && !nav && <span>Logout</span>}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Page content */}
-      {/* <div
-        className={`ml-auto p-4 duration-300 ${nav ? "w-[calc(100%-90px)]" : "w-[calc(100%-13%)]"}`}
+      {/* Main content area */}
+      <div
+        className={`ml-auto p-4 transition-all duration-300 ${
+          isMobile ? "w-[calc(100%-60px)]" : nav ? "w-[calc(100%-70px)]" : "w-[calc(100%-200px)]"
+        }`}
       >
-        <Outlet />
-      </div> */}
+        {/* Your page content will go here */}
+      </div>
 
       {/* Logout Confirmation Modal */}
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={() => setModalIsOpen(false)}
         contentLabel="Confirm Logout"
-        className="bg-white p-6 rounded-lg shadow-md w-1/3 mx-auto"
+        className="bg-white p-6 rounded-lg shadow-md w-4/5 md:w-1/3 mx-auto"
         overlayClassName="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center"
       >
         <div className="text-center mb-4">
@@ -273,13 +259,13 @@ const Navbar = () => {
         <div className="flex justify-center space-x-4">
           <button
             onClick={() => setModalIsOpen(false)}
-            className="border border-gray-700 px-6 py-2 w-32 rounded-3xl text-gray-700"
+            className="border border-gray-700 px-6 py-2 w-32 rounded-full text-gray-700"
           >
             Cancel
           </button>
           <button
             onClick={handleLogout}
-            className="bg-red-500 text-white px-6 py-2 w-32 rounded-3xl"
+            className="bg-red-500 text-white px-6 py-2 w-32 rounded-full"
           >
             Yes
           </button>
