@@ -74,7 +74,7 @@ const IncomeSection = () => {
 <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md w-full">
   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6">
     <h5 className="font-semibold text-lg mb-2 sm:mb-0">Sales Amount</h5>
-    <div className="flex flex-wrap flex-col sm:flex-row md:flex-row gap-2 sm:gap-1 bg-gray-100 p-1 rounded-full">
+    <div className="flex flex-wrap gap-2 sm:gap-1 bg-gray-100 p-1 rounded-full">
       {["yearly", "monthly", "daily"].map((period) => (
         <button
           key={period}

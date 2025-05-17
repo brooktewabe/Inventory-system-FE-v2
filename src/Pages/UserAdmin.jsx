@@ -233,7 +233,7 @@ const UserAdmin = () => {
                 >
                   <option value="">Choose Role</option>
                   <option value="admin">Administrator</option>
-                  <option value="manager">Production Manager</option>
+                  <option value="manager">Manager</option>
                   <option value="user">Data Clerk</option>
                 </select>
                 {errors.role && <p className="text-red-500 text-xs mt-1">{errors.role}</p>}
