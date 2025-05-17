@@ -130,7 +130,7 @@ const RecordSale = () => {
         title: "Success!",
         text: "Recorded successfully.",
         icon: "success",
-        confirmButtonColor: "#3085d6",
+        confirmButtonColor: "#2563eb",
         confirmButtonText: "OK",
       }).then(() => {
         navigate("/");
@@ -341,6 +341,7 @@ const RecordSale = () => {
           </form>
         </div>
       </div>
+      <ToastContainer/>
     </section>
   );
 };

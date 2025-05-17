@@ -76,7 +76,7 @@ const RecordSale = () => {
           text: "You have unsaved changes. Leaving now will make your sales history inconsistent. Are you sure you want to leave?",
           icon: "warning",
           showCancelButton: true,
-          confirmButtonColor: "#3085d6",
+          confirmButtonColor: "#2563eb",
           cancelButtonColor: "#d33",
           confirmButtonText: "Yes, leave",
           cancelButtonText: "Stay",
@@ -290,7 +290,7 @@ const RecordSale = () => {
           title: "Success!",
           text: "Sale saved successfully.",
           icon: "success",
-          confirmButtonColor: "#3085d6",
+          confirmButtonColor: "#2563eb",
           confirmButtonText: "OK",
         });
         navigate("/");

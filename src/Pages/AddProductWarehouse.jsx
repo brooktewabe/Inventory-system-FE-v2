@@ -159,7 +159,7 @@ const AddProduct = () => {
         title: "Success!",
         text: "Product added successfully.",
         icon: "success",
-        confirmButtonColor: "#3085d6",
+        confirmButtonColor: "#2563eb",
         confirmButtonText: "OK",
       }).then(() => {
         navigate("/");

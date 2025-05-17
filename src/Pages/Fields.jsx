@@ -102,7 +102,7 @@ const ManageOptions = () => {
           setFields(fields.filter((field) => field.id !== id))
           toast.success("Deleted successfully.")
         } catch (error) {
-          toast.error("Failed to delete.")
+          toast.error("Failed to delete field. Make sure the field is not in use.")
         }
       }
     })

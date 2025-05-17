@@ -161,7 +161,7 @@ const Inventory = () => {
         title: "Success!",
         text: "Stock has been moved successfully.",
         icon: "success",
-        confirmButtonColor: "#3085d6",
+        confirmButtonColor: "#2563eb",
         confirmButtonText: "OK",
       })
     } catch (error) {
@@ -309,7 +309,6 @@ const Inventory = () => {
                 </thead>
                 <tbody>
                   {filteredStocks
-                    // ?.filter((stock) => stock.Type === "Finished Products"||stock.Type === "Finished Product")
                     ?.map((stock, index) => (
                       <tr key={stock.id}>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">

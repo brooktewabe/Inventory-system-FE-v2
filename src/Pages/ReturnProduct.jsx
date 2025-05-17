@@ -99,7 +99,7 @@ const EditProduct = () => {
           title: "Success!",
           text: "Returned successfully.",
           icon: "success",
-          confirmButtonColor: "#3085d6",
+          confirmButtonColor: "#2563eb",
           confirmButtonText: "OK",
         }).then(() => {
           navigate("/");
