@@ -45,14 +45,16 @@ const ValidatedLoginForm = () => {
     }
 
     try {
-      const response = await axios.post("https://api.akbsproduction.com/login", {
+      const response = await axios.post("http://localhost:5000/login", {
         email,
         password,
       })
 
       Cookies.set("jwt", response.data.jwt, { expires: 1 })
       localStorage.setItem("role", response.data.role)
+      localStorage.setItem("name", response.data.name)
       localStorage.setItem("uid", response.data.id)
+      localStorage.setItem("permissions", response.data.permissions)
 
       setEmail("")
       setPassword("")
@@ -85,73 +87,75 @@ const ValidatedLoginForm = () => {
   }
 
   return (
-    <div className="flex items-center h-screen bg-black p-4 md:p-0">
-      <div className="w-full max-w-md p-8 rounded-lg text-white md:w-1/2 md:px-8 md:mb-4 md:ml-6">
-        <div className="mb-6">
-          <p className="font-bold text-2xl">Login</p>
-          <p className="text-stone-500">Hello - Login to your panel</p>
+  <div className="flex items-center justify-center h-screen bg-[#edf0f0] p-4">
+    <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-md">
+      <div className="mb-6">
+        <p className="font-bold text-2xl text-gray-800">Login</p>
+        <p className="text-sm text-gray-500">Hello - Login to your panel</p>
+      </div>
+      {errors.login && <div className="text-red-500 text-sm text-center mb-4">{errors.login}</div>}
+      <form onSubmit={handleSubmit}>
+        {/* Username */}
+        <div className="mb-4">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            Username
+          </label>
+          <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white">
+            <AiOutlineUser size={20} className="text-gray-500 mr-2" />
+            <input
+              id="email"
+              name="email"
+              type="text"
+              placeholder="Enter username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={`w-full bg-transparent text-gray-800 outline-none text-sm ${
+                errors.email ? "border-red-500" : ""
+              }`}
+            />
+          </div>
+          {errors.email && <div className="text-red-500 text-sm mt-1">{errors.email}</div>}
         </div>
-        {errors.login && <div className="text-red-500 text-sm text-center">{errors.login}</div>}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-sm mb-2">
-              Username
-            </label>
-            <div className="flex items-center bg-[#a19f9f] rounded">
-              <AiOutlineUser size={25} className="mr-4 ml-2" />
-              <input
-                id="email"
-                name="email"
-                type="text"
-                placeholder="Enter username"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className={`w-full py-2 px-3 bg-[#494747] text-white outline-none ${
-                  errors.email ? "border-red-500" : ""
-                }`}
-              />
-            </div>
-            {errors.email && <div className="text-red-500 text-sm">{errors.email}</div>}
-          </div>
 
-          <div className="mb-6">
-            <label htmlFor="password" className="block text-sm mb-2">
-              Password
-            </label>
-            <div className="relative">
-              <div className="flex items-center bg-[#a19f9f] rounded">
-                <AiFillSecurityScan size={25} className="mr-4 ml-2" />
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={`w-full py-2 px-3 bg-[#494747] text-white outline-none ${
-                    errors.password ? "border-red-500" : ""
-                  }`}
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <BiHide /> : <BiShow />}
-                </button>
-              </div>
-              {errors.password && <div className="text-red-500 text-sm mt-2">{errors.password}</div>}
-            </div>
-          </div>
-
-          <div className="text-center">
-            <button type="submit" className="bg-[#131756] hover:bg-blue-700 w-full py-2 px-4 rounded font-bold">
-              Login
+        {/* Password */}
+        <div className="mb-6">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            Password
+          </label>
+          <div className="relative flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white">
+            <AiFillSecurityScan size={20} className="text-gray-500 mr-2" />
+            <input
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={`w-full bg-transparent text-gray-800 outline-none text-sm ${
+                errors.password ? "border-red-500" : ""
+              }`}
+            />
+            <button
+              type="button"
+              className="absolute right-3 text-gray-400 hover:text-gray-600"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <BiHide /> : <BiShow />}
             </button>
           </div>
-        </form>
-      </div>
+          {errors.password && <div className="text-red-500 text-sm mt-1">{errors.password}</div>}
+        </div>
+
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 font-semibold"
+        >
+          Login
+        </button>
+      </form>
     </div>
+  </div>
+
   )
 }
 
