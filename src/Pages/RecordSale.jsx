@@ -1,15 +1,19 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { useNavigate, useParams,useLocation  } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import { GoImage } from "react-icons/go";
+import { FaSearch, FaInfoCircle, FaUpload } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
+import icon from "../assets/user.png";
+import Spinner from "../Components/Spinner";
 
 const RecordSale = () => {
-  // const location = useLocation();
-  // const { id } = location.state || {}; // Extract id from state (props)
-  const { id } = useParams();
+  const location = useLocation();
+  const { id } = location.state || {}; // Extract id from state (props)
+  // const { id } = useParams();
+  const role = localStorage.getItem("role");
+  const name = localStorage.getItem("name");
   const navigate = useNavigate();
   const [sale, setSale] = useState(null);
   const [formData, setFormData] = useState({
@@ -17,23 +21,21 @@ const RecordSale = () => {
     Full_name: "",
     Contact: "",
     Quantity: "",
-    Amount: "",
     Payment_method: "",
     Total_amount: "",
-    Sale_type:"Single",
-    Credit_due: null,
-    Credit: "0",
+    Sale_type: "Single",
     Receipt: "",
     Transaction_id: "",
-    Item_name: "",
+    Item_List: "",
   });
 
   useEffect(() => {
     const fetchStock = async () => {
       try {
-        const response = await axios.get(`https://api.akbsproduction.com/stock/all/${id}`);
+        const response = await axios.get(
+          `http://localhost:5000/stock/all/${id}`
+        );
         setSale(response.data);
-        console.log(sale.Name)
       } catch (error) {
         console.error("Error fetching:", error);
       }
@@ -45,7 +47,7 @@ const RecordSale = () => {
     let updatedFormData = { ...formData, [name]: value };
 
     if (sale) {
-      updatedFormData.Item_name = sale.Name;
+      updatedFormData.Item_List = sale.Name;
     }
     // Update Total_amount based on Quantity and sale.Price
     if (name === "Quantity" && sale?.Price) {
@@ -53,17 +55,9 @@ const RecordSale = () => {
       const price = sale.Price;
       updatedFormData.Total_amount = quantity * price;
     }
-  
-    // Update Credit as Total_amount - Amount
-    if (name === "Amount" || name === "Quantity") {
-      const totalAmount = updatedFormData.Total_amount
-      const amount = updatedFormData.Amount
-      updatedFormData.Credit = totalAmount - amount;
-    }
-  
+
     setFormData(updatedFormData);
   };
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -74,7 +68,6 @@ const RecordSale = () => {
       "Full_name",
       "Contact",
       "Quantity",
-      "Amount",
       "Payment_method",
       "Total_amount",
       "Transaction_id",
@@ -91,38 +84,7 @@ const RecordSale = () => {
         return; // Exit the function if validation fails
       }
     }
-  
-    // Check if Credit is provided and Credit_due is required
-    if (formData.Credit &&  formData.Credit >1 && (formData.Credit_due === null || formData.Credit_due === "")) {
-      Swal.fire({
-        title: "Error!",
-        text: "Credit Due is required when Credit is provided.",
-        icon: "error",
-        confirmButtonColor: "#d33",
-        confirmButtonText: "OK",
-      });
-      return; // Exit the function if validation fails
-    }
 
-      // Check if Credit_due is in the future
-  if (formData.Credit_due) {
-    const dueDate = new Date(formData.Credit_due);
-    const today = new Date();
-
-    // Set time of today to 00:00:00 for accurate comparison
-    today.setHours(0, 0, 0, 0);
-
-    if (dueDate <= today) {
-      Swal.fire({
-        title: "Error!",
-        text: "Credit Due must be a future date.",
-        icon: "error",
-        confirmButtonColor: "#d33",
-        confirmButtonText: "OK",
-      });
-      return; // Exit the function if validation fails
-    }
-  }
     // Check if the new quantity would be negative
     if (newQuantity < 0) {
       Swal.fire({
@@ -134,31 +96,35 @@ const RecordSale = () => {
       });
       return; // Exit the function to prevent further actions
     }
-  
+
     // Prepare the PATCH request data
     const patchData = { Curent_stock: newQuantity };
-  
+
     try {
       // First, record the sale
-      await axios.post("https://api.akbsproduction.com/sales/create", formData, {
+      await axios.post("http://localhost:5000/sales/create", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-  
+
       // Then, update the stock
-      await axios.patch(`https://api.akbsproduction.com/stock/all/${id}`, patchData);
-  
+      await axios.patch(`http://localhost:5000/stock/all/${id}`, patchData);
+
       // Check if new quantity is less than reorder level
-      if (newQuantity < sale.Reorder_level) {
+      if (newQuantity < sale.Restock_level) {
         const notifData = {
           message: `${sale.Name} is running low on stock.`,
           priority: "High",
         };
         // Send the notification
-        await axios.post("https://api.akbsproduction.com/notification/create", notifData, {
-          headers: { "Content-Type": "application/json" },
-        });
+        await axios.post(
+          "http://localhost:5000/notification/create",
+          notifData,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
       }
-  
+
       // Show success alert
       Swal.fire({
         title: "Success!",
@@ -170,234 +136,205 @@ const RecordSale = () => {
         navigate("/");
         toast.success("Recorded Successfully");
       });
-  
+
       // Reset form after submission
       setFormData({
         Product_id: "",
         Full_name: "",
         Contact: "",
         Quantity: "",
-        Amount: "",
-        Sale_type:"Single",
+        Sale_type: "Single",
         Payment_method: "",
         Total_amount: "",
-        Credit_due: null,
-        Credit: "",
         Receipt: "",
         Transaction_id: "",
-        Item_name: "",
+        Item_List: "",
       });
     } catch (error) {
       console.error("Error creating sale:", error);
-      toast.error("Error Recorded. Try again later. Make sure all fields are appropriately filled");
+      toast.error(
+        "Error Recorded. Try again later. Make sure all fields are appropriately filled"
+      );
     }
   };
-  
-  
-  const handleCancel = () => {
-    navigate("/");
-  };
-  if (!sale) return <div>Loading...</div>;
+
+  if (!sale)
+    return (
+      <div>
+        <Spinner />
+      </div>
+    );
 
   return (
     <section className="bg-[#edf0f0b9] h-screen">
       <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-6">
           {/* First small full-width grid */}
-          <div className="bg-white p-4  ">
-            <h3 className="text-xl font-bold">Record Sale</h3>
+          <div className="bg-white  flex justify-between">
+            <p className="text-xl font-bold">Store Management System</p>
+            <div className="flex items-center bg-blue-500 text-white rounded-lg w-48  mr-2">
+              <img
+                src={icon}
+                className="w-8 h-8 rounded-full object-cover mr-4"
+              />
+              <div>
+                <p className="font-semibold">{name}</p>
+                <p className="text-xs">{role}</p>
+              </div>
+            </div>
           </div>
 
           {/* Create Product Section */}
           <form onSubmit={handleSubmit}>
-            <div className="bg-white p-6 rounded-lg shadow-md max-w-[70%] ml-20">
-              <h3 className="text-xl font-bold mb-4">Record Sales</h3>
-              <hr />
-              <h3 className="text-md font-bold mb-4">Buyer Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Right Side */}
-                <div className="space-y-4">
+            <div className="bg-white p-6 rounded-lg shadow-sm max-w-3xl mx-auto">
+              {/* Header with info icon */}
+              <div className="flex items-center mb-6 pb-2 border-b">
+                <FaInfoCircle className="text-blue-600 mr-2" />
+                <h2 className="text-lg font-medium">Point of Sale </h2>
+              </div>
+
+              {/* Buyer Information */}
+              <div className="mb-6">
+                <h3 className="text-base font-bold mb-4">Buyer Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      name="Full_name"
-                      value={formData.Full_name}
-                      onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
+                    <label className="block text-sm mb-1">Full Name</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <FaSearch className="text-blue-600" />
+                      </div>
+                      <input
+                        type="text"
+                        name="Full_name"
+                        placeholder="Enter name"
+                        value={formData.Full_name || ""}
+                        onChange={handleChange}
+                        className="w-full pl-10 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
+                      />
+                    </div>
                   </div>
-                </div>
-                {/* Left Side */}
-                <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Phone Number
-                    </label>
+                    <label className="block text-sm mb-1">Phone Number</label>
                     <input
                       type="number"
                       name="Contact"
-                      value={formData.Contact}
+                      placeholder="  Enter Phone Number"
+                      value={formData.Contact || ""}
                       onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                      className="w-full py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
                     />
                   </div>
                 </div>
               </div>
-              <br /> <hr />
-              <br />
-              <h3 className="text-md font-bold mb-4">Order Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Right Side */}
-                <div className="space-y-4">
+
+              {/* Order Information */}
+              <div>
+                <h3 className="text-base font-bold mb-4">Order Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
                   <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Quantity
-                    </label>
+                    <label className="block text-sm mb-1">Quantity</label>
                     <input
                       type="number"
                       name="Quantity"
-                      value={formData.Quantity}
+                      placeholder=" Enter quantity"
+                      value={formData.Quantity || ""}
                       onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                      className="w-full py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Credit Given
-                    </label>
+                    <label className="block text-sm mb-1">Total Payment</label>
                     <input
-                    disabled
                       type="number"
-                      name="Credit"
-                      value={formData.Credit}
+                      name="Total_amount"
+                      placeholder=" Enter total payment"
+                      disabled
+                      value={formData.Total_amount || ""}
                       onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                      className="w-full py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
                     />
                   </div>
+
                   <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Transaction ID
-                    </label>
+                    <label className="block text-sm mb-1">Payment Method</label>
+                    <div className="relative">
+                      <select
+                        name="Payment_method"
+                        value={formData.Payment_method || ""}
+                        onChange={handleChange}
+                        className="w-full py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none appearance-none pr-8"
+                      >
+                        <option value="" disabled>
+                          Select Payment Method
+                        </option>
+                        <option value="Cash">Cash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Telebirr">Telebirr</option>
+                        <option value="E Birr">E Birr</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                        <svg
+                          className="w-4 h-4 text-gray-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M19 9l-7 7-7-7"
+                          ></path>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-1">Transaction ID</label>
                     <input
                       type="text"
                       name="Transaction_id"
-                      value={formData.Transaction_id}
+                      placeholder=" Enter transaction ID"
+                      value={formData.Transaction_id || ""}
                       onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
-                  </div>
-                </div>
-                {/* 2nd Side */}
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Amount Paid
-                    </label>
-                    <input
-                       required
-                      type="number"
-                      name="Amount"
-                      value={formData.Amount}
-                      onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                      className="w-full py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
                     />
                   </div>
                   <div>
-                <label className="block text-sm font-bold text-gray-700">
-                  Payment Method
-                </label>
-                <select
-                  name="Payment_method"
-                  value={formData.Payment_method}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                >
-                  <option value="" disabled>Select Payment Method</option>
-                  <option value="Cash">Cash</option>
-                  <option value="Bank Transfer">Bank Transfer</option>
-                  <option value="Tele Birr">Tele Birr</option>
-                  <option value="E Birr">E Birr</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-                  <div className="mb-4 w-1/2">
-                    <label className="block text-sm font-bold text-gray-700">
-                      Receipt
-                    </label>
-
-                    <input
-                      type="file"
-                      id="Receipt"
-                      name="Receipt"
-                      // value={formData.Receipt}
-                      onChange={(e) => {
-                        const file = e.target.files[0];
-                        setFormData({ ...formData, Receipt: file });
-                      }}
-                      className="hidden"
-                      accept=".png, .jpg, .jpeg"
-                    />
-
-                    <div className="flex items-center">
-                      <div className="bg-[#]">
-                        <GoImage size={30} />
-                      </div>
+                    <label className="block text-sm mb-1">Receipt Image</label>
+                    <div>
+                      <input
+                        type="file"
+                        id="Receipt"
+                        name="Receipt"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          setFormData({ ...formData, Receipt: file });
+                        }}
+                        className="hidden"
+                        accept=".png, .jpg, .jpeg"
+                      />
                       <label
                         htmlFor="Receipt"
-                        className="text-white bg-[#16033a] py-2 px-6  mx-2 cursor-pointer border rounded-2xl"
+                        className="flex items-center justify-center gap-2 bg-blue-600 text-white py-2 rounded-md"
                       >
-                        Upload Image <br />
-                        {/* <span className="text-[#98b4c7]">(Required)</span> */}
+                        <FaUpload size={16} />
+                        Upload Image
                       </label>
                     </div>
                   </div>
                 </div>
-                {/* 3rd Side */}
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Total Payment
-                    </label>
-                    <input
-                    disabled
-                      type="number"
-                      name="Total_amount"
-                      value={formData.Total_amount}
-                      onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Credit due
-                    </label>
-                    <input
-                      type="date"
-                      // disabled={formData.Credit < 1} // disable if Credit is not provided
-                      name="Credit_due"
-                      value={formData.Credit_due}
-                      onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
-                  </div>
-                </div>
               </div>
-              {/* Buttons */}
-              <div className="flex justify-around space-x-4 mt-6">
+
+              {/* Complete Sale Button */}
+              <div className="mt-8 flex justify-center">
                 <button
-                  onClick={handleCancel}
-                  className="border border-gray-400 text-gray-700 px-16 py-2 rounded-lg"
+                  type="submit"
+                  className="w-1/3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                 >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  className="bg-[#16033a]  text-white px-16 py-2 rounded-lg"
-                >
-                  Sale
+                  Complete Sale
                 </button>
               </div>
             </div>

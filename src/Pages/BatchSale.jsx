@@ -4,34 +4,30 @@ import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
 import { toast, ToastContainer } from "react-toastify";
-import { GoImage } from "react-icons/go";
+import { FaSearch, FaInfoCircle, FaUpload } from "react-icons/fa";
 import Spinner from "../Components/Spinner";
 
 const RecordSale = () => {
   const navigate = useNavigate();
   const [sale, setSale] = useState(null);
   const [salesTotal, setSalesTotal] = useState(0);
-  const [salesNames, setSalesName] = useState("");
+  const [salesIdFromNames, setSalesIdFromNames] = useState("");
   const [SalesItems, setSalesItems] = useState("");
   const [salesQuantity, setSalesQuantity] = useState(0);
-  const [salesCredit, setSalesCredit] = useState(0);
-  const [salesCreditDue, setSalesCreditDue] = useState("");
-  const [salesAmtPaid, setSalesAmtPaid] = useState("");
-  const [salesQUan, setSalesQUan] = useState("");
+  const [salesQuantityList, setSalesQuantityList] = useState("");
   const [addedItems, setAddedItems] = useState([]);
+  const role = localStorage.getItem("role");
+  const name = localStorage.getItem("name");
   const [items, setItems] = useState([
     {
       itemName: "",
       quantity: 0,
       totalAmount: 0,
-      amount: 0,
-      credit: 0,
-      credit_due: null,
     },
   ]);
   const getSelectedIds = () => {
-    if (!salesNames) return [];
-    return salesNames.split(',').map(id => id.trim());
+    if (!salesIdFromNames) return [];
+    return salesIdFromNames.split(",").map((id) => id.trim());
   };
   const [formData, setFormData] = useState({
     Full_name: "",
@@ -40,13 +36,13 @@ const RecordSale = () => {
     Transaction_id: "",
     Receipt: "",
     Sale_type: "Batch",
-    EachQuantity:""
+    EachQuantity: "",
   });
 
   useEffect(() => {
     const fetchStock = async () => {
       try {
-        const response = await axios.get("https://api.akbsproduction.com/stock/all");
+        const response = await axios.get("http://localhost:5000/stock/all/store");
         setSale(response.data.data);
       } catch (error) {
         console.error("Error fetching stock:", error);
@@ -54,13 +50,6 @@ const RecordSale = () => {
     };
     fetchStock();
   }, []);
-  
-  // Calculate credit based on total amount and amount paid
-  useEffect(() => {
-    const amountPaid = parseFloat(salesAmtPaid) || 0;
-    const calculatedCredit = salesTotal - amountPaid;
-    setSalesCredit(calculatedCredit > 0 ? calculatedCredit : 0);
-  }, [salesTotal, salesAmtPaid]);
 
   const handleBeforeUnload = useCallback(
     (event) => {
@@ -102,18 +91,10 @@ const RecordSale = () => {
     },
     [navigate, salesTotal]
   );
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "salesAmtPaid") {
-      setSalesAmtPaid(value);
-    } else {
-      setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    }
-    
-    if (name === "salesCreditDue") {
-      setSalesCreditDue(value);
-    }
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   };
 
   const handleItemChange = (index, e) => {
@@ -134,7 +115,7 @@ const RecordSale = () => {
           updatedItems[index].totalAmount = 0;
         }
       }
-      
+
       return updatedItems;
     });
   };
@@ -154,10 +135,7 @@ const RecordSale = () => {
     }
 
     // Check for required fields
-    const requiredFields = [
-      "Full_name",
-      "Contact",
-    ];
+    const requiredFields = ["Full_name", "Contact"];
 
     for (let field of requiredFields) {
       if (!formData[field]) {
@@ -206,45 +184,42 @@ const RecordSale = () => {
       Product_id: selectedItem.id,
       Quantity: currentItem.quantity,
       Total_amount: currentItem.totalAmount,
-      Amount: 0, 
-      Credit: 0, 
-      Credit_due: null, // We'll handle the 3 at batch level
-      EachQuantity: "Only for batch" 
+      EachQuantity: null,
     };
 
     try {
       // Send the POST request for the current item
-      await axios.post("https://api.akbsproduction.com/sales/create", saleData, {
+      await axios.post("http://localhost:5000/sales/create", saleData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       // Update stock quantity
       const newQuantity = selectedItem.Curent_stock - currentItem.quantity;
-      await axios.patch(`https://api.akbsproduction.com/stock/all/${selectedItem.id}`, {
+      await axios.patch(`http://localhost:5000/stock/all/${selectedItem.id}`, {
         Curent_stock: newQuantity,
       });
 
-      if (newQuantity < selectedItem.Reorder_level) {
-        await axios.post("https://api.akbsproduction.com/notification/create", {
+      if (newQuantity < selectedItem.Restock_level) {
+        await axios.post("http://localhost:5000/notification/create", {
           message: `${selectedItem.Name} is running low on stock.`,
           priority: "High",
         });
       }
-      
+
       // Update sales totals
       setSalesTotal((prevTotal) => prevTotal + currentItem.totalAmount);
       setSalesQuantity(
-        (prevTotal) => prevTotal + parseInt(currentItem.quantity, 10)
+        (prevQuantity) => prevQuantity + parseInt(currentItem.quantity, 10)
       );
-      setSalesQUan((prevTotal) => prevTotal ? prevTotal + "," + currentItem.quantity : currentItem.quantity);
-      setSalesName((prevNames) =>
+      setSalesQuantityList((prevList) =>
+        prevList ? prevList + "," + currentItem.quantity : currentItem.quantity
+      );
+      setSalesIdFromNames((prevNames) =>
         prevNames
           ? `${prevNames}, ${currentItem.itemName}`
           : currentItem.itemName
       );
       setSalesItems((prevNames) =>
-        prevNames
-          ? `${prevNames}, ${selectedItem.Name}`
-          : selectedItem.Name
+        prevNames ? `${prevNames}, ${selectedItem.Name}` : selectedItem.Name
       );
 
       // Add the current item to the addedItems array
@@ -263,9 +238,6 @@ const RecordSale = () => {
           itemName: "",
           quantity: 0,
           totalAmount: 0,
-          credit: 0,
-          credit_due: null,
-          amount: 0,
         },
       ]); // Keep existing items and add a new empty one
     } catch (error) {
@@ -275,10 +247,6 @@ const RecordSale = () => {
   };
 
   const handleSave = async () => {
-    // Calculate amount paid and credit
-    const amountPaid = parseFloat(salesAmtPaid) || 0;
-    const calculatedCredit = salesTotal - amountPaid;
-    
     const combinedData = {
       Full_name: formData.Full_name,
       Contact: formData.Contact,
@@ -286,19 +254,14 @@ const RecordSale = () => {
       Transaction_id: formData.Transaction_id,
       Receipt: formData.Receipt,
       Sale_type: "Batch Sale",
-      Product_id: salesNames,
-      Credit: calculatedCredit > 0 ? calculatedCredit : 0,
+      Product_id: salesIdFromNames,
       Quantity: salesQuantity,
-      Credit_due: salesCreditDue ? salesCreditDue : null, 
-      Amount: amountPaid,
       Total_amount: salesTotal,
-      EachQuantity: salesQUan,
-      Item_name: SalesItems,
+      EachQuantity: salesQuantityList, // list of quantities
+      Item_List: SalesItems, // list of item names
     };
-    
-    const requiredFields = [
-      "Payment_method",
-    ];
+
+    const requiredFields = ["Payment_method"];
 
     for (let field of requiredFields) {
       if (!formData[field]) {
@@ -313,65 +276,9 @@ const RecordSale = () => {
       }
     }
 
-    // Check if Amount Paid is provided
-    if (!salesAmtPaid) {
-      Swal.fire({
-        title: "Error!",
-        text: "Amount Paid is required.",
-        icon: "error",
-        confirmButtonColor: "#d33",
-        confirmButtonText: "OK",
-      });
-      return;
-    }
-
-    // Check if Credit Due is required when there's credit
-    if (calculatedCredit > 0 && !salesCreditDue) {
-      Swal.fire({
-        title: "Error!",
-        text: "Credit Due is required when Credit is provided.",
-        icon: "error",
-        confirmButtonColor: "#d33",
-        confirmButtonText: "OK",
-      });
-      return; // Exit the function if validation fails
-    }
-    
-    // Check if Credit is +ve
-    if (calculatedCredit < 0) {
-      Swal.fire({
-        title: "Error!",
-        text: "Credit shouldn't be Negative.",
-        icon: "error",
-        confirmButtonColor: "#d33",
-        confirmButtonText: "OK",
-      });
-      return; // Exit the function if validation fails
-    }
-    
-    // Check if Credit_due is in the future
-    if (salesCreditDue) {
-      const dueDate = new Date(salesCreditDue);
-      const today = new Date();
-
-      // Set time of today to 00:00:00 for accurate comparison
-      today.setHours(0, 0, 0, 0);
-
-      if (dueDate <= today) {
-        Swal.fire({
-          title: "Error!",
-          text: "Credit Due must be a future date.",
-          icon: "error",
-          confirmButtonColor: "#d33",
-          confirmButtonText: "OK",
-        });
-        return; // Exit the function if validation fails
-      }
-    }
-    
     try {
       const response = await axios.post(
-        "https://api.akbsproduction.com/sales/create",
+        "http://localhost:5000/sales/create",
         combinedData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -398,48 +305,66 @@ const RecordSale = () => {
     handleNavigation("/");
   };
 
-  if (!sale) return <div><Spinner/></div>;
+  if (!sale)
+    return (
+      <div>
+        <Spinner />
+      </div>
+    );
 
   return (
     <section className="bg-[#edf0f0b9] h-full">
       <div className="container m-auto">
         <div className="grid grid-cols-1 gap-6">
-          <div className="bg-white p-4">
-            <h3 className="text-xl font-bold">Record Batch Sale</h3>
+          <div className="bg-white  flex justify-between">
+            <p className="text-xl font-bold">Store Management System</p>
+            <div className="flex items-center bg-blue-500 text-white rounded-lg w-48 mr-2">
+              <img
+                src="src\assets\user.png"
+                className="w-8 h-8 rounded-full object-cover mr-4"
+              />
+              <div>
+                <p className="font-semibold">{name}</p>
+                <p className="text-xs">{role}</p>
+              </div>
+            </div>
           </div>
           <form onSubmit={(e) => e.preventDefault()}>
-            <div className="bg-white p-6 rounded-lg shadow-md max-w-[70%] ml-20">
-              <h3 className="text-xl font-bold mb-4">Record Sales</h3>
-              <hr />
-              <h3 className="text-md font-bold mb-4">Buyer Information</h3>
+            <div className="bg-white p-6 rounded-lg shadow-md max-w-4xl mx-auto">
+              <div className="flex items-center mb-6 pb-2 border-b">
+                <FaInfoCircle className="text-blue-600 mr-2" />
+                <h2 className="text-lg font-medium">Point of Sale (Batch) </h2>
+              </div>
+
+              {/* Buyer Information */}
+              <h4 className="text-base font-bold mb-4">Buyer Information</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Full Name
-                    </label>
+                <div>
+                  <label className="block text-sm mb-1">Full Name</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                      <FaSearch className="text-blue-600" />
+                    </div>
                     <input
                       type="text"
                       name="Full_name"
-                      value={formData.Full_name}
+                      placeholder="Enter name"
+                      value={formData.Full_name || ""}
                       onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                      className="w-full pl-10 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
                     />
                   </div>
                 </div>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Phone Number
-                    </label>
-                    <input
-                      type="number"
-                      name="Contact"
-                      value={formData.Contact}
-                      onChange={handleChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm mb-1">Phone Number</label>
+                  <input
+                    type="text"
+                    name="Contact"
+                    placeholder="  Enter Phone Number"
+                    value={formData.Contact || ""}
+                    onChange={handleChange}
+                    className="w-full py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
+                  />
                 </div>
               </div>
               <br />
@@ -487,37 +412,40 @@ const RecordSale = () => {
                   ))}
                 </div>
               )}
-              <h3 className="text-md font-bold mb-4">Order Information</h3>
+              {/* Order Information */}
+              <h4 className="text-base font-bold mb-4 mt-6">
+                Order Information
+              </h4>
               {items.map((item, index) => (
                 <div
                   key={index}
                   className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4"
                 >
                   <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Item Name
-                    </label>
+                    <label className="block text-sm mb-1">Item Name</label>
                     <select
                       name="itemName"
                       value={item.itemName}
                       onChange={(e) => handleItemChange(index, e)}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                      className="w-full py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
                     >
                       <option value="" disabled>
                         Select Item
                       </option>
                       {Array.isArray(sale) && sale.length > 0 ? (
-                        sale
-                        .filter(sl => sl.Type !== "Raw Material")
-                        .map((sl) => {
-                          const isDisabled = getSelectedIds().includes(sl.id.toString());
+                        sale.map((sl) => {
+                          const isDisabled = getSelectedIds().includes(
+                            sl.id.toString()
+                          );
                           return (
-                            <option 
-                              key={sl.id} 
+                            <option
+                              key={sl.id}
                               value={sl.id}
-                              disabled={isDisabled && item.itemName !== sl.id.toString()}
+                              disabled={
+                                isDisabled && item.itemName !== sl.id.toString()
+                              }
                             >
-                              {sl.Name} {isDisabled ? '(Already Selected)' : ''}
+                              {sl.Name} {isDisabled ? "(Already Selected)" : ""}
                             </option>
                           );
                         })
@@ -527,66 +455,59 @@ const RecordSale = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Quantity
-                    </label>
+                    <label className="block text-sm mb-1">Quantity</label>
                     <input
                       type="number"
                       name="quantity"
+                      placeholder="Enter quantity"
                       value={item.quantity}
                       onChange={(e) => handleItemChange(index, e)}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                      className="w-full py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Total Amount
-                    </label>
+                    <label className="block text-sm mb-1">Total Amount</label>
                     <input
                       type="number"
+                      placeholder="Total Amount"
                       value={item.totalAmount}
                       readOnly
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
+                      className="w-full py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
                     />
                   </div>
                 </div>
               ))}
-              <div className="flex justify-end">
+              <div className="flex justify-end mb-6">
                 <button
                   type="button"
                   onClick={addMoreItem}
-                  className="bg-[#16033a] text-white px-4 py-2 rounded-lg"
+                  className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition"
                 >
                   Add To Sale
                 </button>
               </div>
 
-              <h3 className="text-md font-bold mb-4 mt-6">
-                Payment Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+              {/* Payment Information */}
+              <h4 className="text-base font-bold mb-4">Payment Information</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label className="block text-sm font-bold text-gray-700">
-                    Transaction ID
-                  </label>
+                  <label className="block text-sm mb-1">Transaction ID</label>
                   <input
                     type="text"
                     name="Transaction_id"
-                    value={formData.Transaction_id}
+                    placeholder=" Enter transaction ID"
+                    value={formData.Transaction_id || ""}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                    className="w-full py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-sm font-bold text-gray-700">
-                    Payment Method
-                  </label>
+                  <label className="block text-sm mb-1">Payment Method</label>
                   <select
                     name="Payment_method"
                     value={formData.Payment_method}
                     onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                    className="w-full py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
                   >
                     <option value="" disabled>
                       Select Method
@@ -598,12 +519,8 @@ const RecordSale = () => {
                     <option value="Other">Other</option>
                   </select>
                 </div>
-
-                <div className="w-1/2">
-                  <label className="block text-sm font-bold text-gray-700">
-                    Receipt
-                  </label>
-
+                <div>
+                  <label className="block text-sm mb-1">Receipt Image</label>
                   <input
                     type="file"
                     id="Receipt"
@@ -615,96 +532,57 @@ const RecordSale = () => {
                     className="hidden"
                     accept=".png, .jpg, .jpeg"
                   />
-
-                  <div className="flex items-center">
-                    <div className="bg-[#]">
-                      <GoImage size={30} />
-                    </div>
-                    <label
-                      htmlFor="Receipt"
-                      className="text-white bg-[#16033a] py-2 px-6  mx-2 cursor-pointer border rounded-2xl"
-                    >
-                      Upload Image <br />
-                    </label>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-700">
-                    Amount Paid
+                  <label
+                    htmlFor="Receipt"
+                    className="flex items-center justify-center gap-2 bg-blue-600 text-white py-2 rounded-md"
+                  >
+                    <FaUpload size={16} />
+                    Upload Image
                   </label>
-                  <input
-                    type="number"
-                    name="salesAmtPaid"
-                    value={salesAmtPaid}
-                    onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-700">
-                    Credit Given
-                  </label>
-                  <input
-                    type="number"
-                    disabled
-                    name="credit"
-                    value={salesCredit}
-                    className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-700">
-                    Credit Due
-                  </label>
-                  <input
-                    type="date"
-                    name="salesCreditDue"
-                    value={salesCreditDue}
-                    onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                  />
-                </div>
-                <div className="flex md:grid-cols-2 gap-6 mb-4 ">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700">
-                      Total Sales
-                    </label>
-                    <input
-                      type="number"
-                      value={salesTotal}
-                      disabled
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
-                    />
-                  </div>
                 </div>
                 <div></div>
-                <div className="mt-6 flex space-x-4">
-                  <button
-                    type="button"
-                    onClick={handleCancel}
-                    className="border border-gray-400 text-gray-700 px-8 py-2 rounded-lg"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleSave}
-                    disabled={salesTotal === 0}
-                    title={salesTotal === 0 ? "Sales total must be greater than 0 to save." : ""}
-                    className={`border border-gray-400 px-8 py-2 rounded-lg ${
-                      salesTotal === 0
-                        ? "bg-[#16033a] text-white cursor-not-allowed"
-                        : "bg-[#16033a] text-white"
-                    }`}
-                  >
-                    Save sale
-                  </button>
+                <div>
+                  <label className="block text-sm mb-1">Total Sales</label>
+                  <input
+                    type="number"
+                    value={salesTotal}
+                    disabled
+                    className="w-1/3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
+                  />
                 </div>
               </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end space-x-4">
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="border border-gray-400 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-100 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={salesTotal === 0}
+                  className={`px-6 py-2 rounded-md text-white transition ${
+                    salesTotal === 0
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700"
+                  }`}
+                >
+                  Save Sale
+                </button>
+              </div>
+
+              {/* Unsaved Changes Warning */}
               {salesTotal !== 0 && (
-                <div>
-                <p>* You have unsaved changes. Leaving now will make your sales history inconsistent.</p>
-                <p>* Don&apos;t forget to add your last item to sale.</p>
+                <div className="mt-6 text-red-600">
+                  <p>
+                    * You have unsaved changes. Leaving now will make your sales
+                    history inconsistent.
+                  </p>
+                  <p>* Don&apos;t forget to add your last item to sale.</p>
                 </div>
               )}
             </div>
