@@ -3,10 +3,13 @@ import Swal from "sweetalert2";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import { GoImage } from "react-icons/go";
 import { toast, ToastContainer } from "react-toastify";
 import { useFormik } from "formik";
+import icon from "../assets/user.png";
 import * as Yup from "yup";
+import { FaInfoCircle, FaUpload } from "react-icons/fa";
+import { AiFillCaretDown } from "react-icons/ai";
+import Spinner from "../Components/Spinner";
 
 const EditProduct = () => {
   const { id } = useParams();
@@ -14,26 +17,29 @@ const EditProduct = () => {
   const [stock, setStock] = useState(null);
   const [user, setUser] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [ProductImage, setProductImage] = useState(null);
+  const [customColumns, setCustomColumns] = useState([]);
   const uid = localStorage.getItem("uid");
+  const role = localStorage.getItem("role");
+  const name = localStorage.getItem("name");
 
   const validationSchema = Yup.object({
     Name: Yup.string().required("Required"),
     Location: Yup.string().required("Required"),
     Category: Yup.string().required("Required"),
-    Type: Yup.string().required("Required"),
     Price: Yup.number()
       .required("Required")
       .positive("Must be greater than zero"),
     Curent_stock: Yup.number()
       .required("Required")
       .positive("Must be greater than zero"),
-    // .moreThan(Yup.ref('Reorder_level'), "Stock must be greater than reorder level"),
+    // .moreThan(Yup.ref('Restock_level'), "Stock must be greater than restock level"),
   });
   useEffect(() => {
     // Fetch categories from the API endpoint
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("https://api.akbsproduction.com/category/all");
+        const response = await axios.get("http://localhost:5000/category/all");
         setCategories(response.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -42,70 +48,105 @@ const EditProduct = () => {
 
     fetchCategories();
   }, []);
+
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch both resources in parallel
+        const [stockResponse, columnsResponse] = await Promise.all([
+          axios.get(`http://localhost:5000/stock/all/${id}`),
+          axios.get("http://localhost:5000/custom-product-columns/all")
+        ]);
+        
+        const productData = stockResponse.data;
+        const columns = columnsResponse.data;
+        
+        setStock(productData);
+        setCustomColumns(columns);
+        
+        // Now initialize the form with all data available
+        const customFieldValues = columns.reduce((acc, col) => {
+          acc[col.fieldName] = productData[col.fieldName] || "";
+          return acc;
+        }, {});
+        
+        formik.setValues({
+          Name: productData.Name || "",
+          Location: productData.Location || "",
+          Category: productData.Category || "",
+          Price: productData.Price || "",
+          storageLocation: productData.storageLocation || "",
+          Curent_stock: productData.Curent_stock || "",
+          Restock_level: productData.Restock_level || "",
+          Product_image: null,
+          ...customFieldValues
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchData();
+  }, [id]); // Only depends on id now
+
   const formik = useFormik({
     initialValues: {
-      Name: "",
-      Location: "",
-      Category: "",
-      Type: "",
-      Price: "",
-      Curent_stock: "",
-      Reorder_level: "",
+      Name: stock?.Name || "",
+      Location: stock?.Location || "",
+      Category: stock?.Category || "",
+      Type: stock?.Type || "",
+      Price: stock?.Price || "",
+      Curent_stock: stock?.Curent_stock || "",
+      storageLocation: stock?.storageLocation || "",
+      Restock_level: stock?.Restock_level || "",
       Product_image: null,
-    },
+      ...customColumns.reduce((acc, col) => {
+        acc[col.fieldName] = stock?.[col.fieldName] || ""; 
+        return acc;
+      }, {}),  
+    },  
     validationSchema,
     onSubmit: async (values) => {
       const formData = new FormData();
+
       formData.append("Name", values.Name);
       formData.append("Location", values.Location);
       formData.append("Category", values.Category);
-      formData.append("Type", values.Type);
+      formData.append("storageLocation", values.storageLocation);
       formData.append("Price", values.Price);
       formData.append("Curent_stock", values.Curent_stock);
-      formData.append("Reorder_level", values.Reorder_level);
-      if (values.Product_image) formData.append("files", values.Product_image);
+      formData.append("Restock_level", values.Restock_level);
 
+      if (values.Product_image) {
+        formData.append("file", values.Product_image);
+      }  
+
+      customColumns.forEach((col) => {
+        const val = values[col.fieldName];
+        if (val !== undefined && val !== null) {
+          formData.append(col.fieldName, val);
+        }  
+      });  
       try {
-        const response = await axios.patch(
-          `https://api.akbsproduction.com/stock/all/${id}`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        await axios.patch(`http://localhost:5000/stock/all/${id}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });  
 
-        // Create movement data
-        const mvtData = new FormData();
-        mvtData.append("User", `${user.fname} ${user.lname}`);
-        mvtData.append("Name", values.Name);
-        mvtData.append("Adjustment", values.Curent_stock - stock.Curent_stock);
-        mvtData.append("Type", "Modification");
+        await axios.post("http://localhost:5000/movement/create", {
+          User: `${name}`,
+          Name: values.Name,
+          Adjustment: values.Curent_stock - stock.Curent_stock,
+          Type: "Modification",
+        });  
 
-        // Post movement data
-        await axios.post("https://api.akbsproduction.com/movement/create", mvtData, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        // Create notification data
-        if (values.Curent_stock < values.Reorder_level) {
-          const notifData = new FormData();
-          notifData.append("message", `${stock.Name} is running low on stock.`);
-          notifData.append("priority", "High");
+        if (values.Curent_stock < values.Restock_level) {
+          await axios.post("http://localhost:5000/notification/create", {
+            message: `${stock.Name} is running low on stock.`,
+            priority: "High",
+          });  
+        }  
 
-          // Post notification data
-          await axios.post(
-            "https://api.akbsproduction.com/notification/create",
-            notifData,
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
-        }
         Swal.fire({
           title: "Success!",
           text: "Updated successfully.",
@@ -115,79 +156,51 @@ const EditProduct = () => {
         }).then(() => {
           navigate("/");
           toast.success("Updated Successfully");
-        });
+        });  
       } catch (error) {
         console.error("Error updating stock:", error);
-        toast.error("Error updating stock. Try again later." + error);
-      }
-    },
-  });
-
-  useEffect(() => {
-    const fetchStock = async () => {
-      try {
-        const response = await axios.get(
-          `https://api.akbsproduction.com/stock/all/${id}`
-        );
-        setStock(response.data);
-        formik.setValues({
-          Name: response.data.Name,
-          Location: response.data.Location,
-          Category: response.data.Category,
-          Type: response.data.Type,
-          Price: response.data.Price,
-          Curent_stock: response.data.Curent_stock,
-          Reorder_level: response.data.Reorder_level,
-          Product_image: response.data.Product_image,
-        });
-      } catch (error) {
-        console.error("Error fetching stock:", error);
-      }
-    };
-
-    // Fetch stock data only if it hasn't been fetched yet
-    if (!stock) {
-      fetchStock();
-    }
-  }, [id, stock]); 
-
-  useEffect(() => {
-    const fetchInfo = async () => {
-      try {
-        const response = await axios.get(`https://api.akbsproduction.com/user/${uid}`);
-        setUser(response.data);
-      } catch (error) {
-        console.error("Error fetching details:", error);
-      }
-    };
-    fetchInfo();
-  }, [uid]);
+        toast.error("Error updating stock. Try again later.");
+      }  
+    },  
+  });    
 
   const handleFileChange = (e) => {
     formik.setFieldValue("Product_image", e.currentTarget.files[0]);
+    setProductImage(e.currentTarget.files[0])
   };
 
-  if (!stock) return <div>Loading...</div>;
-  const handleCancel = () => {
-    navigate("/");
-  };
+  if (!stock) return <div><Spinner/></div>;
 
   return (
     <section className="bg-[#edf0f0b9] h-screen">
       <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-6">
-          <div className="bg-white p-4 ">
-            <h3 className="text-xl font-bold">Edit Product</h3>
+          <div className="bg-white  flex justify-between">
+            <p className="text-xl font-bold">Inventory Management System</p>
+            <div className="flex items-center bg-blue-500 text-white rounded-lg w-48  mr-2">
+              <img
+                src={icon}
+                className="w-8 h-8 rounded-full object-cover mr-4"
+              />
+              <div>
+                <p className="font-semibold">{name}</p>
+                <p className="text-xs">{role}</p>
+              </div>
+            </div>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md max-w-[70%] ml-20">
+            <div className="flex items-center mb-6 pb-2 border-b">
+              <FaInfoCircle className="text-blue-600 mr-2" />
+              <h2 className="text-lg font-medium">Edit Product </h2>
+            </div>
             <h3 className="text-xl font-bold mb-4">Edit Product</h3>
             <form onSubmit={formik.handleSubmit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Product Title
+                      Name
                     </label>
                     <input
                       type="text"
@@ -200,24 +213,6 @@ const EditProduct = () => {
                     {formik.touched.Name && formik.errors.Name && (
                       <div className="text-red-600 text-sm">
                         {formik.errors.Name}
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Location
-                    </label>
-                    <input
-                      type="text"
-                      name="Location"
-                      value={formik.values.Location}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    />
-                    {formik.touched.Location && formik.errors.Location && (
-                      <div className="text-red-600 text-sm">
-                        {formik.errors.Location}
                       </div>
                     )}
                   </div>
@@ -238,6 +233,24 @@ const EditProduct = () => {
                         {formik.errors.Price}
                       </div>
                     )}
+                  </div>
+
+                  <div className="flex mt-2">
+                    <input
+                      type="file"
+                      id="Product_image"
+                      name="Product_image"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      accept=".jpg, .jpeg, .png"
+                    />
+                    <label
+                      htmlFor="Product_image"
+                      className="flex items-center justify-center gap-2 bg-blue-600 text-white py-2 px-1 rounded-md cursor-pointer"
+                    >
+                      <FaUpload size={16} />
+                      Upload Image
+                    </label>
                   </div>
                 </div>
                 <div className="space-y-4">
@@ -264,6 +277,30 @@ const EditProduct = () => {
                       </div>
                     )}
                   </div>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Restock Level
+                      </label>
+                      <input
+                        type="text"
+                        name="Restock_level"
+                        value={formik.values.Restock_level}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                      />
+                      {formik.touched.Restock_level &&
+                        formik.errors.Restock_level && (
+                          <div className="text-red-600 text-sm">
+                            {formik.errors.Restock_level}
+                          </div>
+                        )}
+                    </div>
+                  </div>
+                </div>
+
+                <div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Stock Amount
@@ -283,38 +320,85 @@ const EditProduct = () => {
                         </div>
                       )}
                   </div>
-                  <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700">
-                    Type
-                  </label>
-                  <select
-                    name="Type"
-                    value={formik.values.Type}
-                    onChange={formik.handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                  >
-                    <option value="" disabled>Select Type</option>
-                    <option value="Finished Product">Finished Product</option>
-                    <option value="Raw Material">Raw Material</option>
-                  </select>
+                  <div>
+                    <label className="block text-sm mt-4 font-medium text-gray-700">
+                      Location
+                    </label>
+                    <input
+                      type="text"
+                      name="Location"
+                      value={formik.values.Location}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      className="block w-full border border-gray-300 rounded-lg p-2"
+                    />
+                    {formik.touched.Location && formik.errors.Location && (
+                      <div className="text-red-600 text-sm">
+                        {formik.errors.Location}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
+              {/* ➤ Custom Fields Section */}
+              <div className="col-span-3 mt-8">
+                <h3 className="text-md font-semibold mb-4">
+                  Additional Product Details
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {customColumns.map((col) => (
+                    <div key={col.id}>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {col.fieldName}
+                      </label>
+                      {col.type === "options" ? (
+                        <div className="relative">
+                          <select
+                            name={col.fieldName}
+                            value={formik.values[col.fieldName] || ""}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md appearance-none pr-10"
+                          >
+                            <option disabled value="">
+                              {col.options?.length
+                                ? `Select ${col.fieldName}`
+                                : "No options"}
+                            </option>
+                            {col.options?.map((opt) => (
+                              <option key={opt} value={opt}>
+                                {opt}
+                              </option>
+                            ))}
+                          </select>
+                          <AiFillCaretDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                        </div>
+                      ) : (
+                        <input
+                          type={col.type === "number" ? "number" : "text"}
+                          name={col.fieldName}
+                          value={formik.values[col.fieldName] || ""}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md"
+                        />
+                      )}
+                      {formik.touched[col.fieldName] &&
+                        formik.errors[col.fieldName] && (
+                          <div className="text-red-600 text-sm">
+                            {formik.errors[col.fieldName]}
+                          </div>
+                        )}
+                    </div>
+                  ))}
                 </div>
               </div>
 
               {/* Buttons */}
-              <div className="flex justify-around space-x-4 mt-6">
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  className="border border-gray-400 text-gray-700 px-16 py-2 rounded-lg"
-                >
-                  Cancel
-                </button>
+              <div className="flex justify-center mt-6">
                 <button
                   type="submit"
-                  className="bg-[#16033a] text-white px-16 py-2 rounded-lg"
+                  className="bg-blue-600 text-white px-6 py-2 rounded-md"
                 >
                   Save
                 </button>
