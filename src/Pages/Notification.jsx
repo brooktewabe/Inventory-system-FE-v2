@@ -115,6 +115,7 @@ const Notification = () => {
                 <option value="">All</option>
                 <option value="low">Low stock</option>
                 <option value="deleted">Deleted Stock</option>
+                <option value="moved">Moved Stock</option>
               </select>
             </div>
 

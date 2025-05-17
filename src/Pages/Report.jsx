@@ -9,7 +9,7 @@ const Report = () => {
   const name = localStorage.getItem("name");
 
   return (
-    <section className="bg-[#edf0f0b9] h-full">
+    <section className="bg-[#edf0f0b9] h-screen">
       <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-2">
           {/* First small full-width grid */}
