@@ -1,38 +1,37 @@
 import withAuth from "../withAuth";
 import Revenue from "../Components/Revenue";
 import Total from "../Components/Total"
-import Chart from "../Components/Chart"
-import History from "../Components/History"
+import Store from "../Components/Store";
 const Dashboard = () => {
-    const role = localStorage.getItem("role");
+  const role = localStorage.getItem("role");
+  const name = localStorage.getItem("name");
 
   return (
     <section className="bg-[#edf0f0b9] min-h-screen">
       <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-6">
-          <div className="bg-white p-4">
-            <h3 className="text-xl font-bold">Dashboard</h3>
+        <div className="bg-white  flex justify-between">
+            <p className="text-xl font-bold">Dashboard</p>
+            <div className="flex items-center bg-blue-500 text-white rounded-lg w-48  mr-2">
+              <img
+                src="src\assets\user.png"
+                className="w-8 h-8 rounded-full object-cover mr-4"
+              />
+              <div>
+                <p className="font-semibold">{name}</p>
+                <p className="text-xs">{role}</p>
+              </div>
+            </div>
           </div>
-          {role== 'admin' &&   <>
-          <div className="flex flex-col sm:grid sm:grid-cols-3 gap-6">
-            <div className="px-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
+            <div className="px-4 sm:px-6">
               <Revenue />
             </div>
-            <div className="px-1">
+            <div className="px-4 sm:px-6">
               <Total />
             </div>
-            <div className="px-1">
-              <Chart />
-            </div>
           </div>
-          <History />
-        </>
-        }
-        {role!== 'admin' && 
-        <div className="bg-white p-6 text-center rounded-lg shadow-md ml-6 mr-6">
-          <p> You don&apos;t have the necessary permission to view this page</p>
-        </div>
-        }
+          <Store />
         </div>
       </div>
     </section>

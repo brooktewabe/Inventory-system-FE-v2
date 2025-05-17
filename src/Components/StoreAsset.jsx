@@ -25,7 +25,7 @@ const IncomeSection = () => {
   // Function to fetch stock value
   const fetchIncome = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/stock/total/total-stock`);
+      const response = await axios.get(`http://localhost:5000/stock/total/store-stock`);
       const data = response.data.totalSum;
       setStockVal(data);
     } catch (error) {
@@ -47,7 +47,7 @@ const IncomeSection = () => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
     <div className="flex justify-between items-center mb-4">
-      <h3 className="text-lg font-bold">Total Inventory Asset</h3>
+      <h3 className="text-lg font-bold">Store Asset</h3>
     </div>
     <div className="flex justify-between items-start mt-4">
       <p className="text-2xl mb-10 font-extrabold">{formatNumber(stockVal)}</p>
