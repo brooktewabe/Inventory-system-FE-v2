@@ -1,253 +1,53 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import { FaCreditCard } from "react-icons/fa";
-import SalesHistory from "../Components/History";
+import Revenue from "../Components/Revenue";
+import TopSelling from "../Components/TopSelling";
+import WarehouseAssets from "../Components/WarehouseAsset";
+import StoreAssets from "../Components/StoreAsset";
 
 const Report = () => {
-  const navigate = useNavigate();
-  const [activePeriod, setActivePeriod] = useState("monthly");
-  const [currentDateIncome, setCurrentDateIncome] = useState(0);
-  const [currentMonthIncome, setCurrentMonthIncome] = useState(0);
-  const [currentYearIncome, setCurrentYearIncome] = useState(0);
-  const [activeProdPeriod, setActiveProdPeriod] = useState("monthly");
-  const [productionData, setProductionData] = useState([]);
-  const currentDate = new Date(); // Get current date
-  const [stock, setStock] = useState([]);
-
-  useEffect(() => {
-    const fetchStocks = async () => {
-      try {
-        const stockResponse = await axios.get(
-          "https://api.akbsproduction.com/stock/total/total-stock"
-        );
-        setStock(stockResponse.data.totalSum);
-      } catch (error) {
-        console.error("Error fetching stock:", error);
-      }
-    };
-
-    fetchStocks();
-  }, []);
-
-  const formattedDate = currentDate.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
-  const handleToggle = (period) => {
-    setActivePeriod(period);
-    fetchIncome(period); // Fetch income based on the selected period
-  };
-  const handleProdToggle = (period) => {
-    setActiveProdPeriod(period);
-    fetchProduction(period); // Fetch income based on the selected period
-  };
-
-  // Function to fetch income data based on the selected period
-  const fetchIncome = async (period) => {
-    try {
-      let endpoint;
-      switch (period) {
-        case "daily":
-          endpoint = "https://api.akbsproduction.com/sales/total-amount/day";
-          break;
-        case "monthly":
-          endpoint = "https://api.akbsproduction.com/sales/total-amount/month";
-          break;
-        case "yearly":
-          endpoint = "https://api.akbsproduction.com/sales/total-amount/year";
-          break;
-        default:
-          endpoint = "https://api.akbsproduction.com/sales/total-amount/month"; // Default to monthly
-      }
-
-      const response = await axios.get(endpoint);
-
-      // Accessing total directly from the response
-      const data = response.data.total; // This is now a string
-
-      // Convert the string to a float for calculations
-      const totalAmount = parseFloat(data) || 0;
-
-      if (period === "daily") {
-        setCurrentDateIncome(totalAmount);
-      } else if (period === "monthly") {
-        setCurrentMonthIncome(totalAmount);
-      } else if (period === "yearly") {
-        setCurrentYearIncome(totalAmount);
-      }
-    } catch (error) {
-      console.error("Error fetching income data:", error);
-    }
-  };
-  const fetchProduction = async (period) => {
-    try {
-      let endpoint;
-      switch (period) {
-        case "daily":
-          endpoint = "https://api.akbsproduction.com/movement/stats/daily";
-          break;
-        case "monthly":
-          endpoint = "https://api.akbsproduction.com/movement/stats/monthly";
-          break;
-        case "yearly":
-          endpoint = "https://api.akbsproduction.com/movement/stats/yearly";
-          break;
-        default:
-          endpoint = "https://api.akbsproduction.com/movement/stats/monthly"; // Default to monthly
-      }
-
-      const response = await axios.get(endpoint);
-      setProductionData(response.data);
-    } catch (error) {
-      console.error("Error fetching Prod data:", error);
-    }
-  };
-  const handleCreditNavigation = () => {
-    navigate("/credits");
-  };
-  // Fetch initial Prod data
-  useEffect(() => {
-    fetchIncome(activePeriod);
-    fetchProduction(activeProdPeriod);
-  }, [activePeriod, activeProdPeriod]);
+  const role = localStorage.getItem("role");
+  const name = localStorage.getItem("name");
 
   return (
     <section className="bg-[#edf0f0b9] h-full">
       <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-2">
           {/* First small full-width grid */}
-          <div className="bg-white p-4">
-            <h3 className="text-xl font-bold">Analytics</h3>
-          </div>
-
-          <div className="py-4 px-8">
-            <div>
-              <div className="flex justify-between items-center mb-4 flex-wrap">
-                <h3 className="flex-shrink-0">
-                  <div>
-                    <div
-                      className="bg-[#eceaeaec] p-6 w-80 rounded-lg ml-20 shadow-md cursor-pointer"
-                      onClick={handleCreditNavigation}
-                    >
-                      <div className="items-center mb-6 flex flex-col">
-                        <FaCreditCard size={40} />
-                        <p>Credits Report</p>
-                      </div>
-                    </div>
-                  </div>
-                </h3>
+          <div className="bg-white  flex justify-between">
+            <p className="text-xl font-bold">Report</p>
+            <div className="flex items-center bg-blue-500 text-white rounded-lg w-48 mr-2">
+              <img
+                src="src\assets\user.png"
+                className="w-8 h-8 rounded-full object-cover mr-4"
+              />
+              <div>
+                <p className="font-semibold">{name}</p>
+                <p className="text-xs">{role}</p>
               </div>
             </div>
           </div>
-          <div className="gap-2">
-            <div className="px-6">
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-bold">Total Assets</h3>
-                </div>
-                <div className="mt-4">
-                  <p className="text-2xl font-extrabold">{stock}</p>
-                </div>
-                <p className="mb-6 text-sm font-bold">Total value</p>
-                <p className="mb-6 text-sm">{formattedDate}</p>
-              </div>
-            </div>
-            <div className="py-10 px-6">
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="flex justify-between items-center mb-4 flex-wrap">
-                  <h3 className="text-lg font-bold flex-shrink-0">
-                    Total Sales
-                  </h3>
-                  <div className="flex flex-col sm:flex-row justify-end items-start sm:items-center">
-                    {["yearly", "monthly", "daily"]?.map((period) => (
-                      <button
-                        key={period}
-                        onClick={() => handleToggle(period)}
-                        className={`py-1 px-4 rounded-lg mb-2 sm:mb-0 sm:mr-2 ${
-                          activePeriod === period
-                            ? "bg-black text-white"
-                            : "bg-[#e0e9ec] text-black"
-                        }`}
-                      >
-                        {period.charAt(0).toUpperCase() + period.slice(1)}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <p className="text-2xl font-extrabold">
-                    {activePeriod === "daily"
-                      ? currentDateIncome.toFixed(2)
-                      : activePeriod === "monthly"
-                      ? currentMonthIncome.toFixed(2)
-                      : currentYearIncome.toFixed(2)}
-                  </p>
-                </div>
-                <p className="mb-6 text-sm font-bold">Total Sales</p>
-                <p className="mb-6 text-sm">{formattedDate}</p>
-              </div>
-              <br />
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="flex justify-between items-center mb-4 flex-wrap">
-                  <h3 className="text-lg font-bold flex-shrink-0">
-                    Production Report
-                  </h3>
-                  <div className="flex flex-col sm:flex-row justify-end items-start sm:items-center">
-                    {["yearly", "monthly", "daily"].map((period) => (
-                      <button
-                        key={period}
-                        onClick={() => handleProdToggle(period)}
-                        className={`py-1 px-4 rounded-lg mb-2 sm:mb-0 sm:mr-2 ${
-                          activeProdPeriod === period
-                            ? "bg-black text-white"
-                            : "bg-[#e0e9ec] text-black"
-                        }`}
-                      >
-                        {period.charAt(0).toUpperCase() + period.slice(1)}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                {/* Show Aggregated Production Data */}
-                <div className="mt-4">
-                  {productionData.length > 0 ? (
-                    <div>
-                      {/* Table Header */}
-                      <div className="grid grid-cols-2 text-[#9aa3a7] text-sm border-b pb-2 px-10">
-                        <span>Name</span>
-                        <span>Total Production</span>
-                      </div>
-
-                      {/* Table Body */}
-                      <ul>
-                        {productionData.map((item, index) => (
-                          <li
-                            key={index}
-                            className="grid grid-cols-2 border-b py-4 px-10"
-                          >
-                            <span>
-                              {index + 1}.{" "}
-                              <span>{item.Name}</span>
-                            </span>
-                            <span>{item.TotalAdjustment}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : (
-                    <p>No production data available</p>
-                  )}
-                </div>
-              </div>
-            </div>
+          <div className="flex justify-between items-center p-4 ml-2">
+          <h3 className="font-bold text-lg">General Report</h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
+          <div className="px-4 sm:px-6">
+            <Revenue />
+          </div>
+          <div className="px-4 sm:px-6">
+            <WarehouseAssets />
           </div>
         </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
+          <div className="px-4 sm:px-6">
+            <TopSelling />
+          </div>
+          <div className="px-4 sm:px-6">
+            <StoreAssets />
+          </div>
+        </div>
+
+        </div>
       </div>
-      <SalesHistory />
     </section>
   );
 };
