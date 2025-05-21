@@ -58,7 +58,10 @@ const Import = () => {
         <div className="grid grid-cols-1 gap-6">
           {/* Header with user info */}
           <div className="bg-white flex justify-between">
-            <p className="text-xl font-bold">Inventory Management System</p>
+            <p className="text-lg sm:text-xl font-bold whitespace-nowrap">
+              <span className="sm:hidden">Inventory</span>
+              <span className="hidden sm:inline">Inventory Management System</span>
+            </p>
             <div className="flex items-center bg-blue-500 text-white rounded-lg w-48 mr-2">
               <img
                 src="src/assets/user.png"

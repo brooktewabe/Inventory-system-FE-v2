@@ -81,7 +81,7 @@ const ManageOptions = () => {
 
       toast.success("Field added successfully")
     } catch (error) {
-      toast.error("Failed to add field")
+      toast.error("Failed to add field. Make sure field names and values are not duplicate", error)
       console.error("Error adding field:", error)
     }
   }
