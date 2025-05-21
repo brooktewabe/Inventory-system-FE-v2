@@ -13,7 +13,7 @@ const Layout = () => {
   return (
     <>
       <Navbar />
-      <div className={`${role ? "ml-16 sm:ml-32 md:ml-56" : ""}`}>
+      <div className={`${role ? "ml-16 sm:ml-32 md:ml-52" : ""}`}>
         <Outlet />
       </div>
       <ToastContainer />
