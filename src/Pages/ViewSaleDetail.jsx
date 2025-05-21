@@ -170,11 +170,19 @@ const ViewSaleDetail = () => {
               <div className="flex items-center">
                 <strong className="w-60 text-[#8f8d8d]">Receipt</strong>
                 {sale.Receipt && (
-                  <img
-                    src={`http://localhost:5000/uploads/${sale.Receipt}`}
-                    alt="Receipt"
-                    className="w-36 h-40"
-                  />
+                  <a
+                    href={`http://localhost:5000/uploads/${sale.Receipt}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <img
+                      src={`http://localhost:5000/uploads/${sale.Receipt}`}
+                      alt="Receipt"
+                      className="w-36 h-40 cursor-pointer hover:opacity-90 border border-gray-300 rounded"
+                      title="Click to open in new tab"
+                    />
+                  </a>
                 )}
               </div>
             </div>

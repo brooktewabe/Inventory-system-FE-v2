@@ -5,14 +5,14 @@ import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import { FaUpload, FaInfoCircle } from "react-icons/fa";
+import { FaUpload, FaInfoCircle, FaTimes } from "react-icons/fa";
 import { AiFillCaretDown } from "react-icons/ai";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 
 const AddProduct = () => {
   const [Product_image, setProduct_image] = useState(null);
+  const [ProductImagePreview, setProductImagePreview] = useState(null);
   const [user, setUser] = useState(null);
-  const [categories, setCategories] = useState([]);
   const [customColumns, setCustomColumns] = useState([]);
   const navigate = useNavigate();
   const uid = localStorage.getItem("uid");
@@ -34,19 +34,7 @@ const AddProduct = () => {
     };
     fetchInfo();
   }, [uid]);
-  useEffect(() => {
-    // Fetch categories from the API endpoint
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/category/all");
-        setCategories(response.data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
 
-    fetchCategories();
-  }, []);
   useEffect(() => {
     // Fetch categories from the API endpoint
     const fetchColumns = async () => {
@@ -70,7 +58,6 @@ const AddProduct = () => {
   const initialValues = {
     Name: "",
     Location: "",
-    Category: "",
     Price: "",
     Curent_stock: "",
     Restock_level: "",
@@ -80,7 +67,6 @@ const AddProduct = () => {
   const baseSchema = {
       Name: Yup.string().required("Required"),
       Location: Yup.string().required("Required"),
-      Category: Yup.string().required("Required"),
       // Type: Yup.string().required("Required"),
       Price: Yup.number()
         .required("Required")
@@ -113,7 +99,6 @@ const AddProduct = () => {
     const formData = new FormData();
     formData.append("Name", values.Name);
     formData.append("Location", values.Location);
-    formData.append("Category", values.Category);
     formData.append("Price", values.Price);
     formData.append("Curent_stock", values.Curent_stock);
     formData.append("Restock_level", values.Restock_level);
@@ -181,7 +166,10 @@ const AddProduct = () => {
         <div className="grid grid-cols-1 gap-6">
           {/* First small full-width grid */}
           <div className="bg-white  flex justify-between">
-            <p className="text-xl font-bold">Inventory Management System</p>
+            <p className="text-lg sm:text-xl font-bold whitespace-nowrap">
+              <span className="sm:hidden">Inventory</span>
+              <span className="hidden sm:inline">Inventory Management System</span>
+            </p>
             <div className="flex items-center bg-blue-500 text-white rounded-lg w-48  mr-2">
               <img
                 src="src\assets\user.png"
@@ -211,149 +199,180 @@ const AddProduct = () => {
               >
                 {({ isSubmitting }) => (
                   <Form>
-                    <div className="grid grid-cols-3 gap-x-6 gap-y-4">
-                      {/* Left Column */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+                    {/* Left Column */}
+                    <div className="space-y-4">
                       <div>
-                        <div>
-                          <label className="block text-sm mb-1">Name</label>
-                          <Field
-                            name="Name"
-                            placeholder="Enter Product Name"
-                            type="text"
-                            className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md"
-                          />
-                          <ErrorMessage
-                            name="Name"
-                            component="div"
-                            className="text-red-600 text-sm"
-                          />
-                        </div>
+                        <label className="block text-sm mb-1">Name</label>
+                        <Field
+                          name="Name"
+                          placeholder="Enter Product Name"
+                          type="text"
+                          className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        />
+                        <ErrorMessage
+                          name="Name"
+                          component="div"
+                          className="text-red-600 text-sm mt-1"
+                        />
+                      </div>
 
-                        <div className="mt-4">
-                          <label className="block text-sm mb-1">Price</label>
-                          <Field
-                            name="Price"
-                            placeholder="Enter Price"
-                            type="text"
-                            className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md"
-                          />
-                          <ErrorMessage
-                            name="Price"
-                            component="div"
-                            className="text-red-600 text-sm"
-                          />
-                        </div>
-                        <div className="mt-4">
-                          <label className="block text-sm mb-1">
-                            Product Image
-                          </label>
-                          <div className="flex mt-2">
+                      <div>
+                        <label className="block text-sm mb-1">Price</label>
+                        <Field
+                          name="Price"
+                          placeholder="Enter Price"
+                          type="text"
+                          className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        />
+                        <ErrorMessage
+                          name="Price"
+                          component="div"
+                          className="text-red-600 text-sm mt-1"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm mb-1">Product Image</label>
+                        <div className="flex items-center gap-4">
+                          {/* Upload Button (fixed size) */}
+                          <div className="w-40">
                             <input
                               type="file"
                               id="Product_image"
                               name="Product_image"
-                              onChange={(e) =>
-                                handleFileChange(e, setProduct_image)
-                              }
+                              onChange={(e) => {
+                              handleFileChange(e, setProduct_image)
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const blobURL = URL.createObjectURL(file);
+                                  setProductImagePreview(blobURL);
+                                }
+                              }}
                               className="hidden"
-                              accept=".jpg, .jpeg, .png"
+                              accept=".png, .jpg, .jpeg"
                             />
                             <label
                               htmlFor="Product_image"
-                              className="flex items-center justify-center gap-2 bg-blue-600 text-white py-2 px-1 rounded-md cursor-pointer"
+                              className="flex items-center justify-center gap-2 bg-blue-600 text-white py-2 px-4 rounded-md cursor-pointer hover:bg-blue-700 transition-colors w-full"
                             >
                               <FaUpload size={16} />
-                              Upload Image
+                              <span className="truncate">Upload</span>
                             </label>
                           </div>
-                        </div>
-                      </div>
 
-                      {/* Middle Column */}
-                      <div>
-                        <div>
-                          <label className="block text-sm mb-1">Category</label>
-                          <div className="relative">
-                            <Field
-                              as="select"
-                              name="Category"
-                              className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md appearance-none pr-10"
-                            >
-                              <option disabled value="">
-                                Choose category
-                              </option>
-                              {categories.map((category) => (
-                                <option
-                                  key={category.id}
-                                  value={category.category}
-                                >
-                                  {category.category}
-                                </option>
-                              ))}
-                            </Field>
-                            <AiFillCaretDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none" />
-                            <ErrorMessage
-                              name="Category"
-                              component="div"
-                              className="text-red-600 text-sm"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="mt-4">
-                          <label className="block text-sm mb-1">
-                            Restock Level
-                          </label>
-                          <Field
-                            name="Restock_level"
-                            placeholder="Enter Restock Level"
-                            type="number"
-                            className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md"
-                          />
-                          <ErrorMessage
-                            name="Restock_level"
-                            component="div"
-                            className="text-red-600 text-sm"
-                          />
-                        </div>
-                      </div>
-                      {/* 3rd Column */}
-                      <div>
-                        <div className="">
-                          <div>
-                            <label className="block text-sm mb-1">
-                              Stock Amount
-                            </label>
-                            <Field
-                              name="Curent_stock"
-                              placeholder=" Enter Stock Amount"
-                              type="number"
-                              className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md"
-                            />
-                            <ErrorMessage
-                              name="Current_stock"
-                              component="div"
-                              className="text-red-600 text-sm"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="mt-4">
-                          <label className="block text-sm mb-1">Location</label>
-                          <Field
-                            name="Location"
-                            placeholder="Enter Location"
-                            type="text"
-                            className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md"
-                          />
-                          <ErrorMessage
-                            name="Location"
-                            component="div"
-                            className="text-red-600 text-sm"
-                          />
+                          {/* Image Preview */}
+                          {ProductImagePreview && (
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-20 h-20 border border-gray-200 rounded-md overflow-hidden cursor-pointer hover:border-blue-500 transition-colors"
+                                onClick={() => window.open(ProductImagePreview, '_blank')}
+                                title="Click to view full size"
+                              >
+                                <img
+                                  src={ProductImagePreview}
+                                  alt="Product preview"
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setProductImagePreview(null)
+                                }
+                                className="text-gray-500 hover:text-red-500"
+                                title="Remove image"
+                              >
+                                <FaTimes size={16} />
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
+
+                    {/* Middle Column */}
+                    <div className="space-y-4">
+                      <div>
+                      {customColumns
+                        .filter((col) => col.fieldName === "Category" && col.type === "options")
+                        .map((col) => (
+                          <div key={col.id}>
+                            <label className="block text-sm mb-1">{col.fieldName}</label>
+                            <div className="relative">
+                              <Field
+                                as="select"
+                                name={col.fieldName}
+                                className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md appearance-none pr-10 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              >
+                                <option disabled value="">
+                                  {col.options?.length ? `Select ${col.fieldName}` : "No options"}
+                                </option>
+                                {col.options?.map((opt) => (
+                                  <option key={opt} value={opt}>
+                                    {opt}
+                                  </option>
+                                ))}
+                              </Field>
+                              <AiFillCaretDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none" />
+                              <ErrorMessage
+                                name={col.fieldName}
+                                component="div"
+                                className="text-red-600 text-sm mt-1"
+                              />
+                            </div>
+                          </div>
+                      ))}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm mb-1">Restock Level</label>
+                        <Field
+                          name="Restock_level"
+                          placeholder="Enter Restock Level"
+                          type="number"
+                          className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        />
+                        <ErrorMessage
+                          name="Restock_level"
+                          component="div"
+                          className="text-red-600 text-sm mt-1"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Right Column */}
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm mb-1">Stock Amount</label>
+                        <Field
+                          name="Curent_stock"
+                          placeholder="Enter Stock Amount"
+                          type="number"
+                          className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        />
+                        <ErrorMessage
+                          name="Current_stock"
+                          component="div"
+                          className="text-red-600 text-sm mt-1"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm mb-1">Location</label>
+                        <Field
+                          name="Location"
+                          placeholder="Enter Location"
+                          type="text"
+                          className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        />
+                        <ErrorMessage
+                          name="Location"
+                          component="div"
+                          className="text-red-600 text-sm mt-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
                     {/* ───────────────── Additional Product Details ───────────────── */}
                     {customColumns.length != 0 && (
                       <div className="col-span-3 mt-8">
@@ -362,7 +381,9 @@ const AddProduct = () => {
                         </h4>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
-                          {customColumns.map((col) => (
+                          {customColumns
+                          .filter((col) => col.fieldName !== "Category")
+                          .map((col) => (
                             <div key={col.id}>
                               <label className="block text-sm mb-1">
                                 {col.fieldName}

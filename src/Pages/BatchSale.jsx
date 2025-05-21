@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
 import { toast, ToastContainer } from "react-toastify";
-import { FaSearch, FaInfoCircle, FaUpload } from "react-icons/fa";
+import { FaSearch, FaInfoCircle, FaUpload, FaTimes } from "react-icons/fa";
 import Spinner from "../Components/Spinner";
 
 const RecordSale = () => {
@@ -201,8 +201,9 @@ const RecordSale = () => {
       });
       // Update stock quantity
       const newQuantity = selectedItem.Curent_stock - currentItem.quantity;
-      await axios.patch(`http://localhost:5000/stock/all/${selectedItem.id}`, {
+      await axios.patch(`http://localhost:5000/stock/all/sale/${selectedItem.id}`, {
         Curent_stock: newQuantity,
+        Name: selectedItem.Name,
       });
 
       if (newQuantity < selectedItem.Restock_level) {
@@ -325,7 +326,10 @@ const RecordSale = () => {
       <div className="container m-auto">
         <div className="grid grid-cols-1 gap-6">
           <div className="bg-white  flex justify-between">
-            <p className="text-xl font-bold">Store Management System</p>
+            <p className="text-lg sm:text-xl font-bold whitespace-nowrap">
+              <span className="sm:hidden">Store</span>
+              <span className="hidden sm:inline">Store Management System</span>
+            </p>
             <div className="flex items-center bg-blue-500 text-white rounded-lg w-48 mr-2">
               <img
                 src="src\assets\user.png"
@@ -527,26 +531,60 @@ const RecordSale = () => {
                     <option value="Other">Other</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm mb-1">Receipt Image</label>
-                  <input
-                    type="file"
-                    id="Receipt"
-                    name="Receipt"
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      setFormData({ ...formData, Receipt: file });
-                    }}
-                    className="hidden"
-                    accept=".png, .jpg, .jpeg"
-                  />
-                  <label
-                    htmlFor="Receipt"
-                    className="flex items-center justify-center gap-2 bg-blue-600 text-white py-2 rounded-md"
-                  >
-                    <FaUpload size={16} />
-                    Upload Image
-                  </label>
+                <div className="flex items-center gap-4">
+                  {/* Upload Button (fixed size) */}
+                  <div className="w-40"> {/* Fixed width container */}
+                    <input
+                      type="file"
+                      id="Receipt"
+                      name="Receipt"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const blobURL = URL.createObjectURL(file);
+                          setFormData({
+                            ...formData,
+                            Receipt: file,
+                            ReceiptPreview: blobURL,
+                          });
+                        }
+                      }}
+                      className="hidden"
+                      accept=".png, .jpg, .jpeg"
+                    />
+                    <label
+                      htmlFor="Receipt"
+                      className="flex items-center justify-center gap-2 bg-blue-600 text-white py-2 px-4 rounded-md cursor-pointer hover:bg-blue-700 transition-colors w-full" /* w-full makes it fill container */
+                    >
+                      <FaUpload size={16} />
+                      <span className="truncate">Upload</span> {/* Prevents text overflow */}
+                    </label>
+                  </div>
+                  
+                  {/* Image Preview */}
+                  {formData.ReceiptPreview && (
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-20 h-20 border border-gray-200 rounded-md overflow-hidden cursor-pointer hover:border-blue-500 transition-colors"
+                        onClick={() => window.open(formData.ReceiptPreview, '_blank')}
+                        title="Click to view full size"
+                      >
+                        <img 
+                          src={formData.ReceiptPreview} 
+                          alt="Receipt preview" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <button 
+                        type="button"
+                        onClick={() => setFormData({...formData, ReceiptPreview: null})}
+                        className="text-gray-500 hover:text-red-500"
+                        title="Remove image"
+                      >
+                        <FaTimes size={16} />
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div></div>
                 <div>
