@@ -15,8 +15,6 @@ const EditProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [stock, setStock] = useState(null);
-  const [user, setUser] = useState(null);
-  const [categories, setCategories] = useState([]);
   const [ProductImage, setProductImage] = useState(null);
   const [customColumns, setCustomColumns] = useState([]);
   const uid = localStorage.getItem("uid");
@@ -26,7 +24,6 @@ const EditProduct = () => {
   const validationSchema = Yup.object({
     Name: Yup.string().required("Required"),
     Location: Yup.string().required("Required"),
-    Category: Yup.string().required("Required"),
     Price: Yup.number()
       .required("Required")
       .positive("Must be greater than zero"),
@@ -35,20 +32,6 @@ const EditProduct = () => {
       .positive("Must be greater than zero"),
     // .moreThan(Yup.ref('Restock_level'), "Stock must be greater than restock level"),
   });
-  useEffect(() => {
-    // Fetch categories from the API endpoint
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/category/all");
-        setCategories(response.data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
   
   useEffect(() => {
     const fetchData = async () => {
@@ -74,7 +57,6 @@ const EditProduct = () => {
         formik.setValues({
           Name: productData.Name || "",
           Location: productData.Location || "",
-          Category: productData.Category || "",
           Price: productData.Price || "",
           storageLocation: productData.storageLocation || "",
           Curent_stock: productData.Curent_stock || "",
@@ -94,7 +76,6 @@ const EditProduct = () => {
     initialValues: {
       Name: stock?.Name || "",
       Location: stock?.Location || "",
-      Category: stock?.Category || "",
       Type: stock?.Type || "",
       Price: stock?.Price || "",
       Curent_stock: stock?.Curent_stock || "",
@@ -112,7 +93,6 @@ const EditProduct = () => {
 
       formData.append("Name", values.Name);
       formData.append("Location", values.Location);
-      formData.append("Category", values.Category);
       formData.append("storageLocation", values.storageLocation);
       formData.append("Price", values.Price);
       formData.append("Curent_stock", values.Curent_stock);
@@ -131,13 +111,6 @@ const EditProduct = () => {
       try {
         await axios.patch(`http://localhost:5000/stock/all/${id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
-        });  
-
-        await axios.post("http://localhost:5000/movement/create", {
-          User: `${name}`,
-          Name: values.Name,
-          Adjustment: values.Curent_stock - stock.Curent_stock,
-          Type: "Modification",
         });  
 
         if (values.Curent_stock < values.Restock_level) {
@@ -176,7 +149,10 @@ const EditProduct = () => {
       <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-6">
           <div className="bg-white  flex justify-between">
-            <p className="text-xl font-bold">Inventory Management System</p>
+            <p className="text-lg sm:text-xl font-bold whitespace-nowrap">
+              <span className="sm:hidden">Inventory</span>
+              <span className="hidden sm:inline">Inventory Management System</span>
+            </p>
             <div className="flex items-center bg-blue-500 text-white rounded-lg w-48  mr-2">
               <img
                 src={icon}
@@ -254,29 +230,49 @@ const EditProduct = () => {
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Category
+                {customColumns
+                .filter((col) => col.fieldName === "Category" && col.type === "options")
+                .map((col) => (
+                  <div key={col.id}>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {col.fieldName}
                     </label>
-                    <select
-                      name="Category"
-                      value={formik.values.Category}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
-                    >
-                      {categories.map((category) => (
-                        <option key={category.id} value={category.category}>
-                          {category.category}
-                        </option>
-                      ))}
-                    </select>
-                    {formik.touched.Category && formik.errors.Category && (
-                      <div className="text-red-600 text-sm">
-                        {formik.errors.Category}
+                    {col.type === "options" ? (
+                      <div className="relative">
+                        <select
+                          name={col.fieldName}
+                          value={formik.values[col.fieldName] || ""}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md appearance-none pr-10"
+                        >
+                          <option disabled value="">
+                            {col.options?.length ? `Select ${col.fieldName}` : "No options"}
+                          </option>
+                          {col.options?.map((opt) => (
+                            <option key={opt} value={opt}>
+                              {opt}
+                            </option>
+                          ))}
+                        </select>
+                        <AiFillCaretDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
                       </div>
+                    ) : (
+                      <input
+                        type={col.type === "number" ? "number" : "text"}
+                        name={col.fieldName}
+                        value={formik.values[col.fieldName] || ""}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md"
+                      />
+                    )}
+                    {formik.touched[col.fieldName] && formik.errors[col.fieldName] && (
+                      <div className="text-red-600 text-sm">{formik.errors[col.fieldName]}</div>
                     )}
                   </div>
+                ))}
+
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
@@ -346,7 +342,9 @@ const EditProduct = () => {
                   Additional Product Details
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {customColumns.map((col) => (
+                  {customColumns
+                  .filter((col) => col.fieldName !== "Category")
+                  .map((col) => (
                     <div key={col.id}>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         {col.fieldName}
