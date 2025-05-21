@@ -13,7 +13,8 @@ const SalesHistory = () => {
   const [searchVisible, setSearchVisible] = useState(false)
   const [filterVisible, setFilterVisible] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
-  const [filterDate, setfilterDate] = useState("")
+  const [filterStartDate, setfilterStartDate] = useState("")
+  const [filterEndDate, setfilterEndDate] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const itemsPerPage = 15
@@ -32,10 +33,10 @@ const SalesHistory = () => {
     }
   };
 
-  const fetchSalesByFilter = async (date, nameOrPhone, page = 1) => {
+  const fetchSalesByFilter = async (startDate, endDate, nameOrPhone, page = 1) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/sales/search/find?date=${date || ""}&nameOrPhone=${nameOrPhone || ""}&page=${page}&limit=${itemsPerPage}`,
+        `http://localhost:5000/sales/search/find?startDate=${startDate || ""}&endDate=${endDate || ""}&nameOrPhone=${nameOrPhone || ""}&page=${page}&limit=${itemsPerPage}`,
       )
 
       // Check if response.data has the expected structure
@@ -63,12 +64,12 @@ const SalesHistory = () => {
 
   // Trigger search or filter when searchTerm or filterDate changes
   useEffect(() => {
-    if (searchTerm || filterDate) {
-      fetchSalesByFilter(filterDate, searchTerm, currentPage)
+    if (searchTerm || filterStartDate || filterEndDate) {
+      fetchSalesByFilter(filterStartDate,filterEndDate, searchTerm,currentPage)
     } else {
       fetchSalesByPage(currentPage)
     }
-  }, [searchTerm, filterDate, currentPage])
+  }, [searchTerm,filterStartDate,filterEndDate, currentPage])
 
   const onEdit = (id) => {
     navigate(`/sales-detail/${id}`)
@@ -148,21 +149,39 @@ const SalesHistory = () => {
                   </div>
                 )}
 
-                {filterVisible && (
-                  <div className="md:w-1/3">
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <FaCalendar className="text-gray-400" size={16} />
-                      </div>
-                      <input
-                        type="date"
-                        value={filterDate}
-                        onChange={(e) => setfilterDate(e.target.value)}
-                        className="w-full pl-10 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      />
+            {filterVisible && (
+              <div className="w-full md:w-auto">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                  {/* Start Date Input */}
+                  <div className="relative flex-1 min-w-[180px]">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                      <FaCalendar className="text-gray-400" size={16} />
                     </div>
+                    <input
+                      type="date"
+                      value={filterStartDate}
+                      onChange={(e) => setfilterStartDate(e.target.value)}
+                      className="w-full pl-10 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm sm:text-base"
+                      placeholder="Start date"
+                    />
                   </div>
-                )}
+                  
+                  {/* End Date Input */}
+                  <div className="relative flex-1 min-w-[180px]">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                      <FaCalendar className="text-gray-400" size={16} />
+                    </div>
+                    <input
+                      type="date"
+                      value={filterEndDate}
+                      onChange={(e) => setfilterEndDate(e.target.value)}
+                      className="w-full pl-10 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm sm:text-base"
+                      placeholder="End date"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
               </div>
             </div>
 
