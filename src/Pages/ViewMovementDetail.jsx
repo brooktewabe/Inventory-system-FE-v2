@@ -65,6 +65,14 @@ const ViewMovementDetail = () => {
                   <span className="text-[#8f8d8d]">{movement.User}</span>
                 </div>
                 <div className="flex items-center">
+                  <strong className="w-40">Name:</strong>
+                  <span className="text-[#8f8d8d]">{movement.Name}</span>
+                </div>
+                <div className="flex items-center">
+                  <strong className="w-40">Adjustment:</strong>
+                  <span className="text-[#8f8d8d]">{movement.Adjustment}</span>
+                </div>
+                <div className="flex items-center">
                   <strong className="w-40">Change Mode:</strong>
                   <span className="text-[#8f8d8d]">{movement.Type}</span>
                 </div>

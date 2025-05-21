@@ -100,7 +100,10 @@ const Sales = () => {
         <div className="grid grid-cols-1 gap-6">
           {/* First small full-width grid */}
           <div className="bg-white  flex justify-between">
-            <p className="text-xl font-bold">Store Management System</p>
+            <p className="text-lg sm:text-xl font-bold whitespace-nowrap">
+              <span className="sm:hidden">Store</span>
+              <span className="hidden sm:inline">Store Management System</span>
+            </p>
             <div className="flex items-center bg-blue-500 text-white rounded-lg w-48 mr-2">
               <img
                 src="src\assets\user.png"
@@ -152,9 +155,9 @@ const Sales = () => {
           <h2 className="text-xl font-semibold mb-4 ml-4">Inventory Managment</h2>
           
           {/* Search Bar */}
-          <div className="mb-4 relative w-full sm:w-3/5 md:w-3/5 mx-4">
+          <div className="mb-4 relative w-5/7 sm:w-3/5 md:w-3/5 mx-4">
             <div className="absolute inset-y-0 left-0 flex items-center">
-              <div className="bg-blue-600 rounded-l-md px-3 py-2 text-white flex items-center justify-center">
+              <div className="bg-blue-600 rounded-l-md px-3 py-3 text-white flex items-center justify-center">
                 <FaSearch size={18} className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
             </div>
@@ -215,7 +218,7 @@ const Sales = () => {
                       <img className="size-10" src={stock.Product_image ? `http://localhost:5000/uploads/${stock.Product_image}` : '/src/assets/Placeholder.png'} alt="Stock Image" />
                     </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                        {formatProductId(stock.id)}
+                        {stock.Product_id}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                         {stock.Category}

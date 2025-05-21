@@ -161,7 +161,10 @@ const EditProduct = () => {
       <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-6">
           <div className="bg-white  flex justify-between">
-            <p className="text-xl font-bold">Store Management System</p>
+            <p className="text-lg sm:text-xl font-bold whitespace-nowrap">
+              <span className="sm:hidden">Store</span>
+              <span className="hidden sm:inline">Store Management System</span>
+            </p>
             <div className="flex items-center bg-blue-500 text-white rounded-lg w-48  mr-2">
               <img
                 src={icon}

@@ -1,6 +1,6 @@
 import withAuth from "../withAuth";
 import Revenue from "../Components/Revenue";
-import Total from "../Components/Total"
+import Total from "../Components/Total";
 import Store from "../Components/Store";
 const Dashboard = () => {
   const role = localStorage.getItem("role");
@@ -10,7 +10,7 @@ const Dashboard = () => {
     <section className="bg-[#edf0f0b9] min-h-screen">
       <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-6">
-        <div className="bg-white  flex justify-between">
+          <div className="bg-white  flex justify-between">
             <p className="text-xl font-bold">Dashboard</p>
             <div className="flex items-center bg-blue-500 text-white rounded-lg w-48  mr-2">
               <img

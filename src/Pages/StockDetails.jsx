@@ -1,25 +1,18 @@
 import { useState, useEffect } from "react";
-import Swal from "sweetalert2";
-import { useNavigate, useParams } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import { toast, ToastContainer } from "react-toastify";
+import {  ToastContainer } from "react-toastify";
 import { useFormik } from "formik";
 import icon from "../assets/user.png";
 import * as Yup from "yup";
 import { FaInfoCircle } from "react-icons/fa";
-import { AiFillCaretDown } from "react-icons/ai";
 import Spinner from "../Components/Spinner";
 
 const ViewProduct = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [stock, setStock] = useState(null);
-  const [user, setUser] = useState(null);
-  const [categories, setCategories] = useState([]);
-  const [ProductImage, setProductImage] = useState(null);
   const [customColumns, setCustomColumns] = useState([]);
-  const uid = localStorage.getItem("uid");
   const role = localStorage.getItem("role");
   const name = localStorage.getItem("name");
 
@@ -35,20 +28,6 @@ const ViewProduct = () => {
       .positive("Must be greater than zero"),
     // .moreThan(Yup.ref('Restock_level'), "Stock must be greater than restock level"),
   });
-  useEffect(() => {
-    // Fetch categories 
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/category/all");
-        setCategories(response.data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
   
   useEffect(() => {
     const fetchData = async () => {
@@ -128,7 +107,10 @@ const ViewProduct = () => {
       <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-6">
           <div className="bg-white  flex justify-between">
-            <p className="text-xl font-bold">Inventory Management System</p>
+            <p className="text-lg sm:text-xl font-bold whitespace-nowrap">
+              <span className="sm:hidden">Inventory</span>
+              <span className="hidden sm:inline">Inventory Management System</span>
+            </p>
             <div className="flex items-center bg-blue-500 text-white rounded-lg w-48  mr-2">
               <img
                 src={icon}
@@ -239,7 +221,9 @@ const ViewProduct = () => {
                   Additional Product Details
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {customColumns.map((col) => (
+                  {customColumns
+                  .filter((col) => col.fieldName !== "Category")
+                  .map((col) => (
                     <div key={col.id}>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         {col.fieldName}
@@ -250,16 +234,8 @@ const ViewProduct = () => {
                           name={col.fieldName}
                           disabled
                           value={formik.values[col.fieldName] || ""}
-
                           className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md"
                         />
-                      
-                      {formik.touched[col.fieldName] &&
-                        formik.errors[col.fieldName] && (
-                          <div className="text-red-600 text-sm">
-                            {formik.errors[col.fieldName]}
-                          </div>
-                        )}
                     </div>
                   ))}
                 </div>

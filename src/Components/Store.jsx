@@ -137,9 +137,9 @@ const Inventory = () => {
             <h3 className="text-xl ml-4 font-semibold">Warehouse Inventory</h3>
           </div>
           {/* Search Bar */}
-          <div className="mb-4 relative w-full sm:w-3/5 md:w-3/5 mx-4">
+          <div className="mb-4 relative w-5/7 sm:w-3/5 md:w-3/5 mx-4">
             <div className="absolute inset-y-0 left-0 flex items-center">
-              <div className="bg-blue-600 rounded-l-md px-3 py-2 text-white flex items-center justify-center">
+              <div className="bg-blue-600 rounded-l-md px-3 py-3 text-white flex items-center justify-center">
                 <FaSearch size={18} className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
             </div>
@@ -211,7 +211,7 @@ const Inventory = () => {
                           />
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                          {formatProductId(stock.id)}
+                          {stock.Product_id}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                           {stock.Category}

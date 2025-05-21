@@ -20,7 +20,7 @@ const Sales = () => {
     const fetchStocks = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/stock/all/warehouse`
+          `https://api.cnhtc4.com/stock/all/warehouse`
         );
         setStocks(response.data.data);
         setFilteredStocks(response.data.data);
@@ -68,7 +68,10 @@ const Sales = () => {
         <div className="grid grid-cols-1 gap-6">
           {/* First small full-width grid */}
           <div className="bg-white  flex justify-between">
-            <p className="text-xl font-bold">Inventory Management System</p>
+            <p className="text-lg sm:text-xl font-bold whitespace-nowrap">
+              <span className="sm:hidden">Inventory</span>
+              <span className="hidden sm:inline">Inventory Management System</span>
+            </p>
             <div className="flex items-center bg-blue-500 text-white rounded-lg w-48 mr-2">
               <img
                 src="src\assets\user.png"
