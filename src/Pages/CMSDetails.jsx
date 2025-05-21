@@ -60,7 +60,10 @@ const CmsDetails = () => {
       <div className="container m-auto">
         <div className="grid grid-cols-1 gap-6">
           <div className="bg-white flex justify-between">
-            <p className="text-xl font-bold">Customer Management System</p>
+            <p className="text-lg sm:text-xl font-bold whitespace-nowrap">
+              <span className="sm:hidden">Customer</span>
+              <span className="hidden sm:inline">Customer Management System</span>
+            </p>
             <div className="flex items-center bg-blue-500 text-white rounded-lg w-48 mr-2">
               <img src={icon} className="w-8 h-8 rounded-full object-cover mr-4" />
               <div>
