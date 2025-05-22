@@ -189,7 +189,7 @@ const AddProduct = () => {
           </div>
 
           {/* Create Product Section */}
-          <div className="bg-white p-6 rounded-lg shadow-md max-w-[70%] ml-20">
+          <div className="bg-white p-6 rounded-lg shadow-md max-w-[85%] ml-4">
             {/* Header with info icon */}
             <div className="flex items-center mb-6 pb-2 border-b">
               <FaInfoCircle className="text-blue-600 mr-2" />

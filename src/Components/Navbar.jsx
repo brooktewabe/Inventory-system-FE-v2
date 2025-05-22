@@ -190,7 +190,7 @@ const Navbar = () => {
       <div
         ref={sidebarRef}
         className={`fixed top-0 left-0 h-screen bg-white border-r border-gray-200 z-50 transition-all duration-300 flex flex-col
-          ${isMobile ? "w-[60px]" : nav ? "w-[100px]" : "w-[200px]"}`}
+          ${isMobile ? "w-[62px]" : nav ? "w-[100px]" : "w-[207px]"}`}
       >
         {/* Header */}
         <div className="bg-blue-600 py-4 px-4 flex items-center justify-between">
@@ -236,11 +236,21 @@ const Navbar = () => {
       </div>
 
       {/* Main content area */}
-      <div
+      {/* <div
         className={`ml-auto p-4 transition-all duration-300 ${
           isMobile ? "w-[calc(100%-60px)]" : nav ? "w-[calc(100%-70px)]" : "w-[calc(100%-200px)]"
         }`}
-      >
+      > */}
+      <div
+        className={`ml-auto ${
+          isMobile
+            ? "w-[calc(100%-60px)] h-[calc(10vh-80px)] p-2 overflow-y-auto"
+            : nav
+            ? "w-[calc(100%-70px)] p-4"
+            : "w-[calc(100%-200px)] p-4"
+        } transition-all duration-300`}
+>
+
         {/* Your page content will go here */}
       </div>
 

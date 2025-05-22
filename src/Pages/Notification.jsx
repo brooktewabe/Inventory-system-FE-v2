@@ -88,17 +88,17 @@ const Notification = () => {
               </div>
             </div>
           </div>
-            <p className="text-lg sm:text-xl font-bold whitespace-nowrap">
+            {/* <p className="text-lg sm:text-xl font-bold whitespace-nowrap">
               <span className="sm:hidden">Notification</span>
               <span className="hidden sm:inline">Notification Management System</span>
-            </p>
+            </p> */}
           <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md mx-2 sm:ml-6 w-full sm:min-w-fit">
             {/* Search and Filter Row */}
             <div className="flex flex-col sm:flex-row gap-4 mb-6 w-full mr-2">
               {/* Search Input */}
               <div className="relative w-full sm:w-2/3">
                 <div className="absolute inset-y-0 left-0 flex items-center">
-                  <div className="bg-blue-600 rounded-l-md p-3 text-white">
+                  <div className="bg-blue-600 rounded-l-md p-3.5 text-white">
                     <FaSearch size={16} />
                   </div>
                 </div>

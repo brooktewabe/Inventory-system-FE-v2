@@ -91,28 +91,28 @@ const CmsList = () => {
             </div>
           </div>
 
-          <h3 className="text-xl font-semibold mb-4 ml-4">
+          {/* <h3 className="text-xl font-semibold mb-4 ml-4">
             Customer Management List
-          </h3>
+          </h3> */}
 
           <div className="bg-white rounded-md shadow-md w-[95%] mx-auto overflow-hidden">
             {/* Search Bar */}
-            <div className="p-4 sm:p-6">
-              <div className="mb-4 relative mt-2 w-full sm:w-3/5 md:w-3/5 mx-4">
-                <div className="absolute inset-y-0 left-0 flex items-center">
-                  <div className="bg-blue-600 rounded-l-md px-3 py-3 text-white flex items-center justify-center">
-                    <FaSearch size={18} className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </div>
+          <div className="p-4 sm:p-6">
+            <div className="mb-4 relative mt-2 w-5/7 sm:w-4/8 md:w-3/4 lg:w-2/3 xl:w-1/2 mx-4">
+              <div className="absolute inset-y-0 left-0 flex items-center">
+                <div className="bg-blue-600 rounded-l-md px-3 py-3 text-white flex items-center justify-center">
+                  <FaSearch size={18} className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
-                <input
-                  type="text"
-                  placeholder="Search by Name or Phone Number"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-5/7 pl-14 pr-4 py-2.5 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-                />
               </div>
+              <input
+                type="text"
+                placeholder="Search by Name or Phone Number"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-14 pr-4 py-2.5 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+              />
             </div>
+          </div>
 
             {/* Table */}
             <div className="overflow-x-auto">
