@@ -14,7 +14,6 @@ const UserAdmin = () => {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [role, setRole] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const currentRole = localStorage.getItem("role")
   const name = localStorage.getItem("name")
   const [errors, setErrors] = useState({})
   const [permissions, setPermissions] = useState([])
@@ -28,6 +27,8 @@ const UserAdmin = () => {
     "Add Products": "add",
     "Customer Management System": "cms",
     "Settings": "settings",
+    "Dashboard": "dashboard",
+    "Notification":"notification"
   }
 
   const handlePermissionChange = (displayText, enumValue) => {

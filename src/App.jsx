@@ -39,8 +39,18 @@ const App = () => {
       <Route path='/' element={<Layout />}>
         <Route path='/login' element={<ValidatedLoginForm />} />
         <Route index element={<HomePage />} />
-        <Route path='/dashboard' element={<Dashboard />}/>
-        <Route path='/notification' element={<Notification/>}/>
+
+        {/*  require 'dashboard' permission */}
+        <Route 
+          path='/dashboard'
+          element={<ProtectedRoute element={Dashboard} requiredPermissions={['dashboard']} />}
+        />
+
+        {/*  require 'notification' permission */}
+        <Route
+          path='/notification' 
+          element={<ProtectedRoute element={Notification} requiredPermissions={['notification']} />}
+        />
 
         {/* require 'add' permission */}
         <Route
