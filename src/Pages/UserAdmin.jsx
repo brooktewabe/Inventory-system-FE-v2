@@ -160,12 +160,9 @@ const UserAdmin = () => {
         <div className="grid grid-cols-1 gap-6">
           <div className="bg-white flex justify-between">
             <p className="text-xl font-bold">Settings</p>
-            <div className="flex items-center bg-blue-500 text-white rounded-lg w-48 mr-2">
-              <img src="src\assets\user.png" className="w-8 h-8 rounded-full object-cover mr-4" />
-              <div>
-                <p className="font-semibold">{name}</p>
-                <p className="text-xs">{currentRole}</p>
-              </div>
+            <div className="flex flex-col items-center justify-center bg-blue-500 text-white rounded-lg w-32 mr-2">
+              <p className="font-semibold">{name}</p>
+              <p className="text-xs">{role}</p>
             </div>
           </div>
           <h3 className="text-xl font-semibold mb-4 ml-4">Add User</h3>

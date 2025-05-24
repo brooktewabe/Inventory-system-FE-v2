@@ -3,19 +3,20 @@ import { FaExclamationTriangle } from "react-icons/fa";
 
 const UnauthorizedAccess = () => {
   return (
-    <section className="text-center flex flex-col justify-center items-center h-screen">
-      <FaExclamationTriangle className="text-yellow-400 text-6xl mb-4" />
-      <h1 className="text-5xl font-bold mb-4">Unauthorized Access</h1>
-      <p className="text-xl mb-5">
-        Sorry, you do not have the necessary permissions to view this page.
-      </p>
-
-      <Link
-        to="/"
-        className="text-white bg-black rounded-md px-3 py-2 mt-4"
-      >
-        Back to Home
-      </Link>
+    <section className="min-h-screen flex items-center justify-center px-4 py-8 bg-gray-50 text-center">
+      <div className="max-w-md w-full">
+        <FaExclamationTriangle className="text-yellow-400 text-6xl mx-auto mb-4" />
+        <h1 className="text-3xl sm:text-4xl font-bold mb-4">Unauthorized Access</h1>
+        <p className="text-base sm:text-lg text-gray-700 mb-6">
+          Sorry, you do not have the necessary permissions to view this page.
+        </p>
+        <Link
+          to="/"
+          className="inline-block bg-black text-white px-5 py-2 rounded-md text-sm sm:text-base hover:bg-gray-800 transition"
+        >
+          Back to Home
+        </Link>
+      </div>
     </section>
   );
 };
