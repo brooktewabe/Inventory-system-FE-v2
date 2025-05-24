@@ -80,19 +80,13 @@ const Notification = () => {
         <div className="grid grid-cols-1 gap-6">
           <div className="bg-white flex justify-between">
             <p className="text-xl font-bold">Notification</p>
-            <div className="flex items-center bg-blue-500 text-white rounded-lg w-48 mr-2">
-              <img src="src\assets\user.png" className="w-8 h-8 rounded-full object-cover mr-4" />
-              <div>
-                <p className="font-semibold">{name}</p>
-                <p className="text-xs">{role}</p>
-              </div>
+            <div className="flex flex-col items-center justify-center bg-blue-500 text-white rounded-lg w-32 mr-2">
+              <p className="font-semibold">{name}</p>
+              <p className="text-xs">{role}</p>
             </div>
           </div>
-            {/* <p className="text-lg sm:text-xl font-bold whitespace-nowrap">
-              <span className="sm:hidden">Notification</span>
-              <span className="hidden sm:inline">Notification Management System</span>
-            </p> */}
-          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md mx-2 sm:ml-6 w-full sm:min-w-fit">
+
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md  mx-2 sm:ml-6 w-[95%] sm:min-w-fit">
             {/* Search and Filter Row */}
             <div className="flex flex-col sm:flex-row gap-4 mb-6 w-full mr-2">
               {/* Search Input */}
@@ -130,13 +124,22 @@ const Notification = () => {
                 <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="w-full overflow-x-auto">
                 <table className="min-w-full bg-white">
+                  <thead>
+                    <tr className="bg-white">
+                      <th className="py-2 px-4 text-left text-sm text-gray-600 font-medium">#</th>
+                      <th className="py-2 px-4 text-left text-sm text-gray-600 font-medium">Message</th>
+                      <th className="py-2 px-4 text-left text-sm text-gray-600 font-medium">Date</th>
+                    </tr>
+                  </thead>
                   <tbody>
                     {notifications.length > 0 ? (
                       notifications.map((notification, index) => (
                         <tr key={notification.id} className="hover:bg-gray-50">
-                          <td className="py-3 px-4 border-b whitespace-nowrap">{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                          <td className="py-3 px-4 border-b whitespace-nowrap">
+                            {(currentPage - 1) * itemsPerPage + index + 1}
+                          </td>
                           <td className="py-3 px-4 border-b">{notification.message}</td>
                           <td className="py-3 px-4 border-b whitespace-nowrap">
                             {new Date(notification.createdAt).toLocaleString("en-US", {
