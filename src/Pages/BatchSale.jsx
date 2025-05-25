@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
@@ -6,6 +6,7 @@ import withAuth from "../withAuth";
 import { toast, ToastContainer } from "react-toastify";
 import { FaSearch, FaInfoCircle, FaUpload, FaTimes } from "react-icons/fa";
 import Spinner from "../Components/Spinner";
+import ItemSelector from "../Components/DropdownSearch";
 
 const RecordSale = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const RecordSale = () => {
     {
       itemName: "",
       quantity: 0,
+      price: 0,
       totalAmount: 0,
     },
   ]);
@@ -100,22 +102,24 @@ const RecordSale = () => {
       const updatedItems = [...prevItems];
       updatedItems[index][name] = value;
 
-      // Calculate total amount for the specific item when itemName or quantity changes
-      if (name === "itemName" || name === "quantity") {
-        const selectedItem = sale.find(
-          (sl) => sl.id === updatedItems[index].itemName
-        );
-        if (selectedItem && updatedItems[index].quantity) {
-          const quantity = parseInt(updatedItems[index].quantity, 10) || 0;
-          updatedItems[index].totalAmount = quantity * selectedItem.Price;
-        } else {
-          updatedItems[index].totalAmount = 0;
-        }
+      const selectedItem = sale.find(
+        (sl) => sl.id === updatedItems[index].itemName
+      );
+
+      // If item name is selected, set default price
+      if (name === "itemName" && selectedItem) {
+        updatedItems[index].price = selectedItem.Price || 0;
       }
+
+      // Recalculate total using quantity * price
+      const quantity = parseFloat(updatedItems[index].quantity) || 0;
+      const price = parseFloat(updatedItems[index].price) || 0;
+      updatedItems[index].totalAmount = quantity * price;
 
       return updatedItems;
     });
   };
+
 
   const addMoreItem = async () => {
     // Validate current item before adding
@@ -427,39 +431,13 @@ const RecordSale = () => {
                   key={index}
                   className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4"
                 >
-                  <div>
-                    <label className="block text-sm mb-1">Item Name</label>
-                    <select
-                      name="itemName"
-                      value={item.itemName}
-                      onChange={(e) => handleItemChange(index, e)}
-                      className="w-full py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
-                    >
-                      <option value="" disabled>
-                        Select Item
-                      </option>
-                      {Array.isArray(sale) && sale.length > 0 ? (
-                        sale.map((sl) => {
-                          const isDisabled = getSelectedIds().includes(
-                            sl.id.toString()
-                          );
-                          return (
-                            <option
-                              key={sl.id}
-                              value={sl.id}
-                              disabled={
-                                isDisabled && item.itemName !== sl.id.toString()
-                              }
-                            >
-                              {sl.Name} {isDisabled ? "(Already Selected)" : ""}
-                            </option>
-                          );
-                        })
-                      ) : (
-                        <option disabled>No items available</option>
-                      )}
-                    </select>
-                  </div>
+                <ItemSelector
+                  index={index}
+                  item={item}
+                  handleItemChange={handleItemChange}
+                  getSelectedIds={getSelectedIds}
+                />
+
                   <div>
                     <label className="block text-sm mb-1">Quantity</label>
                     <input
@@ -467,6 +445,17 @@ const RecordSale = () => {
                       name="quantity"
                       placeholder="Enter quantity"
                       value={item.quantity}
+                      onChange={(e) => handleItemChange(index, e)}
+                      className="w-full py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-1">Price</label>
+                    <input
+                      type="number"
+                      name="price"
+                      placeholder="Enter price"
+                      value={item.price}
                       onChange={(e) => handleItemChange(index, e)}
                       className="w-full py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
                     />
@@ -582,7 +571,7 @@ const RecordSale = () => {
                 </div>
                 <div></div>
                 <div>
-                  <label className="block text-sm mb-1">Total Sales</label>
+                  <label className="block text-sm mb-1">Price in ETB</label>
                   <input
                     type="number"
                     value={salesTotal}

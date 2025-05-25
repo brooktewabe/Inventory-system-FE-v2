@@ -5,7 +5,6 @@ import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
 import { FaSearch, FaInfoCircle, FaUpload, FaTimes } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
-import icon from "../assets/user.png";
 import Spinner from "../Components/Spinner";
 
 const RecordSale = () => {
@@ -49,16 +48,18 @@ const RecordSale = () => {
     if (sale) {
       updatedFormData.Item_List = sale.Name;
     }
-    // Update Total_amount based on Quantity and sale.Price
-    if (name === "Quantity" && sale?.Price) {
-      const quantity = value;
-      const price = sale.Price;
-      updatedFormData.Total_amount = quantity * price;
+
+    // Get quantity and price from updated form data
+    const quantity = name === "Quantity" ? value : updatedFormData.Quantity;
+    const price = name === "Price" ? value : updatedFormData.Price || sale?.Price;
+
+    // Calculate total if both quantity and price are present
+    if (quantity && price) {
+      updatedFormData.Total_amount = parseFloat(quantity) * parseFloat(price);
     }
 
     setFormData(updatedFormData);
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Calculate the new stock quantity
@@ -240,6 +241,17 @@ const RecordSale = () => {
                     />
                   </div>
                   <div>
+                    <label className="block text-sm mb-1">Price</label>
+                    <input
+                      type="number"
+                      name="Price"
+                      placeholder=" Enter price"
+                      value={formData.Price !== undefined ? formData.Price : sale.Price}
+                      onChange={handleChange}
+                      className="w-full py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
+                    />
+                  </div>
+                  <div>
                     <label className="block text-sm mb-1">Total Payment</label>
                     <input
                       type="number"
@@ -251,7 +263,6 @@ const RecordSale = () => {
                       className="w-full py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none"
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm mb-1">Payment Method</label>
                     <div className="relative">
