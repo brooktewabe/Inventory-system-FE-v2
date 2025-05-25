@@ -3,6 +3,7 @@ import Revenue from "../Components/Revenue";
 import TopSelling from "../Components/TopSelling";
 import WarehouseAssets from "../Components/WarehouseAsset";
 import StoreAssets from "../Components/StoreAsset";
+import History from "../Components/History";
 
 const Report = () => {
   const role = localStorage.getItem("role");
@@ -39,6 +40,7 @@ const Report = () => {
             <StoreAssets />
           </div>
         </div>
+          <History/>
 
         </div>
       </div>

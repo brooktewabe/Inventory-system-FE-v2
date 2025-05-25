@@ -2,6 +2,7 @@ import withAuth from "../withAuth";
 import Revenue from "../Components/Revenue";
 import Total from "../Components/Total";
 import Store from "../Components/Store";
+import History from "../Components/History";
 const Dashboard = () => {
   const role = localStorage.getItem("role");
   const name = localStorage.getItem("name");
@@ -26,6 +27,8 @@ const Dashboard = () => {
             </div>
           </div>
           <Store />
+          <History/>
+
         </div>
       </div>
     </section>

@@ -10,6 +10,7 @@ import { PiKeyReturnBold } from "react-icons/pi";
 const Inventory = () => {
   const navigate = useNavigate();
 
+  const role = localStorage.getItem("role");
   const [stocks, setStocks] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredStocks, setFilteredStocks] = useState([]);
@@ -246,12 +247,13 @@ const Inventory = () => {
                           >
                             <FaEdit />
                           </button>
-                          <button
+                        {role == 'admin' &&  <button
                             onClick={() => onDelete(stock.id)}
                             className="text-red-500 hover:text-red-700"
                           >
                             <FaTrash />
                           </button>
+                          }
                           <button
                             onClick={() => handleViewNavigation(stock.id)}
                             className="text-blue-500 hover:text-blue-700"
