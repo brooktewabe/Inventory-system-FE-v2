@@ -10,7 +10,7 @@ const Report = () => {
   const name = localStorage.getItem("name");
 
   return (
-    <section className="bg-[#edf0f0b9] h-screen">
+    <section className="bg-[#edf0f0b9] h-full">
       <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-2">
           {/* First small full-width grid */}
@@ -34,14 +34,12 @@ const Report = () => {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
           <div className="px-4 sm:px-6">
-            <TopSelling />
-          </div>
-          <div className="px-4 sm:px-6">
             <StoreAssets />
           </div>
         </div>
-          <History/>
-
+        <div className="ml-6 mr-6">
+          <TopSelling/>
+        </div>
         </div>
       </div>
     </section>

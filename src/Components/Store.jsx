@@ -185,7 +185,7 @@ const Inventory = () => {
                       Restock Level
                     </td>
                     <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">
-                      Region
+                      Unit
                     </td>
                     <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">
                       Action
@@ -231,7 +231,7 @@ const Inventory = () => {
                         </td>
 
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                          {stock.Location}
+                          {stock.Unit}
                         </td>
 
                         <td className="border-b space-x-2">
