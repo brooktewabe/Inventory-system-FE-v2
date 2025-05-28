@@ -103,7 +103,7 @@ const ViewProduct = () => {
   if (!stock) return <div><Spinner/></div>;
 
   return (
-    <section className="bg-[#edf0f0b9] h-screen">
+    <section className="bg-[#edf0f0b9] h-full md:h-screen">
       <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-6">
           <div className="bg-white  flex justify-between">
@@ -117,7 +117,7 @@ const ViewProduct = () => {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md max-w-[70%] ml-20">
+          <div className="bg-white p-6 rounded-lg shadow-md max-w-[70%] ml-6">
             <div className="flex items-center mb-6 pb-2 border-b">
               <FaInfoCircle className="text-blue-600 mr-2" />
               <h2 className="text-lg font-medium">View Product </h2>
