@@ -68,7 +68,8 @@ const ViewSaleDetail = () => {
               <p className="text-xs">{role}</p>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-md mx-4 sm:ml-6 sm:mr-4 max-w-2xl w-full">
+          <div className="flex justify-center px-4">
+            <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl">
             <div className="relative mb-6" id="sale-detail-section">
               <div className="flex flex-col items-center">
                 <FaClock size={25} />
@@ -179,7 +180,7 @@ const ViewSaleDetail = () => {
             </div>
 
             {/* Done Button */}
-            <div className="flex justify-center sm:justify-start mt-6">
+            <div className="flex justify-center sm:justify-center mt-6">
               <button
                 onClick={handleReturn}
                 className="bg-blue-600 text-white px-10 py-2 rounded-lg hover:bg-blue-700"
@@ -188,6 +189,7 @@ const ViewSaleDetail = () => {
               </button>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </section>

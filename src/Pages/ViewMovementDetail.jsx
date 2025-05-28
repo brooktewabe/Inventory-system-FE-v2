@@ -36,64 +36,60 @@ const ViewMovementDetail = () => {
   if (!movement) return <p><Spinner/>...</p>;
 
   return (
-    <section className="bg-[#edf0f0b9] h-screen">
-      <div className="container m-auto">
-        <div className="grid grid-cols-1 gap-6">
-          {/* First small full-width grid */}
-          <div className="bg-white  flex justify-between">
-            <p className="text-xl font-bold">Stock Movement</p>
-            <div className="flex flex-col items-center justify-center bg-blue-500 text-white rounded-lg w-32 mr-2">
-              <p className="font-semibold">{name}</p>
-              <p className="text-xs">{role}</p>
-            </div>
-          </div>
-
-          {/* full-width grid */}
-          <div className="bg-white p-6 rounded-lg shadow-md mx-4 sm:mx-6 max-w-2xl w-full">
-            <div className="mb-6">
-              <h3 className="text-lg font-bold mb-4">
-                Stock Movement | {movement.Type}
-              </h3>
-              <hr className="mb-4" />
-
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center">
-                  <strong className="w-40 text-gray-700">Author:</strong>
-                  <span className="text-[#8f8d8d]">{movement.User}</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:items-center">
-                  <strong className="w-40 text-gray-700">Name:</strong>
-                  <span className="text-[#8f8d8d]">{movement.Name}</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:items-center">
-                  <strong className="w-40 text-gray-700">Adjustment:</strong>
-                  <span className="text-[#8f8d8d]">{movement.Adjustment}</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:items-center">
-                  <strong className="w-40 text-gray-700">Change Mode:</strong>
-                  <span className="text-[#8f8d8d]">{movement.Type}</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:items-center">
-                  <strong className="w-40 text-gray-700">Date:</strong>
-                  <span className="text-[#8f8d8d]">{movement.Date}</span>
-                </div>
-              </div>
-            </div>
-
-            <hr className="my-4" />
-
-            <div className="flex justify-center">
-              <button
-                onClick={handleReturn}
-                className="bg-blue-600 text-white px-8 py-2 rounded-lg hover:bg-blue-700 transition"
-              >
-                Done
-              </button>
-            </div>
-          </div>
+<section className="bg-[#edf0f0b9] min-h-screen overflow-x-hidden">
+  <div className="container m-auto px-4">
+    <div className="grid grid-cols-1 gap-6">
+      <div className="bg-white flex justify-between">
+        <p className="text-xl font-bold">Stock Movement</p>
+        <div className="flex flex-col items-center justify-center bg-blue-500 text-white rounded-lg w-32 mr-2">
+          <p className="font-semibold">{name}</p>
+          <p className="text-xs">{role}</p>
         </div>
       </div>
-    </section>
+
+      <div className="bg-white p-6 rounded-lg shadow-md mx-0 sm:mx-6 max-w-2xl w-full">
+        <div className="mb-6">
+          <h3 className="text-lg font-bold mb-4">
+            Stock Movement | {movement.Type}
+          </h3>
+          <hr className="mb-4" />
+
+          <div className="space-y-3">
+            {[
+              ["Author", movement.User],
+              ["Name", movement.Name],
+              ["Adjustment", movement.Adjustment],
+              ["Change Mode", movement.Type],
+              ["Date", movement.Date],
+            ].map(([label, value], idx) => (
+              <div
+                key={idx}
+                className="flex flex-col sm:flex-row sm:items-center"
+              >
+                <strong className="sm:w-40 text-gray-700 mb-1 sm:mb-0">
+                  {label}:
+                </strong>
+                <span className="text-[#8f8d8d]">{value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <hr className="my-4" />
+
+        <div className="flex justify-center">
+          <button
+            onClick={handleReturn}
+            className="bg-blue-600 text-white px-8 py-2 rounded-lg hover:bg-blue-700 transition"
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
   );
 };
 
