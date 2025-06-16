@@ -222,7 +222,7 @@ const AddProduct = () => {
                         <Field
                           name="Price"
                           placeholder="Enter Price"
-                          type="text"
+                          type="number"
                           className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                         />
                         <ErrorMessage

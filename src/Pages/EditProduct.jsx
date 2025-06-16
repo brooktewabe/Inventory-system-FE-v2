@@ -191,7 +191,7 @@ const EditProduct = () => {
                       Price
                     </label>
                     <input
-                      type="text"
+                      type="number"
                       name="Price"
                       value={formik.values.Price}
                       onChange={formik.handleChange}
