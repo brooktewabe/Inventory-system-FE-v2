@@ -18,6 +18,9 @@ const UserAdmin = () => {
   const [errors, setErrors] = useState({})
   const [permissions, setPermissions] = useState([])
   const [loading, setLoading] = useState(false)
+  const [editingUserId, setEditingUserId] = useState(null)
+  const [editPassword, setEditPassword] = useState("")
+  const [editPermissions, setEditPermissions] = useState([])
 
   // Permission mapping - display text to enum value
   const permissionMap = {
@@ -121,6 +124,27 @@ const UserAdmin = () => {
   useEffect(() => {
     fetchUsers()
   }, [])
+  const startEditingUser = (user) => {
+    setEditingUserId(user.id)
+    setEditPassword("")
+    setEditPermissions(user.permissions || [])
+  }
+
+  const handleSaveEdit = async (id) => {
+    try {
+      await axios.patch(`http://localhost:5000/update/${id}`, {
+        password: editPassword || undefined, // send only if non-empty
+        permissions: editPermissions,
+      })
+
+      toast.success("User updated successfully")
+      setEditingUserId(null)
+      fetchUsers()
+    } catch (error) {
+      toast.error("Failed to update user")
+      console.error(error)
+    }
+  }
 
   const onDeleteUser = async (id) => {
     Swal.fire({
@@ -294,8 +318,29 @@ const UserAdmin = () => {
                         <td className="py-2 px-4">{user.name}</td>
                         <td className="py-2 px-4">{user.email}</td>
                         <td className="py-2 px-4 capitalize">{user.role}</td>
+                        {/* Permissions */}
                         <td className="py-2 px-4">
-                          {user.permissions && Array.isArray(user.permissions) ? (
+                          {editingUserId === user.id ? (
+                            <div className="flex flex-wrap gap-2">
+                              {Object.entries(permissionMap).map(([label, value]) => (
+                                <label key={value} className="flex items-center gap-1 text-xs">
+                                  <input
+                                    type="checkbox"
+                                    checked={editPermissions.includes(value)}
+                                    onChange={() =>
+                                      setEditPermissions((prev) =>
+                                        prev.includes(value)
+                                          ? prev.filter((perm) => perm !== value)
+                                          : [...prev, value]
+                                      )
+                                    }
+                                    className="accent-blue-500"
+                                  />
+                                  {label}
+                                </label>
+                              ))}
+                            </div>
+                          ) : user.permissions && Array.isArray(user.permissions) ? (
                             <div className="flex flex-wrap gap-1">
                               {user.permissions.map((perm, idx) => (
                                 <span key={idx} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
@@ -307,15 +352,54 @@ const UserAdmin = () => {
                             "No permissions"
                           )}
                         </td>
-                        <td className="py-2 px-4">
-                          <button
-                            onClick={() => onDeleteUser(user.id)}
-                            className="text-red-500 hover:text-red-700"
-                            aria-label={`Delete ${user.userName}`}
-                          >
-                            🗑️
-                          </button>
+                        {editingUserId === user.id && (
+                          <tr>
+                            <td colSpan={5} className="py-2 px-4">
+                              <input
+                                type="password"
+                                placeholder="Change Password"
+                                value={editPassword}
+                                onChange={(e) => setEditPassword(e.target.value)}
+                                className="border rounded-md p-1 w-64"
+                              />
+                            </td>
+                          </tr>
+                        )}
+
+                        <td className="py-2 px-4 ">
+                          {editingUserId === user.id ? (
+                            <>
+                              <button
+                                onClick={() => handleSaveEdit(user.id)}
+                                className="text-blue-500 hover:text-blue-700"
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={() => setEditingUserId(null)}
+                                className="text-gray-500 hover:text-gray-700"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => startEditingUser(user)}
+                                className="text-blue-500 hover:text-blue-700"
+                              >
+                                ✏️
+                              </button>
+                              <button
+                                onClick={() => onDeleteUser(user.id)}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                🗑️
+                              </button>
+                            </>
+                          )}
                         </td>
+
                       </tr>
                     ))}
                   </tbody>
