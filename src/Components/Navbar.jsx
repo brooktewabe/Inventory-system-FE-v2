@@ -29,7 +29,7 @@ const Navbar = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [user, setUser] = useState("");
+  // const [user, setUser] = useState("");
   const sidebarRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -56,19 +56,19 @@ const Navbar = () => {
     };
   }, [nav]);
 
-  useEffect(() => {
-    const fetchInfo = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:5000/user/${uid}`
-        );
-        setUser(response.data);
-      } catch (error) {
-        console.error("Error fetching details:", error);
-      }
-    };
-    fetchInfo();
-  }, [id, uid]);
+  // useEffect(() => {
+  //   const fetchInfo = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         `http://localhost:5000/user/${uid}`
+  //       );
+  //       setUser(response.data);
+  //     } catch (error) {
+  //       console.error("Error fetching details:", error);
+  //     }
+  //   };
+  //   fetchInfo();
+  // }, [id, uid]);
 
   // Menu sections based on the image
   const menuSection = [

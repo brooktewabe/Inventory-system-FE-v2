@@ -152,6 +152,18 @@ const ValidatedLoginForm = () => {
         >
           Login
         </button>
+        {/* Forgot Password Link */}
+        <div className="text-center mt-4">
+          <p className="text-sm text-gray-500">
+            Forgot your password?{" "}
+            <a
+              href="/forgot-password"
+              className="text-blue-600 hover:underline font-medium"
+            >
+              Reset here
+            </a>
+          </p>
+        </div>
       </form>
     </div>
   </div>

@@ -21,11 +21,16 @@ axios.interceptors.request.use(
 
 // Response interceptor to handle 401 errors (token expiration)
 axios.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   async (error) => {
-    if (error.response && error.response.status === 401 && !isLoggedOut) {
+    const isResetPasswordRoute =
+      error.config?.url?.includes('/reset-password' || '/forgot-password');
+    const requestUrl = error?.config?.url || "";
+
+    // 🔍 Log the URL that caused 401
+    console.log("[401 Intercepted] Request URL:", requestUrl);
+
+    if (error.response && error.response.status === 401 && !isLoggedOut && !isResetPasswordRoute) {
       isLoggedOut = true; // Prevent further requests
       await handleLogout();
     }
@@ -37,20 +42,18 @@ axios.interceptors.response.use(
 const handleLogout = async () => {
   try {
     await axios.post(`http://localhost:5000/logout`);
-    // Remove cookies and local storage data
     Cookies.remove("jwt");
     localStorage.removeItem("role");
     localStorage.removeItem("name");
     localStorage.removeItem("uid");
     localStorage.removeItem("permissions");
 
-    // Redirect to login page only if not already redirected
     if (window.location.pathname !== "/login") {
       window.location.href = "/login";
     }
   } catch (error) {
     console.error("Logout error:", error);
-    isLoggedOut = false; 
+    isLoggedOut = false;
   }
 };
 

@@ -30,6 +30,8 @@ import ManageOptions from "./Pages/ManageOptions";
 import StockDetails from "./Pages/StockDetails";
 import WarehouseDashboard from "./Pages/WarehouseDashboard";
 import UnauthorizedAccess from "./Components/UnauthorizedAccess";
+import ForgotPassword from "./Pages/ForgotPassword";
+import ResetPassword from "./Pages/ResetPassword";
 
 const App = () => {
 
@@ -38,6 +40,8 @@ const App = () => {
       
       <Route path='/' element={<Layout />}>
         <Route path='/login' element={<ValidatedLoginForm />} />
+        <Route path='/forgot-password' element={<ForgotPassword/>} /> 
+        <Route path='/reset-password' element={<ResetPassword />} />
         <Route index element={<HomePage />} />
 
         {/*  require 'dashboard' permission */}
