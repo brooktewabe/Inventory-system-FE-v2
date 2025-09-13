@@ -87,9 +87,10 @@ const RecordSale = () => {
         salesQuantityList,
         formData
       }));
+    } else {
+      localStorage.removeItem("batchSaleData");
     }
   }, [addedItems, salesTotal, salesQuantity, salesIdFromNames, SalesItems, salesQuantityList, formData]);
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -120,6 +121,60 @@ const RecordSale = () => {
     });
   };
 
+  const removeItem = async (index) => {
+    const itemToRemove = addedItems[index];
+    
+    try {
+
+        // Find the original stock item to restore quantity
+        const originalStockItem = sale.find(item => item.Name === itemToRemove.name);
+        
+        if (originalStockItem) {
+          // Restore stock quantity
+          const restoredQuantity = Number(originalStockItem.Curent_stock) + Number(itemToRemove.quantity);
+          await axios.patch(`http://localhost:5000/stock/all/sale/${originalStockItem.id}`, {
+            Curent_stock: restoredQuantity,
+            Name: originalStockItem.Name,
+          });
+
+          // Update the local stock state
+          setSale(prevSale => 
+            prevSale.map(item => 
+              item.id === originalStockItem.id 
+                ? { ...item, Curent_stock: restoredQuantity }
+                : item
+            )
+          );
+
+        // Remove item from addedItems
+        const newAddedItems = addedItems.filter((_, i) => i !== index);
+        setAddedItems(newAddedItems);
+
+        // Update totals
+        setSalesTotal(prevTotal => prevTotal - itemToRemove.totalAmount);
+        setSalesQuantity(prevQuantity => prevQuantity - itemToRemove.quantity);
+
+        // Update ID and name lists
+        const itemIds = salesIdFromNames.split(",").map(id => id.trim());
+        const itemNames = SalesItems.split(",").map(name => name.trim());
+        const quantities = salesQuantityList.split(",").map(q => q.trim());
+
+        // Remove the item at the specified index
+        itemIds.splice(index, 1);
+        itemNames.splice(index, 1);
+        quantities.splice(index, 1);
+
+        setSalesIdFromNames(itemIds.join(","));
+        setSalesItems(itemNames.join(","));
+        setSalesQuantityList(quantities.join(","));
+
+        // toast.success("Item removed successfully and stock restored!");
+      }
+    } catch (error) {
+      console.error("Error removing item:", error);
+      toast.error("Error removing item. Please try again.");
+    }
+  };
 
   const addMoreItem = async () => {
     // Validate current item before adding
@@ -210,6 +265,15 @@ const RecordSale = () => {
         Name: selectedItem.Name,
       });
 
+      // Update the local stock state
+      setSale(prevSale => 
+        prevSale.map(item => 
+          item.id === selectedItem.id 
+            ? { ...item, Curent_stock: newQuantity }
+            : item
+        )
+      );
+
       if (newQuantity < selectedItem.Restock_level) {
         await axios.post("http://localhost:5000/notification/create", {
           message: `${selectedItem.Name} is running low on stock.`,
@@ -227,11 +291,11 @@ const RecordSale = () => {
       );
       setSalesIdFromNames((prevNames) =>
         prevNames
-          ? `${prevNames}, ${currentItem.itemName}`
+          ? `${prevNames},${currentItem.itemName}`
           : currentItem.itemName
       );
       setSalesItems((prevNames) =>
-        prevNames ? `${prevNames}, ${selectedItem.Name}` : selectedItem.Name
+        prevNames ? `${prevNames},${selectedItem.Name}` : selectedItem.Name
       );
 
       // Add the current item to the addedItems array
@@ -384,7 +448,7 @@ const RecordSale = () => {
                 <div className="mb-6">
                   <h3 className="text-md font-bold mb-4">Added Items</h3>
                   {addedItems.map((item, index) => (
-                    <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4 bg-gray-50 p-4 rounded-lg">
+                    <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-4 bg-gray-50 p-4 rounded-lg relative">
                       <div>
                         <label className="block text-sm font-bold text-gray-700">
                           Item Name
@@ -417,6 +481,16 @@ const RecordSale = () => {
                           readOnly
                           className="mt-1 block w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
                         />
+                      </div>
+                      <div className="flex items-end">
+                        <button
+                          type="button"
+                          onClick={() => removeItem(index)}
+                          className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors duration-200"
+                          title="Remove item"
+                        >
+                          <FaTimes size={16} />
+                        </button>
                       </div>
                     </div>
                   ))}
