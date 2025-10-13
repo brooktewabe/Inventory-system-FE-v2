@@ -74,12 +74,12 @@ const Navbar = () => {
   const menuSection = [
     {
       icon: <BiSolidDashboard size={20} className={isMobile ? "" : "mr-4"} />,
-      text: "Inventory Dashboard",
+      text: "Inventory",
       link: "/dashboard",
     },
     {
       icon: <AiOutlineShop size={20} className={isMobile ? "" : "mr-4"} />,
-      text: "Store Management",
+      text: "Store",
       link: "/sales",
     },
   ];
@@ -87,23 +87,23 @@ const Navbar = () => {
   const functionSection = [
     {
       icon: <AiTwotonePlusCircle size={20} className={isMobile ? "" : "mr-4"} />,
-      text: "Inventory Management",
+      text: "Management",
       link: "/warehouse",
     },
     {
+      icon: <AiOutlineContacts size={20} className={isMobile ? "" : "mr-4"} />,
+      text: "Customers",
+      link: "/customers-list",
+    },
+    {
       icon: <AiOutlineBars size={20} className={isMobile ? "" : "mr-4"} />,
-      text: "Inventory Report",
+      text: "Analytics",
       link: "/sales-history",
     },
     {
       icon: <BiHorizontalCenter size={25} className={isMobile ? "" : "mr-4"} />,
       text: "Stock Movement",
       link: "/stock-movement",
-    },
-    {
-      icon: <AiOutlineContacts size={20} className={isMobile ? "" : "mr-4"} />,
-      text: "CMS",
-      link: "/customers-list",
     },
   ];
 
@@ -213,8 +213,8 @@ const Navbar = () => {
 
         {/* Navigation sections */}
         <div className="flex-1 py-4">
-          {renderMenuItems(menuSection, "MENU")}
-          {renderMenuItems(functionSection, "FUNCTION")}
+          {renderMenuItems(menuSection, "")} {/**menu section */}
+          {renderMenuItems(functionSection, "Mangement")}{/**function section */}
         </div>
 
         {/* Bottom section */}

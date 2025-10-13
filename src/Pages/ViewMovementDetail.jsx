@@ -39,13 +39,32 @@ const ViewMovementDetail = () => {
 <section className="bg-[#edf0f0b9] min-h-screen overflow-x-hidden">
   <div className="container m-auto px-4">
     <div className="grid grid-cols-1 gap-6">
-      <div className="bg-white flex justify-between">
+        <div className="bg-white flex justify-between items-center mr-2">
         <p className="text-xl font-bold">Stock Movement</p>
-        <div className="flex flex-col items-center justify-center bg-blue-500 text-white rounded-lg w-32 mr-2">
-          <p className="font-semibold">{name}</p>
-          <p className="text-xs">{role}</p>
+          <div className="flex items-center bg-blue-600 text-white rounded-lg px-3 py-1 space-x-2 cursor-pointer">
+            {/* Circle with initial */}
+            <div className="bg-white text-blue-600 font-semibold w-6 h-6 flex items-center justify-center rounded-full text-sm">
+              {name?.charAt(0)?.toUpperCase() || "?"}
+            </div>
+
+            {/* Name and role */}
+            <div className="flex flex-col text-left leading-tight">
+              <p className="font-semibold text-sm">{name}</p>
+              <p className="text-xs text-blue-100">{role}</p>
+            </div>
+
+            {/* Dropdown arrow */}
+            <svg
+              className="w-4 h-4 text-blue-100 ml-1"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
         </div>
-      </div>
 
       <div className="bg-white p-6 rounded-lg shadow-md mx-0 sm:mx-6 max-w-2xl w-full">
         <div className="mb-6">
