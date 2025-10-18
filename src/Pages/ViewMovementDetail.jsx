@@ -39,8 +39,8 @@ const ViewMovementDetail = () => {
 <section className="bg-[#edf0f0b9] min-h-screen overflow-x-hidden">
   <div className="container m-auto px-4">
     <div className="grid grid-cols-1 gap-6">
-        <div className="bg-white flex justify-between items-center mr-2">
-        <p className="text-xl font-bold">Stock Movement</p>
+        <div className="bg-white flex justify-between items-center mr-2 p-1">
+        <p className="text-xl font-bold ml-3">Stock Movement</p>
           <div className="flex items-center bg-blue-600 text-white rounded-lg px-3 py-1 space-x-2 cursor-pointer">
             {/* Circle with initial */}
             <div className="bg-white text-blue-600 font-semibold w-6 h-6 flex items-center justify-center rounded-full text-sm">

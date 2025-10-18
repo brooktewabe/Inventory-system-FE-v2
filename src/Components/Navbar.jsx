@@ -244,10 +244,10 @@ const Navbar = () => {
       <div
         className={`ml-auto ${
           isMobile
-            ? "w-[calc(100%-60px)] h-[calc(10vh-80px)] p-2 overflow-y-auto"
+            ? "w-[calc(100%-60px)] h-[calc(10vh-80px)] p-1 overflow-y-auto"
             : nav
-            ? "w-[calc(100%-70px)] p-2"
-            : "w-[calc(100%-200px)] p-2"
+            ? "w-[calc(100%-70px)] p-1"
+            : "w-[calc(100%-200px)] p-1"
         } transition-all duration-300`}
       >
 

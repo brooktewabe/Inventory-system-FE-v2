@@ -87,8 +87,8 @@ const ManageOptions = () => {
     <section className="bg-[#edf0f0b9] min-h-screen">
       <div className="container m-auto">
         <div className="grid grid-cols-1 gap-6">
-        <div className="bg-white flex justify-between items-center mr-2">
-            <p className="text-xl font-bold">Settings</p>
+        <div className="bg-white flex justify-between items-center mr-2 p-1">
+            <p className="text-xl font-bold ml-3">Settings</p>
 
           <div className="flex items-center bg-blue-600 text-white rounded-lg px-3 py-1 space-x-2 cursor-pointer">
             {/* Circle with initial */}

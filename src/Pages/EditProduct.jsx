@@ -148,8 +148,8 @@ const EditProduct = () => {
     <section className="bg-[#edf0f0b9] h-screen">
       <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-6">
-        <div className="bg-white flex justify-between items-center mr-2">
-            <p className="text-lg sm:text-xl font-bold whitespace-nowrap">
+        <div className="bg-white flex justify-between items-center mr-2 p-1">
+          <p className="text-lg sm:text-xl font-bold whitespace-nowrap flex items-center ml-3 mt-[1px]">
               <span className="sm:hidden">Inventory</span>
               <span className="hidden sm:inline">Inventory Management System</span>
             </p>
