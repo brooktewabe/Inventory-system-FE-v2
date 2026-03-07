@@ -38,16 +38,16 @@ const TotalProfit = () => {
       let endpoint;
       switch (period) {
         case "daily":
-          endpoint = "http://localhost:5000/sales/total-profit/day";
+          endpoint = "http://apiv2.cnhtc4.com/sales/total-profit/day";
           break;
         case "monthly":
-          endpoint = "http://localhost:5000/sales/total-profit/month";
+          endpoint = "http://apiv2.cnhtc4.com/sales/total-profit/month";
           break;
         case "yearly":
-          endpoint = "http://localhost:5000/sales/total-profit/year";
+          endpoint = "http://apiv2.cnhtc4.com/sales/total-profit/year";
           break;
         default:
-          endpoint = "http://localhost:5000/sales/total-profit/month"; // Default to monthly
+          endpoint = "http://apiv2.cnhtc4.com/sales/total-profit/month"; // Default to monthly
       }
 
       const response = await axios.get(endpoint);

@@ -41,7 +41,7 @@ axios.interceptors.response.use(
 // Logout function
 const handleLogout = async () => {
   try {
-    await axios.post(`http://localhost:5000/logout`);
+    await axios.post(`http://apiv2.cnhtc4.com/logout`);
     Cookies.remove("jwt");
     localStorage.removeItem("role");
     localStorage.removeItem("name");

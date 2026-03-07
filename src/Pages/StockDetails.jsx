@@ -21,8 +21,8 @@ const ViewProduct = () => {
       try {
         // Fetch both resources in parallel
         const [stockResponse, columnsResponse] = await Promise.all([
-          axios.get(`http://localhost:5000/stock/all/${id}`),
-          axios.get("http://localhost:5000/custom-product-columns/all")
+          axios.get(`http://apiv2.cnhtc4.com/stock/all/${id}`),
+          axios.get("http://apiv2.cnhtc4.com/custom-product-columns/all")
         ]);
         
         const productData = stockResponse.data;

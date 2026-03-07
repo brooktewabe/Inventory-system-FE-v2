@@ -20,7 +20,7 @@ const Sales = () => {
     const fetchStocks = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/stock/all/warehouse`
+          `http://apiv2.cnhtc4.com/stock/all/warehouse`
         );
         setStocks(response.data.data);
         setFilteredStocks(response.data.data);

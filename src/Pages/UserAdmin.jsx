@@ -72,7 +72,7 @@ const UserAdmin = () => {
 
     setLoading(true)
     try {
-      await axios.post("http://localhost:5000/signup", {
+      await axios.post("http://apiv2.cnhtc4.com/signup", {
         name:userName,
         email,
         password,
@@ -106,7 +106,7 @@ const UserAdmin = () => {
   const fetchUsers = async () => {
     setLoading(true)
     try {
-      const response = await axios.get("http://localhost:5000/users")
+      const response = await axios.get("http://apiv2.cnhtc4.com/users")
       if (Array.isArray(response.data)) {
         setUsers(response.data)
       } else {
@@ -132,7 +132,7 @@ const UserAdmin = () => {
 
   const handleSaveEdit = async (id) => {
     try {
-      await axios.patch(`http://localhost:5000/update/${id}`, {
+      await axios.patch(`http://apiv2.cnhtc4.com/update/${id}`, {
         password: editPassword || undefined, // send only if non-empty
         permissions: editPermissions,
       })
@@ -161,7 +161,7 @@ const UserAdmin = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://localhost:5000/user/${id}`)
+          await axios.delete(`http://apiv2.cnhtc4.com/user/${id}`)
           setUsers(users.filter((user) => user.id !== id))
           toast.success("Deleted Successfully")
         } catch (error) {

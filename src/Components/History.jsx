@@ -20,7 +20,7 @@ const SalesHistory = () => {
   const fetchSalesByPage = async (page, status = "Pending") => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/sales/all-sales?status=${status}&page=${page}&limit=${itemsPerPage}`
+        `http://apiv2.cnhtc4.com/sales/all-sales?status=${status}&page=${page}&limit=${itemsPerPage}`
       );
       setSales(response.data.data);
       // Ensure the API returns totalCount for calculating total pages
@@ -40,7 +40,7 @@ const SalesHistory = () => {
   ) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/sales/search/find?startDate=${
+        `http://apiv2.cnhtc4.com/sales/search/find?startDate=${
           startDate || ""
         }&endDate=${endDate || ""}&nameOrPhone=${
           nameOrPhone || ""
@@ -116,7 +116,7 @@ const SalesHistory = () => {
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      await axios.patch(`http://localhost:5000/sales/change-status/${id}`, { status: newStatus });
+      await axios.patch(`http://apiv2.cnhtc4.com/sales/change-status/${id}`, { status: newStatus });
       // Refetch the data
       if (searchTerm || filterStartDate || filterEndDate) {
         fetchSalesByFilter(filterStartDate, filterEndDate, searchTerm, currentPage, activeTab);

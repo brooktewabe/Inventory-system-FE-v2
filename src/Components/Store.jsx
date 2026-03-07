@@ -22,7 +22,7 @@ const Inventory = () => {
   const fetchStocks = async (page) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/stock/all/store?page=${page}&limit=${itemsPerPage}`
+        `http://apiv2.cnhtc4.com/stock/all/store?page=${page}&limit=${itemsPerPage}`
       );
       setStocks(response.data.data);
       setFilteredStocks(response.data.data);
@@ -52,7 +52,7 @@ const Inventory = () => {
     const fetchFilteredStocks = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/stock/search?query=${debouncedSearchTerm}&location=store`
+          `http://apiv2.cnhtc4.com/stock/search?query=${debouncedSearchTerm}&location=store`
         );
         setFilteredStocks(response.data);
       } catch (error) {
@@ -87,10 +87,10 @@ const Inventory = () => {
       if (result.isConfirmed) {
         try {
           const response = await axios.get(
-            `http://localhost:5000/stock/all/${id}`
+            `http://apiv2.cnhtc4.com/stock/all/${id}`
           );
           const stockToDelete = response.data;
-          await axios.delete(`http://localhost:5000/stock/all/${id}`);
+          await axios.delete(`http://apiv2.cnhtc4.com/stock/all/${id}`);
           setStocks(stocks.filter((stock) => stock.id !== id));
           const notifData = new FormData();
           notifData.append("message", `${stockToDelete.Name} is deleted.`);
@@ -98,7 +98,7 @@ const Inventory = () => {
 
           // Post notification data
           await axios.post(
-            "http://localhost:5000/notification/create",
+            "http://apiv2.cnhtc4.com/notification/create",
             notifData,
             {
               headers: {
@@ -205,7 +205,7 @@ const Inventory = () => {
                             className="size-10"
                             src={
                               stock.Product_image
-                                ? `http://localhost:5000/uploads/${stock.Product_image}`
+                                ? `http://apiv2.cnhtc4.com/uploads/${stock.Product_image}`
                                 : "/src/assets/Placeholder.png"
                             }
                             alt="Stock Image"

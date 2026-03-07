@@ -8,7 +8,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target :process.env.BASE_URL, //'http://localhost:5000',
+        target :process.env.BASE_URL, //'http://apiv2.cnhtc4.com',
         // target :'http://frontend', for docker compose
         changeOrigin: true,
         secure:false,

@@ -21,7 +21,7 @@ const Sales = () => {
   const fetchStocks = async (page) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/stock/all/store?page=${page}&limit=${itemsPerPage}`
+        `http://apiv2.cnhtc4.com/stock/all/store?page=${page}&limit=${itemsPerPage}`
       );
       setStocks(response.data.data);
       setFilteredStocks(response.data.data);
@@ -51,7 +51,7 @@ const Sales = () => {
     const fetchFilteredStocks = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/stock/search?query=${debouncedSearchTerm}&location=store`
+          `http://apiv2.cnhtc4.com/stock/search?query=${debouncedSearchTerm}&location=store`
         );
         setFilteredStocks(response.data);
       } catch (error) {
@@ -229,7 +229,7 @@ const Sales = () => {
                           {(currentPage - 1) * itemsPerPage + index + 1}
                         </td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                      <img className="size-10" src={stock.Product_image ? `http://localhost:5000/uploads/${stock.Product_image}` : '/src/assets/Placeholder.png'} alt="Stock Image" />
+                      <img className="size-10" src={stock.Product_image ? `http://apiv2.cnhtc4.com/uploads/${stock.Product_image}` : '/src/assets/Placeholder.png'} alt="Stock Image" />
                     </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                         {stock.Product_id}

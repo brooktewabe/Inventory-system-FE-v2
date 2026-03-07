@@ -25,7 +25,7 @@ const IncomeSection = () => {
   // Function to fetch stock value
   const fetchIncome = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/stock/total/store-stock`);
+      const response = await axios.get(`http://apiv2.cnhtc4.com/stock/total/store-stock`);
       const data = response.data.totalSum;
       setStockVal(data);
     } catch (error) {

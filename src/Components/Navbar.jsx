@@ -57,7 +57,7 @@ const Navbar = () => {
   //   const fetchInfo = async () => {
   //     try {
   //       const response = await axios.get(
-  //         `http://localhost:5000/user/${uid}`
+  //         `http://apiv2.cnhtc4.com/user/${uid}`
   //       );
   //       setUser(response.data);
   //     } catch (error) {
@@ -119,7 +119,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post(`http://localhost:5000/logout`, {
+      await axios.post(`http://apiv2.cnhtc4.com/logout`, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });

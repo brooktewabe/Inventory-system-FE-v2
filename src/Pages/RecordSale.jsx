@@ -33,7 +33,7 @@ const RecordSale = () => {
     const fetchStock = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/stock/all/${id}`
+          `http://apiv2.cnhtc4.com/stock/all/${id}`
         );
         setSale(response.data);
       } catch (error) {
@@ -104,12 +104,12 @@ const RecordSale = () => {
 
     try {
       // First, record the sale
-      await axios.post("http://localhost:5000/sales/create", formData, {
+      await axios.post("http://apiv2.cnhtc4.com/sales/create", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       // Then, update the stock
-      await axios.patch(`http://localhost:5000/stock/all/sale/${id}`, patchData);
+      await axios.patch(`http://apiv2.cnhtc4.com/stock/all/sale/${id}`, patchData);
 
       // Check if new quantity is less than reorder level
       if (newQuantity < sale.Restock_level) {
@@ -119,7 +119,7 @@ const RecordSale = () => {
         };
         // Send the notification
         await axios.post(
-          "http://localhost:5000/notification/create",
+          "http://apiv2.cnhtc4.com/notification/create",
           notifData,
           {
             headers: { "Content-Type": "application/json" },

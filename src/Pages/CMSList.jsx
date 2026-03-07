@@ -18,7 +18,7 @@ const CmsList = () => {
   const fetchCustomers = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/sales/customers/list`,
+        `http://apiv2.cnhtc4.com/sales/customers/list`,
         {
           params: {
             page: currentPage,

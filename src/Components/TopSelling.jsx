@@ -25,16 +25,16 @@ const IncomeSection = () => {
       let endpoint;
       switch (period) {
         case "daily":
-          endpoint = "http://localhost:5000/sales/all/day";
+          endpoint = "http://apiv2.cnhtc4.com/sales/all/day";
           break;
         case "monthly":
-          endpoint = "http://localhost:5000/sales/all/month";
+          endpoint = "http://apiv2.cnhtc4.com/sales/all/month";
           break;
         case "yearly":
-          endpoint = "http://localhost:5000/sales/all/year";
+          endpoint = "http://apiv2.cnhtc4.com/sales/all/year";
           break;
         default:
-          endpoint = "http://localhost:5000/sales/all/month";
+          endpoint = "http://apiv2.cnhtc4.com/sales/all/month";
       }
 
       const response = await axios.get(`${endpoint}?page=${page}&limit=${limit}`);

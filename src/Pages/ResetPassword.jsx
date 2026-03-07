@@ -22,7 +22,7 @@ const ResetPassword = () => {
     if (!validateForm()) return
 
     try {
-      await axios.post("http://localhost:5000/reset-password", {
+      await axios.post("http://apiv2.cnhtc4.com/reset-password", {
         token,
         newPassword: password,
       })

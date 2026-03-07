@@ -27,7 +27,7 @@ const ViewSaleDetail = () => {
   useEffect(() => {
     const fetchSale = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/sales/${id}`);
+        const response = await axios.get(`http://apiv2.cnhtc4.com/sales/${id}`);
         setSale(response.data);
       } catch (error) {
         console.error("Error fetching sale details:", error);
@@ -42,7 +42,7 @@ const ViewSaleDetail = () => {
         try {
           const productIds = sale.Product_id.split(",").map((id) => id.trim());
           const stockPromises = productIds.map((productId) =>
-            axios.get(`http://localhost:5000/stock/all/${productId}`)
+            axios.get(`http://apiv2.cnhtc4.com/stock/all/${productId}`)
           );
           const stockResponses = await Promise.all(stockPromises);
           const stockData = stockResponses.map((res) => res.data);
@@ -183,13 +183,13 @@ const ViewSaleDetail = () => {
                   <strong className="sm:w-60 text-[#8f8d8d]">Receipt:</strong>
                   {sale.Receipt && (
                     <a
-                      href={`http://localhost:5000/uploads/${sale.Receipt}`}
+                      href={`http://apiv2.cnhtc4.com/uploads/${sale.Receipt}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       title="Click to open in new tab"
                     >
                       <img
-                        src={`http://localhost:5000/uploads/${sale.Receipt}`}
+                        src={`http://apiv2.cnhtc4.com/uploads/${sale.Receipt}`}
                         alt="Receipt"
                         className="w-36 h-40 cursor-pointer hover:opacity-90 border border-gray-300 rounded"
                       />

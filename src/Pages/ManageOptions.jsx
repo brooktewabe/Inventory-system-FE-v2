@@ -14,7 +14,7 @@ const ManageOptions = () => {
 
   const fetchFields = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/custom-product-columns/all");
+      const res = await axios.get("http://apiv2.cnhtc4.com/custom-product-columns/all");
       const optionsOnly = res.data.filter((f) => f.type === "options");
       setFields(optionsOnly);
       if (selectedField) {
@@ -46,7 +46,7 @@ const ManageOptions = () => {
 
     try {
       await axios.patch(
-        `http://localhost:5000/custom-product-columns/${selectedField.id}`,
+        `http://apiv2.cnhtc4.com/custom-product-columns/${selectedField.id}`,
         { options: updatedOptions }
       );
       toast.success("Option added successfully.");
@@ -71,7 +71,7 @@ const ManageOptions = () => {
         try {
           const updatedOptions = selectedField.options.filter(opt => opt !== optionToDelete);
           await axios.patch(
-            `http://localhost:5000/custom-product-columns/${selectedField.id}`,
+            `http://apiv2.cnhtc4.com/custom-product-columns/${selectedField.id}`,
             { options: updatedOptions }
           );
           toast.success("Option deleted.");

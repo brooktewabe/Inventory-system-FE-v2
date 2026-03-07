@@ -25,7 +25,7 @@ const Import = () => {
     formData.append("file", file);
 
     try {
-      await axios.post("http://localhost:5000/stock/import-excel", formData, {
+      await axios.post("http://apiv2.cnhtc4.com/stock/import-excel", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
