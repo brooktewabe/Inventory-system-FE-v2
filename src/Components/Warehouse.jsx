@@ -297,9 +297,9 @@ const Inventory = () => {
                     <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">Category</td>
                     <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">Product Name</td>
                     <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">Price</td>
+                    <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">Cost</td>
                     <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">Stock</td>
                     <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">Restock Level</td>
-                    <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">Unit</td>
                     <th className="px-4 py-3 text-xs font-medium text-gray-500">Move</th>
                     <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">Action</td>
                   </tr>
@@ -329,10 +329,10 @@ const Inventory = () => {
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{stock.Category}</td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{stock.Name}</td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{stock.Price}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{stock.Cost}</td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{stock.Curent_stock}</td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{stock.Restock_level}</td>
 
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{stock.Unit}</td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-blue-600">
                           <button
                             onClick={() => handleOpenDialog(stock.id, stock.Name)}

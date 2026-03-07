@@ -15,19 +15,6 @@ const ViewProduct = () => {
   const [customColumns, setCustomColumns] = useState([]);
   const role = localStorage.getItem("role");
   const name = localStorage.getItem("name");
-
-  const validationSchema = Yup.object({
-    Name: Yup.string().required("Required"),
-    Location: Yup.string().required("Required"),
-    Category: Yup.string().required("Required"),
-    Price: Yup.number()
-      .required("Required")
-      .positive("Must be greater than zero"),
-    Curent_stock: Yup.number()
-      .required("Required")
-      .positive("Must be greater than zero"),
-    // .moreThan(Yup.ref('Restock_level'), "Stock must be greater than restock level"),
-  });
   
   useEffect(() => {
     const fetchData = async () => {
@@ -55,6 +42,7 @@ const ViewProduct = () => {
           Location: productData.Location || "",
           Category: productData.Category || "",
           Price: productData.Price || "",
+          Cost: productData.Cost || "",
           storageLocation: productData.storageLocation || "",
           Curent_stock: productData.Curent_stock || "",
           Restock_level: productData.Restock_level || "",
@@ -84,19 +72,7 @@ const ViewProduct = () => {
         acc[col.fieldName] = stock?.[col.fieldName] || ""; 
         return acc;
       }, {}),  
-    },  
-    validationSchema,
-    onSubmit: async (values) => {
-      const formData = new FormData();
-
-      formData.append("Name", values.Name);
-      formData.append("Location", values.Location);
-      formData.append("Category", values.Category);
-      formData.append("storageLocation", values.storageLocation);
-      formData.append("Price", values.Price);
-      formData.append("Curent_stock", values.Curent_stock);
-      formData.append("Restock_level", values.Restock_level);
-    },  
+    },   
   });    
 
 
@@ -168,6 +144,18 @@ const ViewProduct = () => {
                       name="Price"
                       disabled
                       value={formik.values.Price}
+                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Cost
+                    </label>
+                    <input
+                      type="text"
+                      name="Cost"
+                      disabled
+                      value={formik.values.Cost}
                       className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
                     />
                   </div>

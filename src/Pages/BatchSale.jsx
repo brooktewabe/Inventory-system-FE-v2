@@ -14,6 +14,7 @@ const RecordSale = () => {
   const name = localStorage.getItem("name");
   const [sale, setSale] = useState(null);
   const [salesTotal, setSalesTotal] = useState(0);
+  const [salesTotalCost, setSalesTotalCost] = useState(0);
   const [salesIdFromNames, setSalesIdFromNames] = useState("");
   const [SalesItems, setSalesItems] = useState("");
   const [salesQuantity, setSalesQuantity] = useState(0);
@@ -25,6 +26,7 @@ const RecordSale = () => {
       quantity: 0,
       price: 0,
       totalAmount: 0,
+      totalCost: 0,
     },
   ]);
   const getSelectedIds = () => {
@@ -39,6 +41,7 @@ const RecordSale = () => {
     Receipt: "",
     Sale_type: "Batch",
     EachQuantity: "",
+    Status: "Pending",
   });
 
   useEffect(() => {
@@ -59,6 +62,7 @@ const RecordSale = () => {
       const {
         addedItems,
         salesTotal,
+        salesTotalCost,
         salesQuantity,
         salesIdFromNames,
         SalesItems,
@@ -68,6 +72,7 @@ const RecordSale = () => {
 
       setAddedItems(addedItems);
       setSalesTotal(salesTotal);
+      setSalesTotalCost(salesTotalCost);
       setSalesQuantity(salesQuantity);
       setSalesIdFromNames(salesIdFromNames);
       setSalesItems(SalesItems);
@@ -81,6 +86,7 @@ const RecordSale = () => {
       localStorage.setItem("batchSaleData", JSON.stringify({
         addedItems,
         salesTotal,
+        salesTotalCost,
         salesQuantity,
         salesIdFromNames,
         SalesItems,
@@ -90,7 +96,7 @@ const RecordSale = () => {
     } else {
       localStorage.removeItem("batchSaleData");
     }
-  }, [addedItems, salesTotal, salesQuantity, salesIdFromNames, SalesItems, salesQuantityList, formData]);
+  }, [addedItems, salesTotal, salesTotalCost, salesQuantity, salesIdFromNames, SalesItems, salesQuantityList, formData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -110,12 +116,15 @@ const RecordSale = () => {
       // If item name is selected, set default price
       if (name === "itemName" && selectedItem) {
         updatedItems[index].price = selectedItem.Price || 0;
+        updatedItems[index].cost = selectedItem.Cost || 0;
       }
 
       // Recalculate total using quantity * price
       const quantity = parseFloat(updatedItems[index].quantity) || 0;
       const price = parseFloat(updatedItems[index].price) || 0;
+      const cost = parseFloat(updatedItems[index].cost) || 0;
       updatedItems[index].totalAmount = quantity * price;
+      updatedItems[index].totalCost = quantity * cost;
 
       return updatedItems;
     });
@@ -152,6 +161,7 @@ const RecordSale = () => {
 
         // Update totals
         setSalesTotal(prevTotal => prevTotal - itemToRemove.totalAmount);
+        setSalesTotalCost(prevTotal => prevTotal - itemToRemove.totalCost);
         setSalesQuantity(prevQuantity => prevQuantity - itemToRemove.quantity);
 
         // Update ID and name lists
@@ -250,6 +260,7 @@ const RecordSale = () => {
       Product_id: selectedItem.id,
       Quantity: currentItem.quantity,
       Total_amount: currentItem.totalAmount,
+      Total_cost: currentItem.totalCost,
       EachQuantity: null,
     };
 
@@ -283,6 +294,7 @@ const RecordSale = () => {
 
       // Update sales totals
       setSalesTotal((prevTotal) => prevTotal + currentItem.totalAmount);
+      setSalesTotalCost((prevTotal) => prevTotal + currentItem.totalCost);
       setSalesQuantity(
         (prevQuantity) => prevQuantity + parseInt(currentItem.quantity, 10)
       );
@@ -305,6 +317,7 @@ const RecordSale = () => {
           name: selectedItem.Name,
           quantity: currentItem.quantity,
           totalAmount: currentItem.totalAmount,
+          totalCost: currentItem.totalCost,
         },
       ]);
 
@@ -314,6 +327,7 @@ const RecordSale = () => {
           itemName: "",
           quantity: 0,
           totalAmount: 0,
+          totalCost: 0,
         },
       ]); // Keep existing items and add a new empty one
     } catch (error) {
@@ -333,8 +347,10 @@ const RecordSale = () => {
       Product_id: salesIdFromNames,
       Quantity: salesQuantity,
       Total_amount: salesTotal,
+      Total_cost: salesTotalCost,
       EachQuantity: salesQuantityList, // list of quantities
       Item_List: SalesItems, // list of item names
+      Status: "Pending",
     };
 
     const requiredFields = ["Payment_method"];

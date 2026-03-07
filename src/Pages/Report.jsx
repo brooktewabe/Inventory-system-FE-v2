@@ -4,6 +4,7 @@ import TopSelling from "../Components/TopSelling";
 import WarehouseAssets from "../Components/WarehouseAsset";
 import StoreAssets from "../Components/StoreAsset";
 import History from "../Components/History";
+import TotalProfit from "../Components/TotalProfit";
 
 const Report = () => {
   const role = localStorage.getItem("role");
@@ -49,10 +50,11 @@ const Report = () => {
             <Revenue />
           </div>
           <div className="px-4 sm:px-6">
+            <TotalProfit />
+          </div>
+          <div className="px-4 sm:px-6">
             <WarehouseAssets />
           </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
           <div className="px-4 sm:px-6">
             <StoreAssets />
           </div>

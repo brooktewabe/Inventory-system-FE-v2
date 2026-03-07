@@ -179,13 +179,13 @@ const Inventory = () => {
                       Price
                     </td>
                     <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">
+                      Cost
+                    </td>
+                    <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">
                       Stock
                     </td>
                     <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">
                       Restock Level
-                    </td>
-                    <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">
-                      Unit
                     </td>
                     <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">
                       Action
@@ -224,14 +224,14 @@ const Inventory = () => {
                           {stock.Price}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                          {stock.Curent_stock}
+                          {stock.Cost}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                          {stock.Restock_level}
+                          {stock.Curent_stock}
                         </td>
 
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                          {stock.Unit}
+                          {stock.Restock_level}
                         </td>
 
                         <td className="border-b space-x-2">

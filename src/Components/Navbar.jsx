@@ -15,7 +15,6 @@ import { useNavigate, NavLink, useLocation } from "react-router-dom";
 import { BiSolidDashboard } from "react-icons/bi";
 import Cookies from "js-cookie";
 import axios from "../axiosInterceptor";
-import { useParams } from "react-router-dom";
 
 Modal.setAppElement("#root"); // Set the app element for accessibility
 
@@ -33,9 +32,7 @@ const Navbar = () => {
   const sidebarRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const { id } = useParams();
   const role = localStorage.getItem("role");
-  const uid = localStorage.getItem("uid");
 
   // Add resize listener to detect mobile
   useEffect(() => {
@@ -74,7 +71,7 @@ const Navbar = () => {
   const menuSection = [
     {
       icon: <BiSolidDashboard size={20} className={isMobile ? "" : "mr-4"} />,
-      text: "Inventory",
+      text: "Dashboard",
       link: "/dashboard",
     },
     {
@@ -87,7 +84,7 @@ const Navbar = () => {
   const functionSection = [
     {
       icon: <AiTwotonePlusCircle size={20} className={isMobile ? "" : "mr-4"} />,
-      text: "Management",
+      text: "Inventory",
       link: "/warehouse",
     },
     {
@@ -101,7 +98,7 @@ const Navbar = () => {
       link: "/sales-history",
     },
     {
-      icon: <BiHorizontalCenter size={25} className={isMobile ? "" : "mr-4"} />,
+      icon: <BiHorizontalCenter size={20} className={isMobile ? "" : "mr-4"} />,
       text: "Stock Movement",
       link: "/stock-movement",
     },

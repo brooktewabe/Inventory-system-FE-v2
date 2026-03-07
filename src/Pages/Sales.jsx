@@ -209,13 +209,13 @@ const Sales = () => {
                       Price
                     </th>
                     <th className="px-4 py-3 text-xs text-left font-medium text-gray-500">
+                      Cost
+                    </th>
+                    <th className="px-4 py-3 text-xs text-left font-medium text-gray-500">
                       Stock
                     </th>
                     <th className="px-4 py-3 text-xs font-medium text-gray-500">
                       Restock Level
-                    </th>
-                    <th className="px-4 py-3 text-xs text-left font-medium text-gray-500">
-                      Unit
                     </th>
                     <th className="px-4 py-3 text-xs text-left font-medium text-gray-500">
                       Action
@@ -244,13 +244,13 @@ const Sales = () => {
                         {stock.Price}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                        {stock.Cost }
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                         {stock.Curent_stock}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                         {stock.Restock_level}
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                        {stock.Unit }
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-blue-600">
                         <button

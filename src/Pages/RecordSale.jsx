@@ -26,6 +26,7 @@ const RecordSale = () => {
     Receipt: "",
     Transaction_id: "",
     Item_List: "",
+    Status: "Pending",
   });
 
   useEffect(() => {
@@ -150,6 +151,7 @@ const RecordSale = () => {
         Receipt: "",
         Transaction_id: "",
         Item_List: "",
+        Status: "Pending",
       });
     } catch (error) {
       console.error("Error creating sale:", error);

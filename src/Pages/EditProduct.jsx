@@ -27,6 +27,9 @@ const EditProduct = () => {
     Price: Yup.number()
       .required("Required")
       .positive("Must be greater than zero"),
+    Cost: Yup.number()
+      .required("Required")
+      .positive("Must be greater than zero"),
     Curent_stock: Yup.number()
       .required("Required")
       .positive("Must be greater than zero"),
@@ -58,6 +61,7 @@ const EditProduct = () => {
           Name: productData.Name || "",
           Location: productData.Location || "",
           Price: productData.Price || "",
+          Cost: productData.Cost || "",
           storageLocation: productData.storageLocation || "",
           Curent_stock: productData.Curent_stock || "",
           Restock_level: productData.Restock_level || "",
@@ -78,6 +82,7 @@ const EditProduct = () => {
       Location: stock?.Location || "",
       Type: stock?.Type || "",
       Price: stock?.Price || "",
+      Cost: stock?.Cost || "",
       Curent_stock: stock?.Curent_stock || "",
       storageLocation: stock?.storageLocation || "",
       Restock_level: stock?.Restock_level || "",
@@ -95,6 +100,7 @@ const EditProduct = () => {
       formData.append("Location", values.Location);
       formData.append("storageLocation", values.storageLocation);
       formData.append("Price", values.Price);
+      formData.append("Cost", values.Cost);
       formData.append("Curent_stock", values.Curent_stock);
       formData.append("Restock_level", values.Restock_level);
 
@@ -221,6 +227,24 @@ const EditProduct = () => {
                     {formik.touched.Price && formik.errors.Price && (
                       <div className="text-red-600 text-sm">
                         {formik.errors.Price}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Cost
+                    </label>
+                    <input
+                      type="number"
+                      name="Cost"
+                      value={formik.values.Cost}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                    />
+                    {formik.touched.Cost && formik.errors.Cost && (
+                      <div className="text-red-600 text-sm">
+                        {formik.errors.Cost}
                       </div>
                     )}
                   </div>

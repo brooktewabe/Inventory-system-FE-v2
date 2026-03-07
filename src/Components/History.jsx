@@ -14,12 +14,13 @@ const SalesHistory = () => {
   const [filterEndDate, setfilterEndDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [activeTab, setActiveTab] = useState("Completed");
   const itemsPerPage = 15;
 
-  const fetchSalesByPage = async (page) => {
+  const fetchSalesByPage = async (page, status = "Pending") => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/sales/all-sales?page=${page}&limit=${itemsPerPage}`
+        `http://localhost:5000/sales/all-sales?status=${status}&page=${page}&limit=${itemsPerPage}`
       );
       setSales(response.data.data);
       // Ensure the API returns totalCount for calculating total pages
@@ -34,7 +35,8 @@ const SalesHistory = () => {
     startDate,
     endDate,
     nameOrPhone,
-    page = 1
+    page = 1,
+    status = "Pending"
   ) => {
     try {
       const response = await axios.get(
@@ -42,7 +44,7 @@ const SalesHistory = () => {
           startDate || ""
         }&endDate=${endDate || ""}&nameOrPhone=${
           nameOrPhone || ""
-        }&page=${page}&limit=${itemsPerPage}`
+        }&status=${status}&page=${page}&limit=${itemsPerPage}`
       );
 
       // Check if response.data has the expected structure
@@ -75,17 +77,56 @@ const SalesHistory = () => {
         filterStartDate,
         filterEndDate,
         searchTerm,
-        currentPage
+        currentPage,
+        activeTab
       );
     } else {
-      fetchSalesByPage(currentPage);
+      fetchSalesByPage(currentPage, activeTab);
     }
-  }, [searchTerm, filterStartDate, filterEndDate, currentPage]);
+  }, [searchTerm, filterStartDate, filterEndDate, currentPage, activeTab]);
 
-  const onEdit = (id) => {
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setCurrentPage(1);
+  };
+
+  const isFiltering = searchTerm || filterStartDate || filterEndDate;
+  const headers = [
+    "No.",
+    "Product",
+    "Client",
+    "Quantity",
+    "Total amount",
+    "Profit",
+    "Payment",
+    "Type",
+    "Contact",
+  ];
+  if (isFiltering) {
+    headers.push("Status");
+  }
+  if (activeTab === "Pending") {
+    headers.push("Change Status");
+  }
+  headers.push("Action");
+
+  const onDetail = (id) => {
     navigate(`/sales-detail/${id}`);
   };
 
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      await axios.patch(`http://localhost:5000/sales/change-status/${id}`, { status: newStatus });
+      // Refetch the data
+      if (searchTerm || filterStartDate || filterEndDate) {
+        fetchSalesByFilter(filterStartDate, filterEndDate, searchTerm, currentPage, activeTab);
+      } else {
+        fetchSalesByPage(currentPage, activeTab);
+      }
+    } catch (error) {
+      console.error("Error changing status:", error);
+    }
+  };
   // Pagination handler
   const handlePageChange = (page) => {
     if (page > 0 && page <= totalPages) {
@@ -110,6 +151,30 @@ const SalesHistory = () => {
             <FaCalendar size={18} />
           </button>
         </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex space-x-4 mt-4">
+        <button
+          onClick={() => handleTabChange("Completed")}
+          className={`px-4 py-2 rounded-md font-medium ${
+            activeTab === "Completed"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          }`}
+        >
+          Completed
+        </button>
+        <button
+          onClick={() => handleTabChange("Pending")}
+          className={`px-4 py-2 rounded-md font-medium ${
+            activeTab === "Pending"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+          }`}
+        >
+          Pending
+        </button>
       </div>
 
       {/* Search and Filter Section */}
@@ -173,17 +238,7 @@ const SalesHistory = () => {
         <table className="min-w-full">
           <thead className="bg-gray-50">
             <tr>
-              {[
-                "No.",
-                "Product",
-                "Client",
-                "Quantity",
-                "Total amount",
-                "Payment",
-                "Type",
-                "Contact",
-                "Action",
-              ].map((header) => (
+              {headers.map((header) => (
                 <th
                   key={header}
                   className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -214,6 +269,11 @@ const SalesHistory = () => {
                 <td className="py-4 px-4 whitespace-nowrap">
                   {sale.Total_amount}
                 </td>
+<td className="py-4 px-4 whitespace-nowrap">
+  {sale.Total_amount != null && sale.Total_cost != null
+    ? sale.Total_amount - sale.Total_cost
+    : ""}
+</td>
                 <td className="py-4 px-4 whitespace-nowrap">
                   {sale.Payment_method}
                 </td>
@@ -221,9 +281,26 @@ const SalesHistory = () => {
                   {sale.Sale_type}
                 </td>
                 <td className="py-4 px-4 whitespace-nowrap">{sale.Contact}</td>
+                {isFiltering && (
+                  <td className="py-4 px-4 whitespace-nowrap">
+                    {sale.Status}
+                  </td>
+                )}
+                {activeTab === "Pending" && (
+                  <td className="py-4 px-4 whitespace-nowrap">
+                    <select
+                      value={sale.Status}
+                      onChange={(e) => handleStatusChange(sale.id, e.target.value)}
+                      className="border border-gray-300 rounded px-2 py-1 text-sm"
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </td>
+                )}
                 <td className="py-4 px-4 whitespace-nowrap">
                   <button
-                    onClick={() => onEdit(sale.id)}
+                    onClick={() => onDetail(sale.id)}
                     className="text-blue-600 hover:text-blue-800 font-medium"
                   >
                     View Details
