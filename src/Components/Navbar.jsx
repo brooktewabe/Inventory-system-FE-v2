@@ -256,7 +256,7 @@ const Navbar = () => {
         isOpen={modalIsOpen}
         onRequestClose={() => setModalIsOpen(false)}
         contentLabel="Confirm Logout"
-        className="bg-white p-6 rounded-lg shadow-md w-4/5 md:w-1/3 mx-auto mr-4"
+        className="bg-white p-6 rounded-lg shadow-md w-4/5 md:w-1/3 mx-auto"
         overlayClassName="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center"
       >
         <div className="text-center mb-4">
