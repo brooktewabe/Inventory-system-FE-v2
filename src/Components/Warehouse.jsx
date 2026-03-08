@@ -99,6 +99,8 @@ const Inventory = () => {
             },
           })
           toast.success("Deleted Successfully")
+          // Refresh the stock list after deletion
+          fetchStocks(currentPage)
         } catch (error) {
           toast.error("Error deleting stock. Try again later.")
         }

@@ -60,6 +60,7 @@ const AddProduct = () => {
     Location: "",
     // Category: "",
     Price: "",
+    Cost: "",
     Curent_stock: "",
     Restock_level: "",
     ...customInitialValues,
@@ -73,6 +74,10 @@ const AddProduct = () => {
       Price: Yup.number()
         .required("Required")
         .positive("Must be greater than zero"),
+      Cost: Yup.number()
+        .required("Required")
+        .positive("Must be greater than zero")
+        .lessThan(Yup.ref("Price"), "Cost must be less than price"),
       Curent_stock: Yup.number()
         .required("Required")
         .positive("Must be greater than zero"),
@@ -104,6 +109,7 @@ const AddProduct = () => {
     formData.append("Location", values.Location);
     // formData.append("Category", values.Category);
     formData.append("Price", values.Price);
+    formData.append("Cost", values.Cost);
     formData.append("Curent_stock", values.Curent_stock);
     formData.append("Restock_level", values.Restock_level);
     formData.append("storageLocation", "Store");
@@ -247,6 +253,20 @@ const AddProduct = () => {
                         />
                         <ErrorMessage
                           name="Price"
+                          component="div"
+                          className="text-red-600 text-sm mt-1"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm mb-1">Cost</label>
+                        <Field
+                          name="Cost"
+                          placeholder="Enter Cost"
+                          type="number"
+                          className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        />
+                        <ErrorMessage
+                          name="Cost"
                           component="div"
                           className="text-red-600 text-sm mt-1"
                         />
