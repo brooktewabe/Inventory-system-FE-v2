@@ -3,9 +3,8 @@ import Swal from "sweetalert2";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { useFormik } from "formik";
-import icon from "../assets/user.png";
 import * as Yup from "yup";
 import { FaInfoCircle, FaUpload } from "react-icons/fa";
 import { AiFillCaretDown } from "react-icons/ai";
@@ -151,7 +150,7 @@ const EditProduct = () => {
   if (!stock) return <div><Spinner/></div>;
 
   return (
-    <section className="bg-[#edf0f0b9] h-screen">
+    <section className="bg-[#edf0f0b9] h-full">
       <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-6">
         <div className="bg-white flex justify-between items-center mr-2 p-1">
@@ -186,9 +185,17 @@ const EditProduct = () => {
         </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md max-w-[70%] ml-20">
-            <div className="flex items-center mb-6 pb-2 border-b">
-              <FaInfoCircle className="text-blue-600 mr-2" />
-              <h2 className="text-lg font-medium">Edit Product </h2>
+            <div className="flex items-center justify-between mb-6 pb-2 border-b">
+              <div className="flex items-center">
+                <FaInfoCircle className="text-blue-600 mr-2" />
+                <h2 className="text-lg font-medium">Edit Product</h2>
+              </div>
+
+              <p className="text-xs text-blue-600 underline cursor-pointer">
+                <span onClick={() => navigate('/add-purchase-requisition', { state: { type: stock.storageLocation == "Store" ? "store" : "warehouse" } })}>
+                  Add Stock
+                </span>
+              </p>
             </div>
             <h3 className="text-xl font-bold mb-4">Edit Product</h3>
             <form onSubmit={formik.handleSubmit}>
@@ -342,17 +349,10 @@ const EditProduct = () => {
                     <input
                       type="number"
                       name="Curent_stock"
+                      disabled
                       value={formik.values.Curent_stock}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      className="mt-1 block w-full border border-gray-300 rounded-lg p-2"
+                      className="mt-1 block w-full border border-gray-100 rounded-lg p-2 bg-gray-50 cursor-not-allowed"
                     />
-                    {formik.touched.Curent_stock &&
-                      formik.errors.Curent_stock && (
-                        <div className="text-red-600 text-sm">
-                          {formik.errors.Curent_stock}
-                        </div>
-                      )}
                   </div>
                   <div>
                     <label className="block text-sm mt-4 font-medium text-gray-700">
@@ -443,7 +443,6 @@ const EditProduct = () => {
           </div>
         </div>
       </div>
-      <ToastContainer />
     </section>
   );
 };

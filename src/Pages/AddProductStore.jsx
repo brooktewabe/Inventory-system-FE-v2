@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
@@ -61,7 +61,7 @@ const AddProduct = () => {
     // Category: "",
     Price: "",
     Cost: "",
-    Curent_stock: "",
+    Curent_stock: 0,
     Restock_level: "",
     ...customInitialValues,
   };
@@ -78,16 +78,10 @@ const AddProduct = () => {
         .required("Required")
         .positive("Must be greater than zero")
         .lessThan(Yup.ref("Price"), "Cost must be less than price"),
-      Curent_stock: Yup.number()
-        .required("Required")
-        .positive("Must be greater than zero"),
+      Curent_stock: Yup.number().min(0, "Must be at least 0").required("Required"),
       Restock_level: Yup.number()
         .required("Required")
-        .positive("Must be greater than zero")
-        .lessThan(
-          Yup.ref("Curent_stock"),
-          "Stock must be greater than restock level"
-        ),
+        .positive("Must be greater than zero"),
     };
 
   const customSchema = customColumns.reduce((acc, col) => {
@@ -124,7 +118,7 @@ const AddProduct = () => {
 
     try {
       // Create the product
-        await axios.post(
+      const response = await axios.post(
         "http://apiv2.cnhtc4.com/stock/create",
         formData,
         {
@@ -133,6 +127,7 @@ const AddProduct = () => {
           },
         }
       );
+      const createdId = response.data.id;
       // Create movement data
       const mvtData = {
         User: `${name}`,
@@ -154,12 +149,19 @@ const AddProduct = () => {
 
       Swal.fire({
         title: "Success!",
-        text: "Product added successfully.",
+        text: "Product added successfully with 0 stock. Do you want to add stock now?",
         icon: "success",
+        showCancelButton: true,
         confirmButtonColor: "#2563eb",
-        confirmButtonText: "OK",
-      }).then(() => {
-        navigate("/");
+        cancelButtonColor: "#6b7280",
+        confirmButtonText: "Yes, Add Stock",
+        cancelButtonText: "No, Later",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/add-purchase-requisition", { state: { type: "store", stockId: createdId } });
+        } else {
+          navigate("/");
+        }
         toast.success("Created Successfully");
       });
     } catch (error) {
@@ -253,20 +255,6 @@ const AddProduct = () => {
                         />
                         <ErrorMessage
                           name="Price"
-                          component="div"
-                          className="text-red-600 text-sm mt-1"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm mb-1">Cost</label>
-                        <Field
-                          name="Cost"
-                          placeholder="Enter Cost"
-                          type="number"
-                          className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        />
-                        <ErrorMessage
-                          name="Cost"
                           component="div"
                           className="text-red-600 text-sm mt-1"
                         />
@@ -381,21 +369,6 @@ const AddProduct = () => {
                     {/* Right Column */}
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm mb-1">Stock Amount</label>
-                        <Field
-                          name="Curent_stock"
-                          placeholder="Enter Stock Amount"
-                          type="number"
-                          className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        />
-                        <ErrorMessage
-                          name="Current_stock"
-                          component="div"
-                          className="text-red-600 text-sm mt-1"
-                        />
-                      </div>
-
-                      <div>
                         <label className="block text-sm mb-1">Location</label>
                         <Field
                           name="Location"
@@ -405,6 +378,20 @@ const AddProduct = () => {
                         />
                         <ErrorMessage
                           name="Location"
+                          component="div"
+                          className="text-red-600 text-sm mt-1"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm mb-1">Cost</label>
+                        <Field
+                          name="Cost"
+                          placeholder="Enter Cost"
+                          type="number"
+                          className="w-full py-2 px-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        />
+                        <ErrorMessage
+                          name="Cost"
                           component="div"
                           className="text-red-600 text-sm mt-1"
                         />
@@ -494,7 +481,6 @@ const AddProduct = () => {
           </div>
         </div>
       </div>
-    <ToastContainer/>
     </section>
   );
 };

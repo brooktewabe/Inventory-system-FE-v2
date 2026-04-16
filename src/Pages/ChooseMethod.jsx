@@ -17,6 +17,10 @@ const Choose = () => {
     navigate("/import");
   };
 
+  const handleRequisition = () => {
+    navigate("/add-purchase-requisition", { state: { type: "store" } });
+  };
+
   return (
     <section className="bg-[#edf0f0b9] min-h-screen">
       <div className="container m-auto">
@@ -54,7 +58,7 @@ const Choose = () => {
         </div>
 
           {/* Add Product Section */}
-          <div className="bg-white p-6 rounded-lg shadow-sm max-w-3xl mx-auto">
+          <div className="bg-white p-6 rounded-lg shadow-sm max-w-5xl mx-auto">
             {/* Header with info icon */}
             <div className="flex items-center mb-6 pb-2 border-b">
               <FaInfoCircle className="text-blue-600 mr-2" />
@@ -64,7 +68,7 @@ const Choose = () => {
             <h3 className="text-lg font-medium mb-4">Choose option</h3>
             
             {/* Option Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Fill Input Option */}
               <div 
                 onClick={handleInput}
@@ -92,7 +96,20 @@ const Choose = () => {
                   Use this feature to bulk upload product or inventory data using a pre-defined Excel template. Please follows the required format, including columns like Product Name, Quantity, Unit Price, and Category.
                 </p>
               </div>
+            {/* Purchase Requisition Option */}
+            <div 
+              onClick={handleRequisition}
+              className="border border-gray-200 rounded-lg p-4 cursor-pointer hover:border-blue-500 transition-colors"
+            >
+              <div className="text-blue-600 mb-2">
+                <BsListCheck size={24} className="rotate-180" />
+              </div>
+              <h4 className="font-medium mb-2">Purchase Requisition</h4>
+              <p className="text-sm text-gray-600">
+                Use this to record formal stock acquisitions from suppliers. It requires details like supplier name, TIN, and cost.
+              </p>
             </div>
+          </div>
           </div>
         </div>
       </div>

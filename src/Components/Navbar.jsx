@@ -7,9 +7,9 @@ import {
   AiFillSetting,
   AiOutlineShop,
   AiOutlineBell,
-  AiOutlineContacts
+  AiOutlineContacts,
 } from "react-icons/ai";
-import { BiHorizontalCenter } from "react-icons/bi";
+import { BiHorizontalCenter, BiPurchaseTagAlt } from "react-icons/bi";
 import { CiLogout } from "react-icons/ci";
 import { useNavigate, NavLink, useLocation } from "react-router-dom";
 import { BiSolidDashboard } from "react-icons/bi";
@@ -101,6 +101,11 @@ const Navbar = () => {
       icon: <BiHorizontalCenter size={20} className={isMobile ? "" : "mr-4"} />,
       text: "Stock Movement",
       link: "/stock-movement",
+    },
+    {
+      icon: <BiPurchaseTagAlt size={20} className={isMobile ? "" : "mr-4"} />,
+      text: "Aquisition History",
+      link: "/purchase-requisition",
     },
   ];
 

@@ -13,6 +13,8 @@ const ViewProduct = () => {
   const { id } = useParams();
   const [stock, setStock] = useState(null);
   const [customColumns, setCustomColumns] = useState([]);
+  const [acquisitions, setAcquisitions] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const role = localStorage.getItem("role");
   const name = localStorage.getItem("name");
   
@@ -20,10 +22,13 @@ const ViewProduct = () => {
     const fetchData = async () => {
       try {
         // Fetch both resources in parallel
-        const [stockResponse, columnsResponse] = await Promise.all([
+        const [stockResponse, columnsResponse, historyResponse] = await Promise.all([
           axios.get(`http://apiv2.cnhtc4.com/stock/all/${id}`),
-          axios.get("http://apiv2.cnhtc4.com/custom-product-columns/all")
+          axios.get("http://apiv2.cnhtc4.com/custom-product-columns/all"),
+          axios.get(`http://apiv2.cnhtc4.com/purchase-requisition/stock/${id}/history`)
         ]);
+        const historyData = historyResponse.data.data || historyResponse.data || [];
+        setAcquisitions(historyData);
         
         const productData = stockResponse.data;
         const columns = columnsResponse.data;
@@ -79,7 +84,7 @@ const ViewProduct = () => {
   if (!stock) return <div><Spinner/></div>;
 
   return (
-    <section className="bg-[#edf0f0b9] h-full md:h-screen">
+    <section className="bg-[#edf0f0b9] h-full">
       <div className="container m-auto ">
         <div className="grid grid-cols-1 gap-6">
         <div className="bg-white flex justify-between items-center mr-2 p-1">
@@ -242,8 +247,72 @@ const ViewProduct = () => {
                   ))}
                 </div>
               </div>
-
             </form>
+            <div className="mt-4">
+              <hr />
+            </div>
+            {/* Acquisition History Table */}
+            <div className="mt-4">
+              <h3 className="text-xl mb-4 ml-4 font-semibold">Acquisition History</h3>
+              <div className="bg-white rounded-md shadow-sm overflow-hidden ml-4 mr-4 mb-6">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Date</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Supplier</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Quantity</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Cost</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Receipt</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Location</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-100">
+                      {historyLoading ? (
+                        <tr>
+                          <td colSpan="6" className="px-4 py-3 text-center text-sm text-gray-900">
+                            <Spinner />
+                          </td>
+                        </tr>
+                      ) : acquisitions.length === 0 ? (
+                        <tr>
+                          <td colSpan="6" className="px-4 py-3 text-center text-sm text-gray-900 text-gray-400 italic">
+                            No acquisition history found.
+                          </td>
+                        </tr>
+                      ) : (
+                        acquisitions.map((acquisition, index) => (
+                          <tr key={acquisition.id || index} className="hover:bg-gray-50">
+                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                              {acquisition.purchaseDate || acquisition.date || 'N/A'}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                              {acquisition.supplierName || 'N/A'}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 font-semibold text-blue-600">
+                              {parseInt(acquisition.stockQuantity) || parseInt(acquisition.quantity )|| 0}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 font-semibold">
+                              {acquisition.purchaseCost || acquisition.cost || 0}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 font-mono">
+                              {acquisition.receiptNumber || acquisition.receipt || 'N/A'}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                              <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                (acquisition.location === 'Store' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700')
+                              }`}>
+                                {acquisition.location || 'N/A'}
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

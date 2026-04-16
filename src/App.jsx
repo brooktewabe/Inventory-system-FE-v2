@@ -32,6 +32,9 @@ import WarehouseDashboard from "./Pages/WarehouseDashboard";
 import UnauthorizedAccess from "./Components/UnauthorizedAccess";
 import ForgotPassword from "./Pages/ForgotPassword";
 import ResetPassword from "./Pages/ResetPassword";
+import PurchaseRequisition from "./Pages/PurchaseRequisition";
+import AddPurchaseRequisition from "./Pages/AddPurchaseRequisition";
+
 
 const App = () => {
 
@@ -76,6 +79,14 @@ const App = () => {
         <Route
           path='/import'
           element={<ProtectedRoute element={ImportExcel} requiredPermissions={['add']} />}
+        />
+        <Route
+          path='/purchase-requisition'
+          element={<ProtectedRoute element={PurchaseRequisition} requiredPermissions={['add']} />}
+        />
+        <Route
+          path='/add-purchase-requisition'
+          element={<ProtectedRoute element={AddPurchaseRequisition} requiredPermissions={['add']} />}
         />
 
         {/* permission - store */}
