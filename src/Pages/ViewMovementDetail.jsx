@@ -24,7 +24,7 @@ const ViewMovementDetail = () => {
   useEffect(() => {
     const fetchMovement= async () => {
       try {
-        const response = await axios.get(`http://apiv2.cnhtc4.com/movement/${id}`);
+        const response = await axios.get(`https://apiv2.cnhtc4.com/movement/${id}`);
         setMovement(response.data);
       } catch (error) {
         console.error("Error fetching details:", error);

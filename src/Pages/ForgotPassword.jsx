@@ -17,7 +17,7 @@ const ForgotPassword = () => {
 
     setLoading(true)
     try {
-      await axios.post("http://apiv2.cnhtc4.com/forgot-password", { email })
+      await axios.post("https://apiv2.cnhtc4.com/forgot-password", { email })
       toast.success("Reset link sent! Check your inbox.")
       navigate('/')
       setEmail("")

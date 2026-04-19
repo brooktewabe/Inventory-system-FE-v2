@@ -45,7 +45,7 @@ const ValidatedLoginForm = () => {
     }
 
     try {
-      const response = await axios.post("http://apiv2.cnhtc4.com/login", {
+      const response = await axios.post("https://apiv2.cnhtc4.com/login", {
         email,
         password,
       })

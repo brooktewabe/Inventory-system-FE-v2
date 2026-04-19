@@ -20,7 +20,7 @@ const StockMovement = () => {
  
     const fetchMovements = async (startDate,endDate,page) => {
       try {
-        const response = await axios.get(`http://apiv2.cnhtc4.com/movement/all?startDate=${startDate || ""}&endDate=${endDate || ""}&page=${page}&limit=${itemsPerPage}`);
+        const response = await axios.get(`https://apiv2.cnhtc4.com/movement/all?startDate=${startDate || ""}&endDate=${endDate || ""}&page=${page}&limit=${itemsPerPage}`);
         setMovements(response.data.data);
         setFilteredMovements(response.data.data);
         const totalCount = response.data.total;

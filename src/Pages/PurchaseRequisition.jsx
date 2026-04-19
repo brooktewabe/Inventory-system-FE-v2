@@ -25,8 +25,8 @@ const PurchaseRequisitionList = () => {
     setLoading(true);
     try {
       const endpoint = query 
-        ? `http://apiv2.cnhtc4.com/purchase-requisition/all?page=${page}&limit=${itemsPerPage}&search=${query}`
-        : `http://apiv2.cnhtc4.com/purchase-requisition/all?page=${page}&limit=${itemsPerPage}`;
+        ? `https://apiv2.cnhtc4.com/purchase-requisition/all?page=${page}&limit=${itemsPerPage}&search=${query}`
+        : `https://apiv2.cnhtc4.com/purchase-requisition/all?page=${page}&limit=${itemsPerPage}`;
         
       const response = await axios.get(endpoint);
       setHistory(response.data.data || []);
@@ -175,7 +175,7 @@ const PurchaseRequisitionList = () => {
                           {item.receiptImage && (
                             <div className="flex items-center gap-2">
                               <img 
-                                src={`http://apiv2.cnhtc4.com/uploads/${item.receiptImage}`} 
+                                src={`https://apiv2.cnhtc4.com/uploads/${item.receiptImage}`} 
                                 alt="Receipt" 
                                 className="w-12 h-12 object-cover rounded border"
                                 onError={(e) => { e.target.style.display = 'none'; }}

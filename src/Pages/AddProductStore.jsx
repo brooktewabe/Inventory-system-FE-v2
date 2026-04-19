@@ -26,7 +26,7 @@ const AddProduct = () => {
   useEffect(() => {
     const fetchInfo = async () => {
       try {
-        const response = await axios.get(`http://apiv2.cnhtc4.com/user/${uid}`);
+        const response = await axios.get(`https://apiv2.cnhtc4.com/user/${uid}`);
         setUser(response.data);
       } catch (error) {
         console.error("Error fetching details:", error);
@@ -40,7 +40,7 @@ const AddProduct = () => {
     const fetchColumns = async () => {
       try {
         const response = await axios.get(
-          "http://apiv2.cnhtc4.com/custom-product-columns/all"
+          "https://apiv2.cnhtc4.com/custom-product-columns/all"
         );
         setCustomColumns(response.data);
       } catch (error) {
@@ -119,7 +119,7 @@ const AddProduct = () => {
     try {
       // Create the product
       const response = await axios.post(
-        "http://apiv2.cnhtc4.com/stock/create",
+        "https://apiv2.cnhtc4.com/stock/create",
         formData,
         {
           headers: {
@@ -138,7 +138,7 @@ const AddProduct = () => {
 
       // Post movement data
         await axios.post(
-        "http://apiv2.cnhtc4.com/movement/create",
+        "https://apiv2.cnhtc4.com/movement/create",
         mvtData,
         {
           headers: {

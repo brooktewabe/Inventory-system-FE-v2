@@ -29,7 +29,7 @@ const Inventory = () => {
 
   const fetchStocks = async (page) => {
     try {
-      const response = await axios.get(`http://apiv2.cnhtc4.com/stock/all/warehouse?page=${page}&limit=${itemsPerPage}`)
+      const response = await axios.get(`https://apiv2.cnhtc4.com/stock/all/warehouse?page=${page}&limit=${itemsPerPage}`)
       setStocks(response.data.data)
       setFilteredStocks(response.data.data)
       const totalCount = response.data.total
@@ -57,7 +57,7 @@ const Inventory = () => {
   useEffect(() => {
     const fetchFilteredStocks = async () => {
       try {
-        const response = await axios.get(`http://apiv2.cnhtc4.com/stock/search?query=${debouncedSearchTerm}&location=warehouse`)
+        const response = await axios.get(`https://apiv2.cnhtc4.com/stock/search?query=${debouncedSearchTerm}&location=warehouse`)
         setFilteredStocks(response.data)
       } catch (error) {
         console.error("Error fetching filtered stocks:", error)
@@ -86,16 +86,16 @@ const Inventory = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.get(`http://apiv2.cnhtc4.com/stock/all/${id}`)
+          const response = await axios.get(`https://apiv2.cnhtc4.com/stock/all/${id}`)
           const stockToDelete = response.data
-          await axios.delete(`http://apiv2.cnhtc4.com/stock/all/${id}`)
+          await axios.delete(`https://apiv2.cnhtc4.com/stock/all/${id}`)
           setStocks(stocks.filter((stock) => stock.id !== id))
           const notifData = new FormData()
           notifData.append("message", `${stockToDelete.Name} is deleted.`)
           notifData.append("priority", "High")
 
           // Post notification data
-          await axios.post("http://apiv2.cnhtc4.com/notification/create", notifData, {
+          await axios.post("https://apiv2.cnhtc4.com/notification/create", notifData, {
             headers: {
               "Content-Type": "application/json",
             },
@@ -138,7 +138,7 @@ const Inventory = () => {
 
     try {
       const response = await axios.patch(
-        `http://apiv2.cnhtc4.com/stock/move-stock?name=${selectedStockName}&quantity=${moveQuantity}`,
+        `https://apiv2.cnhtc4.com/stock/move-stock?name=${selectedStockName}&quantity=${moveQuantity}`,
       )
 
       setIsDialogOpen(false)
@@ -149,7 +149,7 @@ const Inventory = () => {
       notifData.append("message", `${moveQuantity} units of ${selectedStockName} moved to store.`)
       notifData.append("priority", "Medium")
 
-      await axios.post("http://apiv2.cnhtc4.com/notification/create", notifData, {
+      await axios.post("https://apiv2.cnhtc4.com/notification/create", notifData, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -326,7 +326,7 @@ const Inventory = () => {
                             className="size-10"
                             src={
                               stock.Product_image
-                                ? `http://apiv2.cnhtc4.com/uploads/${stock.Product_image}`
+                                ? `https://apiv2.cnhtc4.com/uploads/${stock.Product_image}`
                                 : "/src/assets/Placeholder.png"
                             }
                             alt="Stock Image"

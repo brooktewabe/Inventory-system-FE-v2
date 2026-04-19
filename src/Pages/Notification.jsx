@@ -18,7 +18,7 @@ const Notification = () => {
   const fetchNotifications = async (page = 1) => {
     setIsLoading(true)
     try {
-      let url = `http://apiv2.cnhtc4.com/notification/all?page=${page}&limit=${itemsPerPage}`
+      let url = `https://apiv2.cnhtc4.com/notification/all?page=${page}&limit=${itemsPerPage}`
 
       if (searchTerm) {
         url += `&search=${searchTerm}`

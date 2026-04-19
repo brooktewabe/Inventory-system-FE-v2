@@ -17,7 +17,7 @@ const CmsDetails = () => {
 
     const fetchCustomer = async () => {
       try {
-        const res = await axios.get(`http://apiv2.cnhtc4.com/sales/search/find?nameOrPhone=${id}&page=${currentPage}&limit=${entriesPerPage}`);
+        const res = await axios.get(`https://apiv2.cnhtc4.com/sales/search/find?nameOrPhone=${id}&page=${currentPage}&limit=${entriesPerPage}`);
         setPurchaseHistoryData(res.data);
         setTotal(res.data.total);
       } catch (err) {

@@ -43,7 +43,7 @@ const EditProduct = () => {
       try {
         if(formik.values.Return_reason!='faulty'){
           const response = await axios.patch(
-            `http://apiv2.cnhtc4.com/stock/all/${id}`,
+            `https://apiv2.cnhtc4.com/stock/all/${id}`,
             formData,
             {
               headers: {
@@ -65,7 +65,7 @@ const EditProduct = () => {
         salesData.append("Return_reason",  formik.values.Return_reason);
 
 
-        await axios.post("http://apiv2.cnhtc4.com/sales/create", salesData, {
+        await axios.post("https://apiv2.cnhtc4.com/sales/create", salesData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
 
@@ -77,7 +77,7 @@ const EditProduct = () => {
         mvtData.append("Type", "Return");
 
         // Post movement data
-        await axios.post("http://apiv2.cnhtc4.com/movement/create", mvtData, {
+        await axios.post("https://apiv2.cnhtc4.com/movement/create", mvtData, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -89,7 +89,7 @@ const EditProduct = () => {
         notifData.append("priority", "High");
 
         // Post notification data
-        await axios.post("http://apiv2.cnhtc4.com/notification/create", notifData, {
+        await axios.post("https://apiv2.cnhtc4.com/notification/create", notifData, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -115,7 +115,7 @@ const EditProduct = () => {
   useEffect(() => {
     const fetchStock = async () => {
       try {
-        const response = await axios.get(`http://apiv2.cnhtc4.com/stock/all/${id}`);
+        const response = await axios.get(`https://apiv2.cnhtc4.com/stock/all/${id}`);
         setStock(response.data);
         formik.setValues({
           Name: response.data.Name,
@@ -142,7 +142,7 @@ const EditProduct = () => {
   useEffect(() => {
     const fetchInfo = async () => {
       try {
-        const response = await axios.get(`http://apiv2.cnhtc4.com/user/${uid}`);
+        const response = await axios.get(`https://apiv2.cnhtc4.com/user/${uid}`);
         setUser(response.data);
       } catch (error) {
         console.error("Error fetching details:", error);

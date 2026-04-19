@@ -40,8 +40,8 @@ const EditProduct = () => {
       try {
         // Fetch both resources in parallel
         const [stockResponse, columnsResponse] = await Promise.all([
-          axios.get(`http://apiv2.cnhtc4.com/stock/all/${id}`),
-          axios.get("http://apiv2.cnhtc4.com/custom-product-columns/all")
+          axios.get(`https://apiv2.cnhtc4.com/stock/all/${id}`),
+          axios.get("https://apiv2.cnhtc4.com/custom-product-columns/all")
         ]);
         
         const productData = stockResponse.data;
@@ -114,12 +114,12 @@ const EditProduct = () => {
         }  
       });  
       try {
-        await axios.patch(`http://apiv2.cnhtc4.com/stock/all/${id}`, formData, {
+        await axios.patch(`https://apiv2.cnhtc4.com/stock/all/${id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });  
 
         if (values.Curent_stock < values.Restock_level) {
-          await axios.post("http://apiv2.cnhtc4.com/notification/create", {
+          await axios.post("https://apiv2.cnhtc4.com/notification/create", {
             message: `${stock.Name} is running low on stock.`,
             priority: "High",
           });  

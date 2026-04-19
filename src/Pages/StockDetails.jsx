@@ -23,9 +23,9 @@ const ViewProduct = () => {
       try {
         // Fetch both resources in parallel
         const [stockResponse, columnsResponse, historyResponse] = await Promise.all([
-          axios.get(`http://apiv2.cnhtc4.com/stock/all/${id}`),
-          axios.get("http://apiv2.cnhtc4.com/custom-product-columns/all"),
-          axios.get(`http://apiv2.cnhtc4.com/purchase-requisition/stock/${id}/history`)
+          axios.get(`https://apiv2.cnhtc4.com/stock/all/${id}`),
+          axios.get("https://apiv2.cnhtc4.com/custom-product-columns/all"),
+          axios.get(`https://apiv2.cnhtc4.com/purchase-requisition/stock/${id}/history`)
         ]);
         const historyData = historyResponse.data.data || historyResponse.data || [];
         setAcquisitions(historyData);
@@ -303,7 +303,7 @@ const ViewProduct = () => {
                               {acquisition.receiptImage && (
                                 <div className="flex items-center gap-2">
                                   <img 
-                                    src={`http://apiv2.cnhtc4.com/uploads/${acquisition.receiptImage}`} 
+                                    src={`https://apiv2.cnhtc4.com/uploads/${acquisition.receiptImage}`} 
                                     alt="Receipt" 
                                     className="w-12 h-12 object-cover rounded border"
                                     onError={(e) => { e.target.style.display = 'none'; }}

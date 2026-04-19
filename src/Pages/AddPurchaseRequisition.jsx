@@ -30,7 +30,7 @@ const AddPurchaseRequisition = () => {
 
   const fetchProducts = async (type) => {
     try {
-      const endpoint = `http://apiv2.cnhtc4.com/stock/all/${type}`;
+      const endpoint = `https://apiv2.cnhtc4.com/stock/all/${type}`;
       const response = await axios.get(endpoint);
       const data = response.data.data || response.data;
       setProducts(data);
@@ -81,7 +81,7 @@ const AddPurchaseRequisition = () => {
       }
 
       await axios.post(
-        "http://apiv2.cnhtc4.com/purchase-requisition/create",
+        "https://apiv2.cnhtc4.com/purchase-requisition/create",
         submitData,
         {
           headers: { "Content-Type": "multipart/form-data" },

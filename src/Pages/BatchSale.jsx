@@ -47,7 +47,7 @@ const RecordSale = () => {
   useEffect(() => {
     const fetchStock = async () => {
       try {
-        const response = await axios.get("http://apiv2.cnhtc4.com/stock/all/store");
+        const response = await axios.get("https://apiv2.cnhtc4.com/stock/all/store");
         setSale(response.data.data);
       } catch (error) {
         console.error("Error fetching stock:", error);
@@ -141,7 +141,7 @@ const RecordSale = () => {
         if (originalStockItem) {
           // Restore stock quantity
           const restoredQuantity = Number(originalStockItem.Curent_stock) + Number(itemToRemove.quantity);
-          await axios.patch(`http://apiv2.cnhtc4.com/stock/all/sale/${originalStockItem.id}`, {
+          await axios.patch(`https://apiv2.cnhtc4.com/stock/all/sale/${originalStockItem.id}`, {
             Curent_stock: restoredQuantity,
             Name: originalStockItem.Name,
           });
@@ -266,12 +266,12 @@ const RecordSale = () => {
 
     try {
       // Send the POST request for the current item
-      await axios.post("http://apiv2.cnhtc4.com/sales/create", saleData, {
+      await axios.post("https://apiv2.cnhtc4.com/sales/create", saleData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       // Update stock quantity
       const newQuantity = selectedItem.Curent_stock - currentItem.quantity;
-      await axios.patch(`http://apiv2.cnhtc4.com/stock/all/sale/${selectedItem.id}`, {
+      await axios.patch(`https://apiv2.cnhtc4.com/stock/all/sale/${selectedItem.id}`, {
         Curent_stock: newQuantity,
         Name: selectedItem.Name,
       });
@@ -286,7 +286,7 @@ const RecordSale = () => {
       );
 
       if (newQuantity < selectedItem.Restock_level) {
-        await axios.post("http://apiv2.cnhtc4.com/notification/create", {
+        await axios.post("https://apiv2.cnhtc4.com/notification/create", {
           message: `${selectedItem.Name} is running low on stock.`,
           priority: "High",
         });
@@ -370,7 +370,7 @@ const RecordSale = () => {
 
     try {
       const response = await axios.post(
-        "http://apiv2.cnhtc4.com/sales/create",
+        "https://apiv2.cnhtc4.com/sales/create",
         combinedData,
         {
           headers: { "Content-Type": "multipart/form-data" },

@@ -20,7 +20,7 @@ const ManageOptions = () => {
   useEffect(() => {
     const fetchFields = async () => {
       try {
-        const res = await axios.get("http://apiv2.cnhtc4.com/custom-product-columns/all")
+        const res = await axios.get("https://apiv2.cnhtc4.com/custom-product-columns/all")
         setFields(res.data)
         setLoading(false)
       } catch (error) {
@@ -69,7 +69,7 @@ const ManageOptions = () => {
       }
 
       // Send POST request to create the field
-      const response = await axios.post("http://apiv2.cnhtc4.com/custom-product-columns/create", fieldData)
+      const response = await axios.post("https://apiv2.cnhtc4.com/custom-product-columns/create", fieldData)
 
       // Update the fields list with the new field
       setFields([...fields, response.data])
@@ -98,7 +98,7 @@ const ManageOptions = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://apiv2.cnhtc4.com/custom-product-columns/${id}`)
+          await axios.delete(`https://apiv2.cnhtc4.com/custom-product-columns/${id}`)
           setFields(fields.filter((field) => field.id !== id))
           toast.success("Deleted successfully.")
         } catch (error) {
