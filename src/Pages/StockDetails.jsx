@@ -263,6 +263,7 @@ const ViewProduct = () => {
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Supplier</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Quantity</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Cost</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Receipt No.</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Receipt</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Location</th>
                       </tr>
@@ -297,6 +298,18 @@ const ViewProduct = () => {
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 font-mono">
                               {acquisition.receiptNumber || acquisition.receipt || 'N/A'}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 font-mono">
+                              {acquisition.receiptImage && (
+                                <div className="flex items-center gap-2">
+                                  <img 
+                                    src={`http://apiv2.cnhtc4.com/uploads/${acquisition.receiptImage}`} 
+                                    alt="Receipt" 
+                                    className="w-12 h-12 object-cover rounded border"
+                                    onError={(e) => { e.target.style.display = 'none'; }}
+                                  />
+                                </div>
+                              )}
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                               <span className={`px-2 py-1 rounded-full text-xs font-semibold ${

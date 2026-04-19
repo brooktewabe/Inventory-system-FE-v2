@@ -5,7 +5,9 @@ import { useNavigate } from "react-router-dom"
 import axios from "../axiosInterceptor"
 import withAuth from "../withAuth"
 import { FaEdit, FaTrash, FaSearch } from "react-icons/fa"
-import { PiKeyReturnBold, PiKeyReturnLight } from "react-icons/pi"
+import { PiKeyReturnLight } from "react-icons/pi"
+import { BiPurchaseTagAlt } from "react-icons/bi";
+
 
 const Inventory = () => {
   const navigate = useNavigate()
@@ -194,9 +196,14 @@ const Inventory = () => {
   const handleViewNavigation = (id) => {
     navigate(`/stock-details/${id}`)
   }
-  const handleReturnNavigation = (id) => {
-    navigate(`/return-product/${id}`)
-  }
+  const onPurchase = (id) => {
+    navigate("/add-purchase-requisition", {
+      state: {
+        stockId: id,
+        type: "warehouse",
+      },
+    });
+  };
   // Pagination handler
   const handlePageChange = (page) => {
     if (page > 0 && page <= totalPages) {
@@ -293,7 +300,7 @@ const Inventory = () => {
                 <thead className="bg-gray-100">
                   <tr>
                     <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">No.</td>
-                    <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">Product Image</td>
+                    {/* <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">Product Image</td> */}
 
                     <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">ID</td>
                     <td className="px-4 py-3 text-left text-xs font-medium text-gray-500">Category</td>
@@ -314,7 +321,7 @@ const Inventory = () => {
                           {(currentPage - 1) * itemsPerPage + index + 1}
                         </td>
 
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                        {/* <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                           <img
                             className="size-10"
                             src={
@@ -324,7 +331,7 @@ const Inventory = () => {
                             }
                             alt="Stock Image"
                           />
-                        </td>
+                        </td> */}
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                           {stock.Product_id}
                         </td>
@@ -346,11 +353,11 @@ const Inventory = () => {
                         </td>
                         <td className="border-b space-x-2">
                           <button
-                            onClick={() => handleReturnNavigation(stock.id)}
+                            onClick={() => onPurchase(stock.id)}
                             className="text-blue-500 hover:text-blue-700"
-                            title="Return Product"
+                            title="Purchase Requisition"
                           >
-                            <PiKeyReturnBold />
+                            <BiPurchaseTagAlt />
                           </button>
                           <button
                             onClick={() => onEditStock(stock.id)}

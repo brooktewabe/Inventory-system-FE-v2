@@ -193,9 +193,9 @@ const Sales = () => {
                     <th className="px-4 py-3 text-xs text-left font-medium text-gray-500">
                       No
                     </th>
-                    <th className="px-4 py-3 text-xs text-left font-medium text-gray-500">
+                    {/* <th className="px-4 py-3 text-xs text-left font-medium text-gray-500">
                       Product Image
-                    </th>
+                    </th> */}
                     <th className="px-4 py-3 text-xs text-left font-medium text-gray-500 ">
                       ID
                     </th>
@@ -228,9 +228,9 @@ const Sales = () => {
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                           {(currentPage - 1) * itemsPerPage + index + 1}
                         </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                    {/* <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                       <img className="size-10" src={stock.Product_image ? `http://apiv2.cnhtc4.com/uploads/${stock.Product_image}` : '/src/assets/Placeholder.png'} alt="Stock Image" />
-                    </td>
+                    </td> */}
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                         {stock.Product_id}
                       </td>

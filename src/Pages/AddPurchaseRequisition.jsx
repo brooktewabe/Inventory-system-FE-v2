@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import { FaInfoCircle, FaSearch, FaCalendarAlt, FaUser, FaFileInvoice, FaHashtag, FaWarehouse, FaMoneyBillWave, FaPercentage, FaArrowLeft } from "react-icons/fa";
+import { FaInfoCircle, FaSearch, FaCalendarAlt, FaUser, FaFileInvoice, FaHashtag, FaMoneyBillWave, FaPercentage, FaTimes, FaUpload } from "react-icons/fa";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Spinner from "../Components/Spinner";
@@ -17,6 +17,8 @@ const AddPurchaseRequisition = () => {
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [formData, setFormData] = useState({ Receipt: null, ReceiptPreview: null });
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
 
   // Pre-selected context: 'store' or 'warehouse'
   const contextType = location.state?.type || "store"; 
@@ -66,8 +68,26 @@ const AddPurchaseRequisition = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      await axios.post("http://apiv2.cnhtc4.com/purchase-requisition/create", values);
-      
+      const submitData = new FormData();
+
+      // append all normal fields
+      Object.keys(values).forEach(key => {
+        submitData.append(key, values[key]);
+      });
+
+      // append file separately
+      if (selectedReceipt) {
+        submitData.append("Receipt", selectedReceipt);
+      }
+
+      await axios.post(
+        "http://apiv2.cnhtc4.com/purchase-requisition/create",
+        submitData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
       Swal.fire({
         title: "Success!",
         text: "Purchase requisition recorded and stock updated.",
@@ -76,6 +96,7 @@ const AddPurchaseRequisition = () => {
       }).then(() => {
         navigate("/purchase-requisition");
       });
+
     } catch (error) {
       console.error("Error creating requisition:", error);
       toast.error(error.response?.data?.message || "Error creating requisition");
@@ -259,9 +280,70 @@ const AddPurchaseRequisition = () => {
                         />
                         <ErrorMessage name="purchaseCost" component="div" className="text-red-500 text-xs mt-1" />
                       </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1 flex items-center gap-1">
+                          <FaFileInvoice className="text-gray-400 text-xs" /> Receipt Image <ErrorMessage name="Receipt" component="span" className="text-red-500 text-xs ml-1" />
+                        </label>
+                        <div className="flex items-center gap-4">
+                          {/* Upload Button */}
+                          <div className="w-44">
+                            <input
+                              type="file"
+                              id="Receipt"
+                              name="Receipt"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  setSelectedReceipt(file);
+                                  const blobURL = URL.createObjectURL(file);
+                                  setFormData({
+                                    ...formData,
+                                    Receipt: file,
+                                    ReceiptPreview: blobURL,
+                                  });
+                                }
+                              }}
+                              className="hidden"
+                              accept="image/*"
+                            />
+                            <label
+                              htmlFor="Receipt"
+                              className="flex items-center justify-center gap-2 bg-blue-600 text-white py-2.5 px-4 rounded-md cursor-pointer hover:bg-blue-700 transition-all w-full text-sm font-medium"
+                            >
+                              <FaUpload size={16} />
+                              Choose Image
+                            </label>
+                          </div>
+                          
+                          {/* Image Preview */}
+                          {formData.ReceiptPreview && (
+                            <div className="flex items-center gap-2">
+                              <div 
+                                className="w-20 h-20 border-2 border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-blue-400 hover:shadow-md transition-all"
+                                onClick={() => window.open(formData.ReceiptPreview, '_blank')}
+                                title="Click to view full size"
+                              >
+                                <img 
+                                  src={formData.ReceiptPreview} 
+                                  alt="Receipt preview" 
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <button 
+                                type="button"
+                                  onClick={() => console.log("BUTTON CLICKED")}
+                                className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                                title="Remove image"
+                              >
+                                <FaTimes size={14} />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        <ErrorMessage name="Receipt" component="div" className="text-red-500 text-xs mt-1" />
+                      </div>
                     </div>
                   </div>
-
                   <div className="mt-10 flex justify-center">
                     <button
                       type="submit"

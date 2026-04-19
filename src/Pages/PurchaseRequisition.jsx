@@ -1,12 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
-import { FaSearch } from "react-icons/fa";
 import Spinner from "../Components/Spinner";
 
 const PurchaseRequisitionList = () => {
-  const navigate = useNavigate();
   const name = localStorage.getItem("name");
   const role = localStorage.getItem("role");
   const [history, setHistory] = useState([]);
@@ -100,6 +97,7 @@ const PurchaseRequisitionList = () => {
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Supplier</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Quantity</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Total Cost</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Receipt No.</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Receipt</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Location</th>
                   </tr>
@@ -139,8 +137,20 @@ const PurchaseRequisitionList = () => {
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 font-semibold">
                           {Number(item.purchaseCost).toLocaleString()}
                         </td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 font-mono">
-                          {item.receiptNumber}
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                          <div className="font-mono mb-1">{item.receiptNumber}</div>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                          {item.receiptImage && (
+                            <div className="flex items-center gap-2">
+                              <img 
+                                src={`http://apiv2.cnhtc4.com/uploads/${item.receiptImage}`} 
+                                alt="Receipt" 
+                                className="w-12 h-12 object-cover rounded border"
+                                onError={(e) => { e.target.style.display = 'none'; }}
+                              />
+                            </div>
+                          )}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                           <span className={`px-2 py-1 rounded-full text-xs font-semibold ${item.location === 'Store' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>

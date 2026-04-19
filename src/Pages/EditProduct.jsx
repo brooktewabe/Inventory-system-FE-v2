@@ -256,7 +256,7 @@ const EditProduct = () => {
                     )}
                   </div>
 
-                  <div className="flex mt-2">
+                  {/* <div className="flex mt-2">
                     <input
                       type="file"
                       id="Product_image"
@@ -272,7 +272,7 @@ const EditProduct = () => {
                       <FaUpload size={16} />
                       Upload Image
                     </label>
-                  </div>
+                  </div> */}
                 </div>
                 <div className="space-y-4">
                 {customColumns

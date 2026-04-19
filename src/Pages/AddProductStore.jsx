@@ -260,10 +260,9 @@ const AddProduct = () => {
                         />
                       </div>
 
-                      <div>
+                      {/* <div>
                         <label className="block text-sm mb-1">Product Image</label>
                         <div className="flex items-center gap-4">
-                          {/* Upload Button (fixed size) */}
                           <div className="w-40">
                             <input
                               type="file"
@@ -289,7 +288,6 @@ const AddProduct = () => {
                             </label>
                           </div>
 
-                          {/* Image Preview */}
                           {ProductImagePreview && (
                             <div className="flex items-center gap-2">
                               <div
@@ -316,7 +314,7 @@ const AddProduct = () => {
                             </div>
                           )}
                         </div>
-                      </div>
+                      </div> */}
                     </div>
 
                     {/* Middle Column */}
