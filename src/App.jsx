@@ -34,6 +34,7 @@ import ForgotPassword from "./Pages/ForgotPassword";
 import ResetPassword from "./Pages/ResetPassword";
 import PurchaseRequisition from "./Pages/PurchaseRequisition";
 import AddPurchaseRequisition from "./Pages/AddPurchaseRequisition";
+import EditPurchaseRequisition from "./Pages/EditPurchaseRequisition";
 
 
 const App = () => {
@@ -87,6 +88,10 @@ const App = () => {
         <Route
           path='/add-purchase-requisition'
           element={<ProtectedRoute element={AddPurchaseRequisition} requiredPermissions={['add']} />}
+        />
+        <Route
+          path='/edit-purchase-requisition/:id'
+          element={<ProtectedRoute element={EditPurchaseRequisition} requiredPermissions={['add']} />}
         />
 
         {/* permission - store */}

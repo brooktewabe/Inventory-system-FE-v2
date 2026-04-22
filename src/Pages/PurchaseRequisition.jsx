@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
 import Spinner from "../Components/Spinner";
 
 const PurchaseRequisitionList = () => {
+  const navigate = useNavigate();
   const name = localStorage.getItem("name");
   const role = localStorage.getItem("role");
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -131,18 +133,19 @@ const PurchaseRequisitionList = () => {
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Receipt No.</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Receipt</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Location</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-100">
                   {loading ? (
                     <tr>
-                      <td colSpan="8" className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-center">
+                      <td colSpan="9" className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-center">
                         <Spinner />
                       </td>
                     </tr>
                   ) : history.length === 0 ? (
                     <tr>
-                      <td colSpan="8" className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-gray-400 font-medium italic text-center">
+                      <td colSpan="9" className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-gray-400 font-medium italic text-center">
                         No requisition records found.
                       </td>
                     </tr>
@@ -187,6 +190,14 @@ const PurchaseRequisitionList = () => {
                           <span className={`px-2 py-1 rounded-full text-xs font-semibold ${item.location === 'Store' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
                             {item.location}
                           </span>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => navigate(`/edit-purchase-requisition/${item.id}`)}
+                            className="text-blue-600 hover:text-blue-900 font-medium"
+                          >
+                            Edit
+                          </button>
                         </td>
                       </tr>
                     ))
