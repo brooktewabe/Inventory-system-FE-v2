@@ -44,7 +44,7 @@ const ItemSelector = ({
   const fetchStock = async (query = "") => {
     try {
       const response = await axios.get(
-        `https://apiv2.cnhtc4.com/stock/all/store?search=${query}`
+        `https://apiv2.cnhtc4.com/stock/all/warehouse?search=${query}`
       );
       setSale(response.data.data || []);
     } catch (error) {

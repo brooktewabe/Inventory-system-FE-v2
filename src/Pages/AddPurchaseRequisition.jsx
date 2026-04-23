@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -7,7 +7,8 @@ import withAuth from "../withAuth";
 import { FaInfoCircle, FaSearch, FaCalendarAlt, FaUser, FaFileInvoice, FaHashtag, FaMoneyBillWave, FaPercentage, FaTimes, FaUpload } from "react-icons/fa";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import Spinner from "../Components/Spinner";
+import DropdownSearch from "../Components/DropdownSearch";
+import DropdownSearchWarehouse from "../Components/DropdownSearchWarehouse";
 
 const AddPurchaseRequisition = () => {
   const navigate = useNavigate();
@@ -15,32 +16,12 @@ const AddPurchaseRequisition = () => {
   const name = localStorage.getItem("name");
   const role = localStorage.getItem("role");
 
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({ Receipt: null, ReceiptPreview: null });
   const [selectedReceipt, setSelectedReceipt] = useState(null);
 
   // Pre-selected context: 'store' or 'warehouse'
   const contextType = location.state?.type || "store"; 
   const preSelectedId = location.state?.stockId || "";
-
-  useEffect(() => {
-    fetchProducts(contextType);
-  }, [contextType]);
-
-  const fetchProducts = async (type) => {
-    try {
-      const endpoint = `https://apiv2.cnhtc4.com/stock/all/${type}`;
-      const response = await axios.get(endpoint);
-      const data = response.data.data || response.data;
-      setProducts(data);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      toast.error("Failed to load products");
-      setLoading(false);
-    }
-  };
 
   const initialValues = {
     purchaseDate: new Date().toISOString().split("T")[0],
@@ -56,7 +37,7 @@ const AddPurchaseRequisition = () => {
 
   const validationSchema = Yup.object().shape({
     purchaseDate: Yup.date().required("Required"),
-    stockId: Yup.string().required("Please select a product"),
+    stockId: Yup.mixed().required("Please select a product"),
     supplierName: Yup.string().required("Required"),
     supplierTinNumber: Yup.string().required("Required"),
     receiptNumber: Yup.string().required("Required"),
@@ -105,8 +86,6 @@ const AddPurchaseRequisition = () => {
     }
   };
 
-  if (loading) return <Spinner />;
-
   return (
     <section className="bg-[#edf0f0b9] min-h-screen">
       <div className="container m-auto">
@@ -153,7 +132,7 @@ const AddPurchaseRequisition = () => {
               onSubmit={handleSubmit}
               enableReinitialize={true}
             >
-              {({ isSubmitting }) => (
+              {({ isSubmitting, values, setFieldValue }) => (
                 <Form>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
                     {/* Left Column */}
@@ -174,19 +153,35 @@ const AddPurchaseRequisition = () => {
                         <label className="block text-sm font-medium mb-1 flex items-center gap-1">
                           <FaSearch className="text-gray-400 text-xs" /> Product
                         </label>
-                        <Field
-                          as="select"
-                          name="stockId"
-                          className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-md focus:ring-1 focus:ring-blue-500 outline-none bg-white"
-                        >
-                          <option value="">Select Product...</option>
-                          {products.map((p) => (
-                            <option key={p.id} value={p.id}>
-                              {p.Name} ({p.Curent_stock} in stock)
-                            </option>
-                          ))}
-                        </Field>
-                        <ErrorMessage name="stockId" component="div" className="text-red-500 text-xs mt-1" />
+                        {contextType === "warehouse" ? (
+                          <DropdownSearchWarehouse
+                            label=""
+                            value={values.stockId}
+                            onChange={(selectedId) => setFieldValue("stockId", selectedId)}
+                            placeholder="Select Product..."
+                            helperText={
+                              <ErrorMessage
+                                name="stockId"
+                                component="div"
+                                className="text-red-500 text-xs mt-1"
+                              />
+                            }
+                          />
+                        ) : (
+                          <DropdownSearch
+                            label=""
+                            value={values.stockId}
+                            onChange={(selectedId) => setFieldValue("stockId", selectedId)}
+                            placeholder="Select Product..."
+                            helperText={
+                              <ErrorMessage
+                                name="stockId"
+                                component="div"
+                                className="text-red-500 text-xs mt-1"
+                              />
+                            }
+                          />
+                        )}
                       </div>
 
                       <div>
