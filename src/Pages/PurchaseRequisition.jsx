@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "../axiosInterceptor";
 import withAuth from "../withAuth";
 import Spinner from "../Components/Spinner";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 const PurchaseRequisitionList = () => {
   const navigate = useNavigate();
@@ -44,6 +46,27 @@ const PurchaseRequisitionList = () => {
     if (page > 0 && page <= totalPages) {
       setCurrentPage(page);
     }
+  };
+
+  const handleDelete = async (id) => {
+    Swal.fire({
+      text: "Are you sure you want to delete this requisition?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axios.delete(`https://apiv2.cnhtc4.com/purchase-requisition/${id}`);
+          setHistory(history.filter((item) => item.id !== id));
+          toast.success("Deleted successfully.");
+        } catch (error) {
+          toast.error("Failed to delete requisition.");
+        }
+      }
+    });
   };
 
   return (
@@ -139,13 +162,13 @@ const PurchaseRequisitionList = () => {
                 <tbody className="bg-white divide-y divide-gray-100">
                   {loading ? (
                     <tr>
-                      <td colSpan="9" className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-center">
+                      <td colSpan="10" className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-center">
                         <Spinner />
                       </td>
                     </tr>
                   ) : history.length === 0 ? (
                     <tr>
-                      <td colSpan="9" className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-gray-400 font-medium italic text-center">
+                      <td colSpan="10" className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 text-gray-400 font-medium italic text-center">
                         No requisition records found.
                       </td>
                     </tr>
@@ -191,12 +214,18 @@ const PurchaseRequisitionList = () => {
                             {item.location}
                           </span>
                         </td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
                           <button
                             onClick={() => navigate(`/edit-purchase-requisition/${item.id}`)}
-                            className="text-blue-600 hover:text-blue-900 font-medium"
+                            className="text-blue-600 hover:text-blue-900 font-medium mr-3"
                           >
                             Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item.id)}
+                            className="text-red-500 hover:text-red-700 font-medium"
+                          >
+                            Delete
                           </button>
                         </td>
                       </tr>
