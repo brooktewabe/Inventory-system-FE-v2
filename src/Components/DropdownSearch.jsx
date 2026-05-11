@@ -19,13 +19,14 @@ const ItemSelector = ({
   const [sale, setSale] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedItemCache, setSelectedItemCache] = useState(null);
   const dropdownRef = useRef();
 
   const selectedValue =
     value !== undefined ? value : item?.itemName;
   const selectedItem = sale.find(
     (stockItem) => String(stockItem.id) === String(selectedValue)
-  );
+  ) || selectedItemCache;
   const reservedIds =
     selectedIds.length > 0
       ? selectedIds.map((id) => String(id))
@@ -33,27 +34,45 @@ const ItemSelector = ({
         ? getSelectedIds().map((id) => String(id))
         : [];
 
+  const fetchStock = async (query = "") => {
+    try {
+      const response = await axios.get(
+        `https://apiv2.cnhtc4.com/stock/all/store?search=${query}`
+      );
+      const newData = response.data.data || [];
+      
+      // If there's a selected item cached, ensure it stays in the list
+      if (selectedValue && selectedItemCache) {
+        const selectedExists = newData.some(
+          (item) => String(item.id) === String(selectedValue)
+        );
+        
+        if (!selectedExists) {
+          // Add the cached selected item to the beginning of the list
+          setSale([selectedItemCache, ...newData]);
+        } else {
+          setSale(newData);
+        }
+      } else {
+        setSale(newData);
+      }
+    } catch (error) {
+      console.error("Error fetching stock:", error);
+    }
+  };
+
   // Debounced search
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       fetchStock(searchTerm);
     }, 300);
     return () => clearTimeout(delayDebounce);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm]);
-
-  const fetchStock = async (query = "") => {
-    try {
-      const response = await axios.get(
-        `https://apiv2.cnhtc4.com/stock/all/store?search=${query}`
-      );
-      setSale(response.data.data || []);
-    } catch (error) {
-      console.error("Error fetching stock:", error);
-    }
-  };
 
   useEffect(() => {
     fetchStock();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Close dropdown on outside click
@@ -111,6 +130,9 @@ const ItemSelector = ({
                   }`}
                   onClick={() => {
                     if (!isDisabled) {
+                      // Cache the selected item before closing
+                      setSelectedItemCache(sl);
+                      
                       if (onChange) {
                         onChange(sl.id, sl);
                       } else if (handleItemChange) {
@@ -137,7 +159,8 @@ const ItemSelector = ({
 ItemSelector.propTypes = {
   index: PropTypes.number,
   item: PropTypes.shape({
-    itemName: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    itemName: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   }),
   handleItemChange: PropTypes.func,
   getSelectedIds: PropTypes.func,
